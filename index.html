@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login - SISTEMA TUTORÍAS</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="container">
+    <div class="card">
+      <div class="brand">
+        <img src="https://raw.githubusercontent.com/github/explore/main/topics/university/university.png" alt="logo" />
+        <h1>SISTEMA TUTORÍAS</h1>
+      </div>
+
+      <form id="loginForm" novalidate>
+        <h2>Iniciar sesión</h2>
+
+        <label for="email">Correo electrónico</label>
+        <input id="email" name="email" type="email" placeholder="tu@correo.edu" required />
+
+        <label for="password">Contraseña</label>
+        <input id="password" name="password" type="password" placeholder="●●●●●●●●" required minlength="6" />
+
+        <div class="row">
+          <label class="checkbox">
+            <input id="remember" name="remember" type="checkbox" />
+            Recordarme
+          </label>
+          <a class="link" href="#">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <button type="submit" class="btn">Entrar</button>
+
+        <div class="separator">o</div>
+
+        <button type="button" class="btn ghost" onclick="alert('Simulación: Iniciar con Google')">
+          Iniciar con Google
+        </button>
+
+        <p class="foot">
+          ¿No tienes cuenta?
+          <a href="#">Registrarse</a>
+        </p>
+      </form>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
