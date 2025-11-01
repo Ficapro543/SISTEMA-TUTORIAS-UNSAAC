@@ -8,33 +8,28 @@ function App() {
   const handleForgotPassword = () => {
     navigate("/recuperar");
   };
+
   const handleRegister = () => {
     navigate("/registro");
   };
+
   const handleGoogleLogin = () => {
+    // Simulación — aquí irá tu lógica real de autenticación con Google
     alert("🔐 Conexión con Google iniciada (pendiente de backend)");
   };
 
   return (
     <div className="login-page">
-      {/* ENCABEZADO */}
+      {/* Encabezado */}
       <header className="header">
-        <img
-          src="/logo_izquierdo.png"
-          alt="Logo Izquierdo"
-          className="logo logo-left"
-        />
+        <img src="/logo_izquierdo.png" alt="Logo Izquierdo" className="logo" />
         <h1 className="title">SISTEMA DE TUTORÍAS UNSAAC</h1>
-        <img
-          src="/logo_derecho.png"
-          alt="Logo Derecho"
-          className="logo logo-right"
-        />
+        <img src="/logo_derecho.png" alt="Logo Derecho" className="logo" />
       </header>
 
-      {/* LOGIN */}
+      {/* Cuadro de login */}
       <div className="login-container">
-        <h>Iniciar Sesión</h>
+        <h2>Iniciar Sesión</h2>
 
         <form className="login-form">
           <div className="form-group">
@@ -51,25 +46,29 @@ function App() {
             Ingresar
           </button>
 
-          <p className="forgot-password">¿Olvidaste tu contraseña?</p>
+          <p className="forgot-password" onClick={handleForgotPassword}>
+            ¿Olvidaste tu contraseña?
+          </p>
         </form>
 
         <div className="divider">
           <span>O continúa con</span>
         </div>
 
-        <button className="google-btn">
+        <button className="google-btn" onClick={handleGoogleLogin}>
           <img src="/google.svg" alt="Google" />
           Continuar con Google
         </button>
 
         <div className="register-section">
           <p>¿No tienes cuenta?</p>
-          <button className="register-btn">Registrarse aquí</button>
+          <button className="register-btn" onClick={handleRegister}>
+            Registrarse aquí
+          </button>
         </div>
       </div>
 
-      {/* PIE DE PÁGINA */}
+      {/* Pie de página */}
       <footer className="footer">
         © 2025 Universidad Nacional de San Antonio Abad del Cusco — Todos los
         derechos reservados.
