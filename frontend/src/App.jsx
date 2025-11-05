@@ -1,79 +1,21 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import "./App.css";
+import {Routes, Route, BrowserRouter} from 'react-router-dom';
+import Login from './pages/Login.jsx';
+import Login2 from './pages/Login2.jsx';
+import Register from './pages/Registro.jsx';
+import ForgotPassword from './pages/ForgotPassword.jsx';
+import BackendStatus from './pages/BackendStatus.jsx';
+import { Navigate } from 'react-router-dom';
 
-function App() {
-  const navigate = useNavigate();
-
-  const handleForgotPassword = () => {
-    navigate("/recuperar");
-  };
-
-  const handleRegister = () => {
-    navigate("/registro");
-  };
-
-  const handleGoogleLogin = () => {
-    // Simulación — aquí irá tu lógica real de autenticación con Google
-    alert("🔐 Conexión con Google iniciada (pendiente de backend)");
-  };
-
-  return (
-    <div className="login-page">
-      {/* Encabezado */}
-      <header className="header">
-        <img src="/logo_izquierdo.png" alt="Logo Izquierdo" className="logo" />
-        <h1 className="title">SISTEMA DE TUTORÍAS UNSAAC</h1>
-        <img src="/logo_derecho.png" alt="Logo Derecho" className="logo" />
-      </header>
-
-      {/* Cuadro de login */}
-      <div className="login-container">
-        <h2>Iniciar Sesión</h2>
-
-        <form className="login-form">
-          <div className="form-group">
-            <label>Correo electrónico</label>
-            <input type="email" placeholder="Ingresa tu correo" />
-          </div>
-
-          <div className="form-group">
-            <label>Contraseña</label>
-            <input type="password" placeholder="Ingresa tu contraseña" />
-          </div>
-
-          <button type="submit" className="login-btn">
-            Ingresar
-          </button>
-
-          <p className="forgot-password" onClick={handleForgotPassword}>
-            ¿Olvidaste tu contraseña?
-          </p>
-        </form>
-
-        <div className="divider">
-          <span>O continúa con</span>
-        </div>
-
-        <button className="google-btn" onClick={handleGoogleLogin}>
-          <img src="/google.svg" alt="Google" />
-          Continuar con Google
-        </button>
-
-        <div className="register-section">
-          <p>¿No tienes cuenta?</p>
-          <button className="register-btn" onClick={handleRegister}>
-            Registrarse aquí
-          </button>
-        </div>
-      </div>
-
-      {/* Pie de página */}
-      <footer className="footer">
-        © 2025 Universidad Nacional de San Antonio Abad del Cusco — Todos los
-        derechos reservados.
-      </footer>
-    </div>
+function App(){
+  return(
+    <Routes>
+      <Route path='/login' element={<Login/>}/>
+      <Route path='/login2' element={<Login2/>}/>
+      <Route path="/registro" element={<Register />} />
+      <Route path="/recuperar" element={<ForgotPassword />} />
+      <Route path="/ping" element={<BackendStatus />} />
+      <Route path = "*" element={<Navigate to = "/ping" replace />} />
+    </Routes>
   );
 }
 
