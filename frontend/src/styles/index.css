@@ -1,6 +1,9 @@
 @import "tailwindcss";
+@import "./base/variables.css";
+@import "./base/globals.css";
+@import "./App.css";
 
-/* estilos extra (opcionales) */
+/* estilos extra adicionales */
 html, body, #root {
   height: 100%;
 }

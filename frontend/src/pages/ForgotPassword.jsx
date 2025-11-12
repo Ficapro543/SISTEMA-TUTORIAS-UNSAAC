@@ -5,7 +5,7 @@ function ForgotPassword() {
   const navigate = useNavigate();
 
   const handleGoBack = () => {
-    navigate("/");
+    navigate("/login");
   };
 
   return (
