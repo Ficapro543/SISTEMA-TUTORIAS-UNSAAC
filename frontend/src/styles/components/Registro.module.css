@@ -1,0 +1,225 @@
+/* Fondo General */
+.registerPage{
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
+    font-family: var(--font-main);
+    color: var(--color-text-light);
+    padding: 40px;
+}
+
+/* Contenedor del registro */
+.registerContainer{
+    background-color: var(--color-text-light);
+    color: var(--color-secondary);
+    padding: 45px 70px;
+    border-radius: 25px;
+    margin-top: 40px auto;
+    width: 600px;
+    max-width: 90%;
+    box-shadow: var(--shadow);
+    text-align: center;
+}
+
+.registerContainer h2{
+    margin-bottom: 10px;
+    color: var(--color-secondary);
+    font-size: 1.8rem;
+}
+
+/*Subtitulo*/
+.subtitle{
+    font-size: 1rem;
+    color: var(--color-gray);
+    margin-bottom: 20px;
+}
+
+/* Formularios */
+.formGroup{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.formGroup label{
+    margin-bottom: 6px;
+    font-weight: bold;
+    font-size: 0.95rem;
+}
+
+.formGroup input{
+    width: 100%;
+    padding: 12px;
+    border: 2px solid var(--color-primary);
+    border-radius: var(--radius);
+    font-size: 1rem;
+}
+
+.formGroup input:focus {
+    border-color: var(--color-secondary);
+    outline: none;
+}
+
+.inputError{
+    border-color: crimson !important; 
+    background-color: #ffe6e6 !important;
+}
+
+/*Campos en fila*/
+.row{
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.half{
+    flex: 1;
+}
+
+.rolesLabel{
+    text-align: left;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: var(--color-secondary)
+}
+
+.rolesContainer{
+    display:flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.rol{
+    background-color: var(--color-gray-light);
+    border: 2px solid var(--color-primary);
+    border-radius: var(--radius);
+    padding: 10px 18px;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--color-secondary);
+    flex: 1;
+    min-width: 120px;
+    justify-content: center;
+}
+
+.rol:hover{
+    background-color: var(--color-primary);
+    color: var(--color-text-light);
+}
+
+.rol.activo{
+    background-color: var(--color-primary);
+    color: var(--color-text-light);
+    border-color: var(--color-secondary);
+}
+
+/* Mensajes */
+.errorMessage{
+    color: crimson;
+    font-size: 0.9rem;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.succesMessage{
+    color: seagreen;
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+/*Boton Principal*/
+.registerBtn{
+    width: 100%;
+    background: var(--color-primary);
+    color: var(--color-text-light);
+    padding: 13px;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 1.05rem;
+    font-weight: bold;
+    margin-top: 10px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.registerBtn:hover{
+    background: var(--color-secondary);
+}
+
+/* Separador */
+.divider{
+    margin: 30px 0 20px;
+    position: relative;
+    color: #777;
+    font-size: 0.9rem;
+}
+
+.divider::before,
+.divider::after{
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 30%;
+    height: 1px;
+    background-color: var(--color-border);
+}
+
+.divider::before{
+    left: 0;
+}
+
+.divider::after{
+    right: 0;
+}
+
+/* Google button */
+.googleBtn{
+    composes: google-btn from global;
+}
+
+/* Seccion de Login */
+.loginSection{
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.loginSection p{
+    color: var(--color-gray);
+    font-size: 0.95rem;
+}
+
+.loginBtn{
+    background: none;
+    border: none;
+    color: var(--color-primary);
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: var(--transition);
+    border-radius: var(--radius);
+}
+
+.loginBtn:hover{
+    text-decoration: underline;
+}
+
+/* Pie de pagina */
+.footer{
+    margin-top: 40px;
+    font-size: 0.85rem;
+    color: var(--color-gray);
+    text-align: center;
+}
