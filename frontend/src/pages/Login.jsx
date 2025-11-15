@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/components/Login.css";
+import styles from "../styles/components/Login.module.css";
 
 function Login() {
   const navigate = useNavigate();
@@ -82,75 +82,62 @@ function Login() {
   };
 
   return (
-    <div className="login-page">
-      {/* Encabezado */}
-      <header className="header">
-        <img src="/logo_izquierdo.png" alt="Logo Izquierdo" className="logo" />
-        <h1 className="title">SISTEMA DE TUTORÍAS UNSAAC</h1>
-        <img src="/logo_derecho.png" alt="Logo Derecho" className="logo" />
-      </header>
-
+    <div className={styles.loginPage}>
       {/* Cuadro de login */}
-      <div className="login-container">
+      <div className={styles.loginContainer}>
         <h2>Iniciar Sesión</h2>
 
-        <form className="login-form" onSubmit={handleSubmit}>
-          <div className="form-group">
+        <form className={styles.loginForm} onSubmit={handleSubmit}>
+          <div className={styles.formGroup}>
             <label>Correo electrónico</label>
             <input
               type="text"
               placeholder="ejemplo@unsaac.edu.pe"
               value={email}
               onChange={(e)=> setEmail(e.target.value)}
-              className={error && !emailRegex.test(email)?"input-error":""}
+              className={error && !emailRegex.test(email)?styles.inputError:""}
               autoComplete="off"
             />
           </div>
 
-          <div className="form-group">
+          <div className={styles.formGroup}>
             <label>Contraseña</label>
             <input 
               type="password" 
               placeholder="Ingresa tu contraseña" 
               value={password}
               onChange={(e)=> setPassword(e.target.value)}
-              className={error && !password ? "input-error":""}
+              className={error && !password ? styles.inputError:""}
             />
           </div>
           
-          {error && <p className="error-message">{error}</p>}
+          {error && <p className={styles.errorMessage}>{error}</p>}
 
-          <button type="submit" className="login-btn">
+          <button type="submit" className={styles.loginBtn}>
             Ingresar
           </button>
 
-          <p className="forgot-password" onClick={handleForgotPassword}>
+          <p className={styles.forgotPassword} onClick={handleForgotPassword}>
             ¿Olvidaste tu contraseña?
           </p>
         </form>
 
-        <div className="divider">
+        <div className={styles.divider}>
           <span>O continúa con</span>
         </div>
 
-        <button className="google-btn" onClick={handleGoogleLogin}>
+        <button className={styles.googleBtn} onClick={handleGoogleLogin}>
           <img src="/google.svg" alt="Google" />
           Continuar con Google
         </button>
 
-        <div className="register-section">
+        <div className={styles.registerSection}>
           <p>¿No tienes cuenta?</p>
-          <button className="register-btn" onClick={handleRegister}>
+          <button className={styles.registerBtn} onClick={handleRegister}>
             Registrarse aquí
           </button>
         </div>
       </div>
-
-      {/* Pie de página */}
-      <footer className="footer">
-        © 2025 Universidad Nacional de San Antonio Abad del Cusco — Todos los
-        derechos reservados.
-      </footer>
     </div>
   );
 }

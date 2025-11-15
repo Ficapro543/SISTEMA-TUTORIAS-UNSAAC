@@ -1,0 +1,404 @@
+/* Fondo General */
+.registerPage{
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
+    font-family: var(--font-main);
+    color: var(--color-text-light);
+    padding: 40px;
+}
+
+/* Contenedor del registro */
+.registerContainer{
+    background-color: var(--color-text-light);
+    color: var(--color-secondary);
+    padding: 45px 70px;
+    border-radius: 25px;
+    margin-top: 40px auto;
+    width: 600px;
+    max-width: 90%;
+    box-shadow: var(--shadow);
+    text-align: center;
+    position: relative;
+}
+
+.registerContainer h2{
+    margin-bottom: 0px;
+    color: var(--color-secondary);
+    font-size: 1.8rem;
+}
+
+/*Subtitulo*/
+.subtitle{
+    font-size: 1rem;
+    color: var(--color-gray);
+    margin-bottom: 30px;
+}
+
+/* Formularios */
+.formGroup{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.formGroup label{
+    margin-bottom: 4px;
+    font-weight: bold;
+    font-size: 0.95rem;
+}
+
+.passwordLabelContainer{
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 4px;
+}
+
+.passwordLabelContainer label{
+    margin-bottom: 0;
+}
+
+.passwordLabelContainer .infoIcon{
+    position: static;
+    width: 16px;
+    height: 16px;
+    background: var(--color-gray-light);
+    color: var(--color-gray);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    cursor: help;
+    transition: var(--transition);
+}
+
+.passwordLabelContainer .infoIcon:hover{
+    background: var(--color-secondary);
+    color: var(--color-text-light)
+}
+
+/* Contenedor Contraseña*/
+.passwordInputWrapper{
+    position: relative;
+    width: 100%;
+}
+
+.passwordInput{
+    width: 100%;
+    padding: 12px;
+    border-radius: var(--radius);
+    background-color: var(--color-gray-light);
+    font-size: 0.95rem;
+    border: 2px solid transparent;
+    padding-right: 45px;
+    transition: var(--transition);
+}
+
+.passwordInput:focus{
+    border-color: var(--color-secondary);
+    outline: none;
+    background-color: white;
+}
+
+/*Boton*/
+.togglePasswordBtn{
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.togglePasswordBtn:hover{
+    background-color: var(--color-gray-light);
+}
+
+.togglePasswordBtn img{
+    width: 20px;
+    height: 20px;
+    filter: brightness(0) saturate(100%) invert(23%) sepia(98%) saturate(1385%) hue-rotate(195deg) brightness(93%) contrast(101%);
+}
+
+.togglePasswordBtn:hover img{
+    filter: brightness(0) saturate(100%) invert(23%) sepia(98%) saturate(1385%) hue-rotate(195deg) brightness(73%) contrast(101%);
+}
+
+.formGroup input{
+    width: 100%;
+    padding: 12px;
+    border-radius: var(--radius);
+    background-color: var(--color-gray-light);
+    font-size: 0.95rem;
+}
+
+.formGroup input:focus {
+    border-color: var(--color-secondary);
+    outline: none;
+}
+
+.inputError{
+    border-color: crimson !important; 
+    background-color: #ffe6e6 !important;
+}
+
+/*Campos en fila*/
+.row{
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.half{
+    flex: 1;
+}
+
+.rolesLabel{
+    text-align: left;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: var(--color-secondary);
+}
+
+.rolesContainer{
+    display:flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.rolCard{
+    flex: 1;
+    background: white;
+    border: 2px solid var(--color-gray-light);
+    border-radius: var(--radius);
+    padding: 20px 15px;
+    cursor: pointer;
+    transition: all var(--transition);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    min-height: 140px;
+}
+
+.rolCard:hover{
+    border-color: var(--color-primary);
+    box-shadow: 0 5px 15px rgba(0 , 0 , 0 , 0.1);
+}
+
+.rolCard.activo{
+    border-color: var(--color-primary);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    color: var(--color-text-light);
+    box-shadow: 0 8px 25px rgba(0 , 78 , 146 , 0.3);
+}
+
+.rolIcon{
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 5px;
+}
+
+.rolIcon img{
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: brightness(0) saturate(100%) invert(23%) sepia(98%) saturate(1385%) hue-rotate(195deg) brightness(93%) contrast(101%);
+}
+
+.rolCard.activo .rolIcon img{
+    filter: brightness(0) invert(1);
+}
+
+.rolName{
+    font-weight: 200;
+    font-size: 0.9rem;
+    text-align: center;
+    margin-top: auto;
+}
+
+.infoIcon{
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 18px;
+    height: 18px;
+    background: var(--color-gray-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    color: var(--color-gray);
+    cursor: help;
+    transition: var(--transition);
+    z-index: 10;
+}
+
+.infoIcon:hover{
+    background: var(--color-secondary);
+    color: var(--color-text-light);
+}
+
+.rolCard.activo .infoIcon{
+    background: var(--color-primary);
+    color: var(--color-text-light);
+}
+
+.rolCard.activo .infoIcon:hover{
+    background: var(--color-text-light);
+    color: var(--color-primary);
+}
+
+/* Tooltip */
+.tooltip{
+    position: fixed;
+    background: var(--color-secondary);
+    color: var(--color-text-light);
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    font-size: 0.8rem;
+    max-width: 250px;
+    z-index: 1000;
+    box-shadow: 0 4px 15px rgba(0 , 0 , 0 , 0.2);
+    pointer-events: none;
+    white-space: pre-line;
+    line-height: 1.4;
+    text-align: center;
+}
+
+.tooltipLeft{
+    text-align: left;
+    padding-left: 20px;
+}
+
+.tooltipArrow{
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid var(--color-secondary);
+}
+
+/* Mensajes */
+.errorMessage{
+    color: crimson;
+    font-size: 0.9rem;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.succesMessage{
+    color: seagreen;
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+/*Boton Principal*/
+.registerBtn{
+    width: 100%;
+    background: var(--color-primary);
+    color: var(--color-text-light);
+    padding: 13px;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 1.05rem;
+    font-weight: bold;
+    margin-top: 10px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.registerBtn:hover{
+    background: var(--color-secondary);
+}
+
+/* Separador */
+.divider{
+    margin: 30px 0 25px;
+    position: relative;
+    color: #777;
+    font-size: 0.9rem;
+}
+
+.divider::before,
+.divider::after{
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 30%;
+    height: 1px;
+    background-color: var(--color-border);
+}
+
+.divider::before{
+    left: 0;
+}
+
+.divider::after{
+    right: 0;
+}
+
+/* Google button */
+.googleBtn{
+    composes: google-btn from global;
+}
+
+/* Seccion de Login */
+.loginSection{
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.loginSection p{
+    color: var(--color-gray);
+    font-size: 0.95rem;
+}
+
+.loginBtn{
+    background: none;
+    border: none;
+    color: var(--color-primary);
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: var(--transition);
+    border-radius: var(--radius);
+}
+
+.loginBtn:hover{
+    text-decoration: underline;
+}
+
+/* Pie de pagina */
+.footer{
+    margin-top: 40px;
+    font-size: 0.85rem;
+    color: var(--color-gray);
+    text-align: center;
+}
