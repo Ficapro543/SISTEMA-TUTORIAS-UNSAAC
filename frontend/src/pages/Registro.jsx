@@ -16,6 +16,10 @@ function Register() {
   const [success, setSuccess] = useState("");
   const [tooltip, setTooltip] = useState({visible: false, content: "", x: 0, y: 0, align: 'center'});
 
+  // Estados para mostrar contraseña
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   // Regex correo institucional
   const emailRegex = /^[a-zA-Z0-9._%+-]+@unsaac\.edu\.pe$/;
 
@@ -206,24 +210,48 @@ function Register() {
                 ⓘ
               </div>
             </div>
-            <input 
-              type="password" 
-              placeholder="Ingrese su contraseña"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className={error && validarPassword(password) ? styles.inputError : ""}
-            />
+            <div className={styles.passwordInputWrapper}>
+              <input 
+                type={showPassword ? "text" : "password"}
+                placeholder="Ingrese su contraseña"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className={`${error && validarPassword(password) ? styles.inputError : ""} ${styles.passwordInput}`}
+              />
+              <button
+                type="button"
+                className={styles.togglePasswordBtn}
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                <img
+                  src={showPassword ? "/hidden.svg" : "/view.svg"}
+                  alt={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                />
+              </button>
+            </div>
           </div>
 
           <div className={styles.formGroup}>
             <label>Confirmar contraseña</label>
-            <input 
-              type="password"
-              placeholder="Confirme su contraseña"
-              value={confirmar}
-              onChange={(e) => setConfirmar(e.target.value)}
-              className={error && (!confirmar || confirmar !== password) ? styles.inputError : ""}
-            />
+            <div className={styles.passwordInputWrapper}>
+              <input 
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder="Confirme su contraseña"
+                value={confirmar}
+                onChange={(e) => setConfirmar(e.target.value)}
+                className={`${error && (!confirmar || confirmar !== password) ? styles.inputError : ""} ${styles.passwordInput}`}
+              />
+              <button
+                type="button"
+                className={styles.togglePasswordBtn}
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                <img
+                  src={showConfirmPassword ? "/hidden.svg" : "/view.svg"}
+                  alt={showConfirmPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                />
+              </button>
+            </div>
           </div>
 
           {/* Roles */}
