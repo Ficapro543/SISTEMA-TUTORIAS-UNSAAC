@@ -51,6 +51,37 @@
     font-size: 0.95rem;
 }
 
+.passwordLabelContainer{
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 4px;
+}
+
+.passwordLabelContainer label{
+    margin-bottom: 0;
+}
+
+.passwordLabelContainer .infoIcon{
+    position: static;
+    width: 16px;
+    height: 16px;
+    background: var(--color-gray-light);
+    color: var(--color-gray);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    cursor: help;
+    transition: var(--transition);
+}
+
+.passwordLabelContainer .infoIcon:hover{
+    background: var(--color-secondary);
+    color: var(--color-text-light)
+}
+
 .formGroup input{
     width: 100%;
     padding: 12px;
@@ -194,12 +225,21 @@
     z-index: 1000;
     box-shadow: 0 4px 15px rgba(0 , 0 , 0 , 0.2);
     pointer-events: none;
+    white-space: pre-line;
+    line-height: 1.4;
+    text-align: center;
+}
+
+.tooltipLeft{
+    text-align: left;
+    padding-left: 20px;
 }
 
 .tooltipArrow{
     position: absolute;
     bottom: -6px;
     left: 50%;
+    transform: translateX(-50%);
     width: 0;
     height: 0;
     border-left: 6px solid transparent;
@@ -243,7 +283,7 @@
 
 /* Separador */
 .divider{
-    margin: 30px 0 20px;
+    margin: 25px 0 15px;
     position: relative;
     color: #777;
     font-size: 0.9rem;

@@ -14,10 +14,30 @@ function Register() {
   const [rol, setRol] = useState([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [tooltip, setTooltip] = useState({visible: false, content: "", x: 0, y: 0});
+  const [tooltip, setTooltip] = useState({visible: false, content: "", x: 0, y: 0, align: 'center'});
 
   // Regex correo institucional
   const emailRegex = /^[a-zA-Z0-9._%+-]+@unsaac\.edu\.pe$/;
+
+  // Validacion contraseña
+  const validarPassword = (pass)=>{
+    if(pass.length < 8 || pass.length > 64){
+      return "La contraseña debe tener entre 8 y 64 caracteres.";
+    }
+    if(!/(?=.*[a-z])/.test(pass)){
+      return "La contraseña debe contener al menos una letra minúscula.";
+    }
+    if(!/(?=.*[A-Z])/.test(pass)){
+      return "La contraseña debe contener al menos una letra mayúscula.";
+    }
+    if(!/(?=.*\d)/.test(pass)){
+      return "La contraseña debe contener al menos un número.";
+    }
+    if(!/(?=.*[@$!%*?&])/.test(pass)){
+      return "La contraseña debe contener al menos un carácter especial (@$!%*?&).";
+    }
+    return null;
+  };
 
   // Funciones de manejo
   const handleRolClick = (rolSeleccionado) =>{
@@ -28,18 +48,21 @@ function Register() {
       );
   };
 
-  const handleTooltipShow = (content, event) => {
+  const handleTooltipShow = (content, event, type = 'rol') => {
     const rect = event.target.getBoundingClientRect();
+    const yOffset = type === 'password' ? -125 : -85;
+    const alineado = type === 'password' ? 'left' : 'center';
     setTooltip({
       visible: true,
       content,
-      x: (rect.left + rect.width / 2) - 5.5,
-      y: rect.top - 90,
+      x: (rect.left + rect.width / 2),
+      y: rect.top + yOffset,
+      align: alineado
     });
   };
 
   const handleTooltipHide = () => {
-    setTooltip({ visible: false, content: "", x: 0, y: 0 });
+    setTooltip({ visible: false, content: "", x: 0, y: 0, align: 'center' });
   }
 
   const handleSubmit = async (e) => {
@@ -58,8 +81,10 @@ function Register() {
       return;
     }
 
-    if(password.length < 8){
-      setError("La contraseña debe tener al menos 8 caracteres.");
+    // Validar contraseña con la función
+    const errorPassword = validarPassword(password);
+    if(errorPassword){
+      setError(errorPassword);
       return;
     }
 
@@ -125,6 +150,9 @@ function Register() {
     }
   ];
 
+  // Información de requisitos de contraseña
+  const passwordRequisitos = "• 8-64 caracteres\n• 1 letra mayúscula\n• 1 letra minúscula\n• 1 número\n• 1 símbolo (@, $, !, %, *, ?, &)";
+
   return (
     <div className={styles.registerPage}>
       <div className={styles.registerContainer}>
@@ -168,13 +196,22 @@ function Register() {
           </div>
 
           <div className={styles.formGroup}>
-            <label>Contraseña</label>
+            <div className={styles.passwordLabelContainer}>
+              <label>Contraseña</label>
+              <div 
+                className={styles.infoIcon}
+                onMouseEnter={(e)=>handleTooltipShow(passwordRequisitos, e, 'password')}
+                onMouseLeave={handleTooltipHide}
+              >
+                ⓘ
+              </div>
+            </div>
             <input 
               type="password" 
               placeholder="Ingrese su contraseña"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className={error && (!password || password.length < 8) ? styles.inputError : ""}
+              className={error && validarPassword(password) ? styles.inputError : ""}
             />
           </div>
 
@@ -204,7 +241,7 @@ function Register() {
                 <div className={styles.rolName}>{rolItem.nombre}</div>
                 <div
                   className={styles.infoIcon}
-                  onMouseEnter={(e)=>handleTooltipShow(rolItem.descripcion, e)}
+                  onMouseEnter={(e)=>handleTooltipShow(rolItem.descripcion, e, 'rol')}
                   onMouseLeave={handleTooltipHide}
                 >
                   ⓘ
@@ -216,7 +253,7 @@ function Register() {
           {/* Tooltip */}
           {tooltip.visible && (
             <div
-              className={styles.tooltip}
+              className={`${styles.tooltip} ${tooltip.align === 'left' ? styles.tooltipLeft : ""}`}
               style={{
                 left: `${tooltip.x}px`,
                 top: `${tooltip.y}px`,
@@ -237,7 +274,7 @@ function Register() {
           </button>
 
           <div className={styles.divider}>
-            <span>O continua con</span>
+            <span>O continúa con</span>
           </div>
 
           <button
