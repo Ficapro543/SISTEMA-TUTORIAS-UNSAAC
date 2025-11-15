@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/components/Registro.css"
+import styles from "../styles/components/Registro.module.css"
 
 function Register() {
   const navigate = useNavigate();
@@ -14,6 +14,7 @@ function Register() {
   const [rol, setRol] = useState([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [tooltip, setTooltip] = useState({visible: false, content: "", x: 0, y: 0});
 
   // Regex correo institucional
   const emailRegex = /^[a-zA-Z0-9._%+-]+@unsaac\.edu\.pe$/;
@@ -26,6 +27,20 @@ function Register() {
         : [...prev, rolSeleccionado]
       );
   };
+
+  const handleTooltipShow = (content, event) => {
+    const rect = event.target.getBoundingClientRect();
+    setTooltip({
+      visible: true,
+      content,
+      x: (rect.left + rect.width / 2) - 5.5,
+      y: rect.top - 90,
+    });
+  };
+
+  const handleTooltipHide = () => {
+    setTooltip({ visible: false, content: "", x: 0, y: 0 });
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -88,110 +103,146 @@ function Register() {
     navigate("/login");
   };
 
+  // Datos de los roles
+  const rolesData = [
+    {
+      id: "Tutor",
+      nombre: "Tutor",
+      imagen: "/tutorIcon.svg",
+      descripcion: "Registra y actualiza las tutorías de sus estudiantes; emite constancias y listados de tutorados."
+    },
+    {
+      id: "evaluador", 
+      nombre: "Evaluador",
+      imagen: "/EvaluadorIcon.svg",
+      descripcion: "Verifica el seguimiento de estudiantes tutorados y revisa el trabajo realizado por cada tutor."
+    },
+    {
+      id: "administrador",
+      nombre: "Administrador",
+      imagen: "/adminIcon.svg",
+      descripcion: "Gestiona el cronograma de tutorías, tutores y administra la información de cada estudiante."
+    }
+  ];
+
   return (
-    <div className="login-page">
-      {/* Encabezado */}
-      <header className="header">
-        <img src="/logo_izquierdo.png" alt="Logo IN" className="logo" />
-        <h1 className="title">SISTEMA DE TUTORIAS UNSAAC</h1>
-        <img src="/logo_derecho.png" alt="Logo UNSAAC" className="logo" />
-      </header>
-
-      <div className="login-container">
+    <div className={styles.registerPage}>
+      <div className={styles.registerContainer}>
         <h2>Registro</h2>
-        <p className="subtitle">Solicitar acceso al sistema</p>
+        <p className={styles.subtitle}>Solicitar acceso al sistema</p>
 
-        <form className="login-form" onSubmit={handleSubmit}>
-          <div className="row">
-            <div className="form-group half">
+        <form className={styles.registerForm} onSubmit={handleSubmit}>
+          <div className={styles.row}>
+            <div className={`${styles.formGroup} ${styles.half}`}>
               <label>Nombres</label>
               <input
                 type="text"
-                placeholder="Ingresa tus nombres"
+                placeholder="Ingrese su nombre"
                 value={nombres}
                 onChange={(e)=>setNombres(e.target.value)}
+                className={error && !nombres ? styles.inputError : ""}
               />
             </div>
 
-            <div className="form-group half">
+            <div className={`${styles.formGroup} ${styles.half}`}>
               <label>Apellidos</label>
               <input
                 type="text"
-                placeholder="Ingresa tus apellidos"
+                placeholder="Ingrese sus apellidos"
                 value={apellidos}
                 onChange={(e)=>setApellidos(e.target.value)}
+                className={error && !apellidos ? styles.inputError : ""}
               />
             </div>
           </div>
 
-          <div className="form-group">
+          <div className={styles.formGroup}>
             <label>Correo electrónico</label>
             <input 
               type="text" 
               placeholder="ejemplo@unsaac.edu.pe"
               value={correo}
               onChange={(e) => setCorreo(e.target.value)}
+              className={error && (!correo || !emailRegex.test(correo)) ? styles.inputError : ""}
             />
           </div>
 
-          <div className="form-group">
+          <div className={styles.formGroup}>
             <label>Contraseña</label>
             <input 
               type="password" 
-              placeholder="Crea una contraseña"
+              placeholder="Ingrese su contraseña"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              className={error && (!password || password.length < 8) ? styles.inputError : ""}
             />
           </div>
 
-          <div className="form-group">
+          <div className={styles.formGroup}>
             <label>Confirmar contraseña</label>
             <input 
               type="password"
-              placeholder="Repite tu contraseña"
+              placeholder="Confirme su contraseña"
               value={confirmar}
               onChange={(e) => setConfirmar(e.target.value)}
+              className={error && (!confirmar || confirmar !== password) ? styles.inputError : ""}
             />
           </div>
 
           {/* Roles */}
-          <p className="roles-label">Selecciona tus roles</p>
-          <div className="roles-container">
-            <div
-              className={`rol ${rol.includes("docente")?"activo":""}`}
-              onClick={() => handleRolClick("docente")}
-            >
-              <span>🎈</span>Docente
-            </div>
-            <div
-              className={`rol ${rol.includes("evaluador")?"activo":""}`}
-              onClick={() => handleRolClick("evaluador")}
-            >
-              <span>🎈</span>Evaluador
-            </div>
-            <div
-              className={`rol ${rol.includes("administrador")?"activo":""}`}
-              onClick={() => handleRolClick("administrador")}
-            >
-              <span>🎈</span>Administrador
-            </div>
+          <p className={styles.rolesLabel}>Selecciona tus roles</p>
+          <div className={styles.rolesContainer}>
+            {rolesData.map((rolItem) => (
+              <div
+                key={rolItem.id}
+                className={`${styles.rolCard} ${rol.includes(rolItem.id) ? styles.activo : ""}`}
+                onClick={()=>handleRolClick(rolItem.id)}
+              >
+                <div className={styles.rolIcon}>
+                  <img src={rolItem.imagen} alt={rolItem.nombre}/>
+                </div>
+                <div className={styles.rolName}>{rolItem.nombre}</div>
+                <div
+                  className={styles.infoIcon}
+                  onMouseEnter={(e)=>handleTooltipShow(rolItem.descripcion, e)}
+                  onMouseLeave={handleTooltipHide}
+                >
+                  ⓘ
+                </div>
+              </div>
+            ))}
           </div>
 
-          {/*Mensajes*/}
-          {error && <p className="error-message">{error}</p>}
-          {success && <p className="success-message">{success}</p>}
+          {/* Tooltip */}
+          {tooltip.visible && (
+            <div
+              className={styles.tooltip}
+              style={{
+                left: `${tooltip.x}px`,
+                top: `${tooltip.y}px`,
+                transform: "translateX(-50%)",
+              }}
+            >
+              {tooltip.content}
+              <div className={styles.tooltipArrow}></div>
+            </div>
+          )}
 
-          <button type="submit" className="login-btn">
+          {/*Mensajes*/}
+          {error && <p className={styles.errorMessage}>{error}</p>}
+          {success && <p className={styles.successMessage}>{success}</p>}
+
+          <button type="submit" className={styles.registerBtn}>
             Registrarse
           </button>
 
-          <div className="divider">
+          <div className={styles.divider}>
             <span>O continua con</span>
           </div>
 
           <button
             type="button"
-            className="google-btn"
+            className={styles.googleBtn}
             onClick={()=>
               alert("🔐 Conexión con Google pendiente de backend.")
             }
@@ -200,11 +251,11 @@ function Register() {
             Continuar con Google
           </button>
 
-          <div className="register-section">
+          <div className={styles.loginSection}>
             <p>¿Ya tienes cuenta?</p>
             <button
               type="button"
-              className="register-btn"
+              className={styles.loginBtn}
               onClick={handleGoBack}
             >
               Inicia sesión
@@ -212,12 +263,6 @@ function Register() {
           </div>
         </form>
       </div>
-
-      {/* Pie de página */}
-      <footer className="footer">
-        © 2025 Universidad Nacional de San Antonio Abad del Cusco — Todos los
-        derechos reservados.
-      </footer>
     </div>
   );
 }
