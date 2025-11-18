@@ -117,10 +117,19 @@ function Register() {
       });
 
       const data = await response.json();
-      if(response.ok){
-        setSuccess(`Su solicitud fue recibida. Se le enviará un correo a ${correo} indicando el estado de su registro`);
-        setTimeout(() => navigate("/login"), 4000);
-      }else{
+      if(response.ok)
+      {
+        // setSuccess(`Su solicitud fue recibida. Se le enviará un correo a ${correo} indicando el estado de su registro`);
+        // setTimeout(() => navigate("/login"), 4000);
+        navigate("registro/confirmacion", { 
+          state: { 
+            email: correo,
+            nombres: nombres 
+          }
+        });
+      }
+      else
+      {
         setError(data.message || "Error en el registro. Inténtalo de nuevo.");
       }
     } catch(err){

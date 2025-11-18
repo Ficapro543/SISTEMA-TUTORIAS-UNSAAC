@@ -1,0 +1,144 @@
+.confirmationPage{
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
+    font-family: var(--font-main);
+    color: var(--color-text-light);
+    padding: 40px;
+}
+
+/*Contenedor principal*/
+.confirmationContainer{
+    background-color: var(--color-text-light);
+    color: var(--color-secondary);
+    padding: 45px 70px;
+    border-radius: 25px;
+    margin-top: 40px auto;
+    width: 600px;
+    max-width: 90%;
+    box-shadow: var(--shadow);
+    text-align: center;
+}
+
+/*Header*/
+.successHeader{
+    margin-bottom: 40px;
+}
+
+.checkIcon{
+    width: 80px;
+    height: 80px;
+    background: rgba(46, 204, 113, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    padding: 15px;
+}
+
+.checkIcon img{
+    width: 40px;
+    height: 40px;
+    filter: brightness(0) saturate(100%) invert(47%) sepia(98%) saturate(388%) hue-rotate(91deg) brightness(95%) contrast(101%);
+}
+
+.successHeader h1{
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+    color: var(--color-secondary);
+}
+
+.subtitle{
+    font-size: 1.1rem;
+    color: var(--color-gray);
+    margin-bottom: 0;
+}
+
+/*Tarjetas de informacion - Contenedores*/
+.infoCard{
+    background-color: var(--color-gray-light);
+    border-radius: var(--radius);
+    padding: 25px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    text-align: left;
+    border: 2px solid transparent;
+    transition: var(--transition);
+}
+
+.infoCard:hover{
+    border-color: var(--color-primary);
+}
+
+.emailCard{
+    background: rgba(0, 78, 146, 0.1);
+    border: 2px solid var(--color-primary);
+}
+
+.cardIcon{
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    background: var(--color-text-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.cardIcon img{
+    width: 25%;
+    height: 25%;
+}
+
+.infoCard .cardIcon img{
+    filter: brightness(0) saturate(100%) invert(23%) sepia(98%) saturate(1385%) hue-rotate(195deg) brightness(93%) contrast(101%);
+}
+
+.emailCard .cardIcon img{
+    filter: brightness(0) saturate(100%) invert(23%) sepia(98%) saturate(1385%) hue-rotate(195deg) brightness(93%) contrast(101%);
+}
+
+.cardContent{
+    flex: 1;
+}
+
+.cardContent h3{
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+    color: var(--color-secondary);
+    font-weight: 600;
+}
+
+.cardContent p{
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--color-gray);
+    margin: 0;
+}
+
+/*Boton volver a login*/
+.backToLoginBtn{
+    width: 100%;
+    background: var(--color-primary);
+    color: var(--color-text-light);
+    padding: 15px;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-top: 30px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.backToLoginBtn:hover{
+    background: var(--color-secondary);
+}
