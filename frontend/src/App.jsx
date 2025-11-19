@@ -15,7 +15,7 @@ function App(){
         <Route path='/login' element={<Login/>}/>
         <Route path='/login2' element={<Login2/>}/>
         <Route path="/registro" element={<Register />} />
-        <Route path="/registro/confirmacion" element={<RegisterConfirmation />} />
+        <Route path="/confirmacion" element={<RegisterConfirmation />} />
         <Route path="/recuperar" element={<ForgotPassword />} />
         <Route path="/ping" element={<BackendStatus />} />
         <Route path = "*" element={<Navigate to = "/ping" replace />} />

@@ -1,13 +1,44 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import styles from "../styles/components/RegistroConfirmacion.module.css"
 
 function RegistroConfirmacion() {
     const navigate = useNavigate();
     const location = useLocation();
+    const [isRedirecting, setIsRedirecting] = useState(false);
+
+    // Verificar si viene de Registro
+    useEffect(()=>{
+        if(!location.state?.email){
+            setIsRedirecting(true);
+
+            //Esperar 3 segundos
+            const timer = setTimeout(()=>{
+                navigate("/registro",{replace: true});
+            }, 3000);
+
+            //Limpiar el timer si el componente se desmonta
+            return () => clearTimeout(timer);
+        }
+    }, [location.state, navigate]);
+
+    // Si no hay estado, mostrar loading 
+    if(!location.state?.email){
+        return(
+            <div className={styles.confirmationPage}>
+                <div className={styles.confirmationContainer}>
+                    <div className={styles.redirectingMessage}>
+                        <div className={styles.loadingSpinner}></div>
+                        <h3>Redirigiendo...</h3>
+                        <p>No se encontraron datos de registro. Regresando al formulario...</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     // Obtener datos del estado de navegacion
-    const email = location.state?.email || "tu correo electrónico";
+    const {email, nombres} = location.state;
 
     const handleBackToLogin = () => {
         navigate('/login');
@@ -33,7 +64,7 @@ function RegistroConfirmacion() {
                     </div>
                     <div className={styles.cardContent}>
                         <h3>Verificación pendiente</h3>
-                        <p>Recibirás un correo a {email} cuando tu solicitud sea aprobada por un administrador. Este proceso puede tomar entre 24 y 48 horas.</p>
+                        <p>Recibirás un correo a <strong>{email}</strong> cuando tu solicitud sea aprobada por un administrador. Este proceso puede tomar entre 24 y 48 horas.</p>
                     </div>
                 </div>
 

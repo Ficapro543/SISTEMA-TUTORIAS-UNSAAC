@@ -102,39 +102,49 @@ function Register() {
       return;
     }
 
-    //Envio simulado al backend
-    try{
-      const response = await fetch("http://localhost:3001/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          nombres, 
-          apellidos, 
-          correo,
-          password,
-          roles: rol 
-        }),
+    // TEMPORAL: Simulando éxito sin backend
+    const simulateSuccess = true; //Cambiar a falso para probar errores
+    if(simulateSuccess){
+      navigate("/confirmacion",{
+        state:{
+          email: correo,
+          nombres: nombres,
+        }
       });
-
-      const data = await response.json();
-      if(response.ok)
-      {
-        // setSuccess(`Su solicitud fue recibida. Se le enviará un correo a ${correo} indicando el estado de su registro`);
-        // setTimeout(() => navigate("/login"), 4000);
-        navigate("registro/confirmacion", { 
-          state: { 
-            email: correo,
-            nombres: nombres 
-          }
-        });
-      }
-      else
-      {
-        setError(data.message || "Error en el registro. Inténtalo de nuevo.");
-      }
-    } catch(err){
-      setError("No se pudo conectar con el servidor.");
+      return;
     }
+
+    //Envio al backend (COMENTADO TEMPORALMENTE)
+    // try{
+    //   const response = await fetch("http://localhost:3001/api/auth/register", {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json" },
+    //     body: JSON.stringify({ 
+    //       nombres, 
+    //       apellidos, 
+    //       correo,
+    //       password,
+    //       roles: rol 
+    //     }),
+    //   });
+
+    //   const data = await response.json();
+    //   if(response.ok)
+    //   {
+    //     navigate("/confirmacion", { 
+    //       state: { 
+    //         email: correo,
+    //         nombres: nombres
+    //       }
+    //     });
+    //   }
+    //   else
+    //   {
+    //     setError(data.message || "Error en el registro. Inténtalo de nuevo.");
+    //   }
+    // } catch(err){
+    //   setError("No se pudo conectar con el servidor.");
+    // }
   };
 
   const handleGoBack = () => {
