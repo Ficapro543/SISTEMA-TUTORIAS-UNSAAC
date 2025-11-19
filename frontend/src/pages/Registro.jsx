@@ -226,7 +226,7 @@ function Register() {
                 onMouseEnter={(e)=>handleTooltipShow(passwordRequisitos, e, 'password')}
                 onMouseLeave={handleTooltipHide}
               >
-                ⓘ
+                <img src="/info-icon.svg" alt="Información"/>
               </div>
             </div>
             <div className={styles.passwordInputWrapper}>
@@ -291,7 +291,7 @@ function Register() {
                   onMouseEnter={(e)=>handleTooltipShow(rolItem.descripcion, e, 'rol')}
                   onMouseLeave={handleTooltipHide}
                 >
-                  ⓘ
+                  <img src="/info-icon.svg" alt="Información"/>
                 </div>
               </div>
             ))}
