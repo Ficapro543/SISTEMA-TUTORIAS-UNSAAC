@@ -51,27 +51,27 @@ function RegistroConfirmacion() {
                 {/* Icono de confirmación */}
                 <div className={styles.successHeader}>
                     <div className={styles.checkIcon}>
-                        <img src="tutorIcon.svg" alt="Check"/>
+                        <img src="check-icon.svg" alt="Check"/>
                     </div>
                     <h1>¡Solicitud Enviada!</h1>
-                    <p className={styles.subtitles}>Tu registro fue recibido exitosamente</p>
+                    <p className={styles.subtitle}>Tu registro fue recibido exitosamente</p>
                 </div>
 
                 {/* Verificación Pendiente */}
                 <div className={styles.infoCard}>
                     <div className={styles.cardIcon}>
-                        <img src="tutorIcon.svg" alt="Información"/>
+                        <img src="info-icon.svg" alt="Información"/>
                     </div>
                     <div className={styles.cardContent}>
                         <h3>Verificación pendiente</h3>
-                        <p>Recibirás un correo a <strong>{email}</strong> cuando tu solicitud sea aprobada por un administrador. Este proceso puede tomar entre 24 y 48 horas.</p>
+                        <p>Recibirás un correo a <strong>{email}</strong> cuando tu solicitud sea aprobada por un administrador.<strong> Este proceso puede tomar entre 24 y 48 horas.</strong></p>
                     </div>
                 </div>
 
                 {/* Revisa tu correo */}
                 <div className={`${styles.infoCard} ${styles.emailCard}`}>
                     <div className={styles.cardIcon}>
-                        <img src="tutorIcon.svg" alt="Correo"/>
+                        <img src="email-icon.svg" alt="Correo"/>
                     </div>
                     <div className={styles.cardContent}>
                         <h3>Revisa tu correo</h3>

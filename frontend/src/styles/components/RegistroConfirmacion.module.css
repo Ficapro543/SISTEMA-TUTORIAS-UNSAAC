@@ -24,12 +24,13 @@
 
 /*Header*/
 .successHeader{
-    margin-bottom: 40px;
+    margin-top: 30px;
+    margin-bottom: 30px;
 }
 
 .checkIcon{
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
     background: rgba(46, 204, 113, 0.1);
     border-radius: 50%;
     display: flex;
@@ -40,19 +41,19 @@
 }
 
 .checkIcon img{
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     filter: brightness(0) saturate(100%) invert(47%) sepia(98%) saturate(388%) hue-rotate(91deg) brightness(95%) contrast(101%);
 }
 
 .successHeader h1{
-    font-size: 2.2rem;
-    margin-bottom: 10px;
+    font-size: 2rem;
+    margin-bottom: 8px;
     color: var(--color-secondary);
 }
 
 .subtitle{
-    font-size: 1.1rem;
+    font-size: 1rem;
     color: var(--color-gray);
     margin-bottom: 0;
 }
@@ -77,25 +78,24 @@
 
 .emailCard{
     background: rgba(0, 78, 146, 0.1);
-    border: 2px solid var(--color-primary);
 }
 
 .cardIcon{
     flex-shrink: 0;
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     background: var(--color-text-light);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px;
+    padding: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .cardIcon img{
-    width: 25%;
-    height: 25%;
+    width: 75%;
+    height: 75%;
 }
 
 .infoCard .cardIcon img{
@@ -132,7 +132,7 @@
     padding: 15px;
     border: none;
     border-radius: var(--radius);
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: bold;
     margin-top: 30px;
     cursor: pointer;
