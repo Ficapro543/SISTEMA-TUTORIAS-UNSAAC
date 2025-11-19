@@ -25,9 +25,10 @@
 }
 
 .registerContainer h2{
-    margin-bottom: 0px;
-    color: var(--color-secondary);
-    font-size: 1.8rem;
+    margin-bottom: 5px;
+    color: var(--color-text-dark);
+    font-size: 2rem;
+    font-weight: 500;
 }
 
 /*Subtitulo*/
@@ -64,22 +65,30 @@
 
 .passwordLabelContainer .infoIcon{
     position: static;
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     background: var(--color-gray-light);
-    color: var(--color-gray);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.6rem;
     cursor: help;
     transition: var(--transition);
+    padding: 1px;
 }
 
 .passwordLabelContainer .infoIcon:hover{
     background: var(--color-secondary);
-    color: var(--color-text-light)
+}
+
+.passwordLabelContainer .infoIcon img{
+    width: 12px;
+    height: 12px;
+    filter: brightness(0) saturate(100%) invert(40%) sepia(10%) saturate(500%) hue-rotate(180deg) brightness(90%) contrast(90%);
+}
+
+.passwordLabelContainer .infoIcon:hover img{
+    filter: brightness(0) invert(1);
 }
 
 /* Contenedor Contraseña*/
@@ -142,15 +151,18 @@
     border-radius: var(--radius);
     background-color: var(--color-gray-light);
     font-size: 0.95rem;
+    border: 2px solid transparent;
+    transition: var(--transition);
 }
 
 .formGroup input:focus {
     border-color: var(--color-secondary);
     outline: none;
+    background-color: white;
 }
 
 .inputError{
-    border-color: crimson !important; 
+    border-color: #e74c3c !important; 
     background-color: #ffe6e6 !important;
 }
 
@@ -238,8 +250,8 @@
     position: absolute;
     top: 8px;
     right: 8px;
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     background: var(--color-gray-light);
     border-radius: 50%;
     display: flex;
@@ -250,21 +262,37 @@
     cursor: help;
     transition: var(--transition);
     z-index: 10;
+    padding: 2px;
 }
 
 .infoIcon:hover{
     background: var(--color-secondary);
-    color: var(--color-text-light);
+}
+
+.infoIcon img{
+    width: 12px; /* Tamaño adecuado para el icono */
+    height: 12px;
+    filter: brightness(0) saturate(100%) invert(40%) sepia(10%) saturate(500%) hue-rotate(180deg) brightness(90%) contrast(90%);
+    transition: var(--transition);
+}
+.infoIcon:hover img{
+    filter: brightness(0) invert(1); /* Blanco al hacer hover */
 }
 
 .rolCard.activo .infoIcon{
     background: var(--color-primary);
-    color: var(--color-text-light);
+}
+
+.rolCard.activo .infoIcon img{
+    filter: brightness(0) invert(1); /* Blanco cuando está activo */
 }
 
 .rolCard.activo .infoIcon:hover{
     background: var(--color-text-light);
-    color: var(--color-primary);
+}
+
+.rolCard.activo .infoIcon:hover img{
+    filter: brightness(0) saturate(100%) invert(23%) sepia(98%) saturate(1385%) hue-rotate(195deg) brightness(93%) contrast(101%);
 }
 
 /* Tooltip */
