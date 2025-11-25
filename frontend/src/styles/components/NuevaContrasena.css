@@ -1,0 +1,111 @@
+.nueva-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #002147, #004e92);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: var(--font-main);
+}
+
+.nueva-container {
+  background: #fff;
+  width: 420px;
+  padding: 45px 40px;
+  border-radius: 25px;
+  box-shadow: var(--shadow);
+  text-align: left;
+}
+
+.nueva-container h2 {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #002147;
+  margin-bottom: 10px;
+}
+
+.sub-text {
+  text-align: center;
+  color: #666;
+  margin-bottom: 25px;
+}
+
+.form-container label {
+  font-weight: 600;
+  margin-bottom: 5px;
+  display: block;
+  color: #002147;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.input-wrapper input {
+  width: 100%;
+  padding: 13px;
+  border-radius: 12px;
+  border: 2px solid #ccc;
+  font-size: 1rem;
+  margin-bottom: 8px;
+  outline: none;
+  transition: 0.25s ease;
+}
+
+.input-error {
+  border-color: #ff4d4d !important;
+}
+
+.toggle {
+  position: absolute;
+  right: 10px;
+  top: 13px;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+.requirements p {
+  margin: 3px 0;
+  font-size: 0.9rem;
+}
+
+.ok {
+  color: #008e2f;
+}
+
+.bad {
+  color: #d00000;
+}
+
+.error-msg {
+  color: #c40000;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 14px;
+  background-color: #5233ff;
+  color: #fff;
+  border: none;
+  border-radius: 15px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: 0.2s ease;
+}
+
+.submit-btn.disabled {
+  background-color: #b5b5b5;
+  cursor: not-allowed;
+}
+
+.submit-btn:hover:not(.disabled) {
+  background-color: #3d26cc;
+}
+.input-wrapper input {
+  color: #000 !important;
+}
+
