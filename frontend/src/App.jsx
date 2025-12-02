@@ -6,6 +6,7 @@ import Register from "./pages/Registro.jsx";
 import RegisterConfirmation from "./pages/RegistroConfirmacion.jsx";
 import CuentaVerificada from "./pages/CuentaVerificada.jsx";
 import AprobarRegistro from "./pages/AprobarRegistro.jsx";
+import MainPage from "./pages/MainPageRoles.jsx";
 import BackendStatus from "./pages/BackendStatus.jsx";
 import { Navigate } from "react-router-dom";
 import RecuperarPassword from "./pages/RecuperarPassword.jsx";
@@ -22,10 +23,11 @@ function App() {
         <Route path="/confirmacion" element={<RegisterConfirmation />} />
         <Route path="/verificado" element={<CuentaVerificada />} />
         <Route path="/solicitudes_registro" element={<AprobarRegistro />} />
+        <Route path="/mainpage" element={<MainPage />} />
         <Route path="/recuperar" element={<RecuperarPassword />} />
-        <Route path="/ping" element={<BackendStatus />} />
         <Route path="/recuperar/verificar" element={<VerificarCodigo />} />
         <Route path="/recuperar/nueva" element={<NuevaContrasena />} />
+        <Route path="/ping" element={<BackendStatus />} />
         <Route path="*" element={<Navigate to="/ping" replace />} />
       </Routes>
     </Layout>
