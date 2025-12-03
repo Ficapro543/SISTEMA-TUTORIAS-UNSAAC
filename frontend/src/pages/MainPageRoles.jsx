@@ -1,9 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function MainPageRoles() {
+  const [roles, setRoles] = useState({});
+
+  useEffect(()=>{
+    const savedRoles = localStorage.getItem("userRoles");
+    if(savedRoles){
+      setRoles(JSON.parse(savedRoles));
+    }
+  },[]);
+
   return (
-    <h2>Pagina principal donde todos los roles serán redireccionados despues de un login correcto</h2>
+    <div>
+      <h1>Bienvenido a MainPage</h1>
+      <p>Tus roles actuales:</p>
+      <pre>{JSON.stringify(roles, null, 2)}</pre>
+    </div>
   );
 }
 

@@ -1,0 +1,17 @@
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Editor config
+.vscode/
+.idea/
+
+# Compilaciones globales (por si acaso)
+dist/
+build/
+
+# rar, zip, backups
+*.zip
+*.rar
+*.7z
+*.bak
