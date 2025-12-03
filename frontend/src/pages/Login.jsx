@@ -50,20 +50,13 @@ function Login() {
       const data = await response.json();
       if (response.ok) {
         //Credenciales correctas
-        const userRole = data.role?.rol || "tutor";
-        switch (userRole) {
-          case "tutor":
-            navigate("/tutor");
-            break;
-          case "verificador":
-            navigate("/verificador");
-            break;
-          case "administrador":
-            navigate("/admin");
-            break;
-          default:
-            navigate("/inicio");
-        }
+        const roles = data.roles; // {administrador: 1, tutor: 0, verificador: 0}
+
+
+        //TODO: CAMBIAR ESTA MADRE AL MAINPAGE
+        localStorage.setItem("userRoles",JSON.stringify(roles));
+        navigate("/mainpage");
+        
       } else {
         // Credenciales incorrectas
         setError(data.message || "Correo o contraseña incorrectos.");
