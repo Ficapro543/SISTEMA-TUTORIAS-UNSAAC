@@ -1,0 +1,259 @@
+.adminPage {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Header */
+.header {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.header h1 {
+  margin: 0 0 10px 0;
+  color: #2c3e50;
+}
+
+.header p {
+  margin: 0 0 15px 0;
+  color: #7f8c8d;
+}
+
+.backButton {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.backButton:hover {
+  background-color: #5a6268;
+}
+
+/* Loading y Error */
+.loadingContainer,
+.errorContainer {
+  text-align: center;
+  padding: 50px;
+}
+
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.errorContainer h3 {
+  color: #e74c3c;
+  margin-bottom: 10px;
+}
+
+.errorContainer button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+/* Sin solicitudes */
+.noSolicitudes {
+  text-align: center;
+  padding: 40px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  color: #7f8c8d;
+}
+
+/* Grid de solicitudes */
+.solicitudesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+  gap: 20px;
+}
+
+/* Tarjeta de solicitud */
+.solicitudCard {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+  transition: transform 0.2s;
+}
+
+.solicitudCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.cardHeader h3 {
+  margin: 0;
+  color: #2c3e50;
+}
+
+.badgePendiente {
+  background-color: #f39c12;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* Cuerpo de la tarjeta */
+.cardBody {
+  margin-bottom: 20px;
+}
+
+.infoRow {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: flex-start;
+}
+
+.infoRow strong {
+  min-width: 120px;
+  color: #34495e;
+}
+
+.infoRow span {
+  color: #2c3e50;
+}
+
+/* Lista de roles */
+.rolesList {
+  flex: 1;
+}
+
+.rolItem {
+  background-color: #f8f9fa;
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-left: 4px solid #3498db;
+}
+
+.rolNombre {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.rolAcciones {
+  display: flex;
+  gap: 8px;
+}
+
+/* Botones */
+.btnAprobarRol,
+.btnRechazarRol {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.btnAprobarRol {
+  background-color: #27ae60;
+  color: white;
+}
+
+.btnAprobarRol:hover {
+  background-color: #219653;
+}
+
+.btnRechazarRol {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.btnRechazarRol:hover {
+  background-color: #c0392b;
+}
+
+/* Footer de tarjeta */
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+.btnDetalles {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btnDetalles:hover {
+  background-color: #2980b9;
+}
+
+.accionesGlobales {
+  display: flex;
+  gap: 10px;
+}
+
+.btnAprobarTodo,
+.btnRechazarTodo {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btnAprobarTodo {
+  background-color: #2ecc71;
+  color: white;
+}
+
+.btnAprobarTodo:hover {
+  background-color: #27ae60;
+}
+
+.btnRechazarTodo {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.btnRechazarTodo:hover {
+  background-color: #c0392b;
+}
