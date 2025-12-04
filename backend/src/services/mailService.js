@@ -7,7 +7,7 @@ async function createTransporter() {
   if (!transporter) {
     transporter = nodemailer.createTransport({
       host: process.env.MAIL_HOST,
-      port: Number(process.env.MAIL_PORT) || 587,
+      port: Number(process.env.MAIL_PORT), //|| 587,
       secure: process.env.MAIL_SECURE === 'true', // true only for 465
       auth: {
         user: process.env.MAIL_USER,
@@ -23,6 +23,18 @@ async function createTransporter() {
     }
   }
   return transporter;
+}
+
+
+async function sendMail({ to, subject, text, html }) {
+  const transporterInstance = await createTransporter();
+  return transporter.sendMail({
+    from: process.env.MAIL_FROM,
+    to,
+    subject,
+    text,
+    html,
+  });
 }
 
 async function sendAdminApprovalEmail(adminEmail, pendingUserId) {
@@ -54,4 +66,4 @@ async function sendUserActivationEmail(userEmail, userId) {
   return info;
 }
 
-module.exports = { sendAdminApprovalEmail, sendUserActivationEmail };
+module.exports = {sendMail, sendAdminApprovalEmail, sendUserActivationEmail };
