@@ -103,7 +103,7 @@ function Register() {
     }
 
     // TEMPORAL: Simulando éxito sin backend
-    const simulateSuccess = true; //Cambiar a falso para probar errores
+    const simulateSuccess = false; //Cambiar a falso para probar errores
     if(simulateSuccess){
       navigate("/confirmacion",{
         state:{
@@ -115,36 +115,37 @@ function Register() {
     }
 
     //Envio al backend (COMENTADO TEMPORALMENTE)
-    // try{
-    //   const response = await fetch("http://localhost:3001/api/auth/register", {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify({ 
-    //       nombres, 
-    //       apellidos, 
-    //       correo,
-    //       password,
-    //       roles: rol 
-    //     }),
-    //   });
+    try{
+      const response = await fetch("http://localhost:3001/api/admin/solicitud", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          first_name: nombres,
+          last_name: apellidos,
+          email: correo,
+          password: password,
+          roles: rol
+        }),
+      });
 
-    //   const data = await response.json();
-    //   if(response.ok)
-    //   {
-    //     navigate("/confirmacion", { 
-    //       state: { 
-    //         email: correo,
-    //         nombres: nombres
-    //       }
-    //     });
-    //   }
-    //   else
-    //   {
-    //     setError(data.message || "Error en el registro. Inténtalo de nuevo.");
-    //   }
-    // } catch(err){
-    //   setError("No se pudo conectar con el servidor.");
-    // }
+
+      const data = await response.json();
+      if(response.ok)
+      {
+        navigate("/confirmacion", { 
+          state: { 
+            email: correo,
+            nombres: nombres
+          }
+        });
+      }
+      else
+      {
+        setError(data.message || "Error en el registro. Inténtalo de nuevo.");
+      }
+    } catch(err){
+      setError("No se pudo conectar con el servidor.");
+    }
   };
 
   const handleGoBack = () => {
