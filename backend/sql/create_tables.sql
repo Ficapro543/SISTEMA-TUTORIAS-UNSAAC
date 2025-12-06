@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS pending_users (
     email TEXT NOT NULL UNIQUE,
     password_hash TEXT,
     roles TEXT[] NOT NULL,
+    roles_decisiones JSONB DEFAULT '[]'::jsonb,
     created_at TIMESTAMP DEFAULT now()
 );
 
@@ -27,4 +28,14 @@ CREATE TABLE IF NOT EXISTS refresh_tokens (
     token TEXT NOT NULL,
     expires_at TIMESTAMP NOT NULL,
     created_at TIMESTAMP DEFAULT now()
+);
+
+CREATE TABLE activation_tokens (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token UUID NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT now(),
+    used BOOLEAN DEFAULT FALSE,
+    used_at TIMESTAMP
 );

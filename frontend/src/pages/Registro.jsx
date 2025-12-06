@@ -163,13 +163,13 @@ function Register() {
     {
       id: "evaluador", 
       nombre: "Evaluador",
-      imagen: "/EvaluadorIcon.svg",
+      imagen: "/evaluadorIcon.svg",
       descripcion: "Verifica el seguimiento de estudiantes tutorados y revisa el trabajo realizado por cada tutor."
     },
     {
       id: "administrador",
       nombre: "Administrador",
-      imagen: "/adminIcon.svg",
+      imagen: "/administradorIcon.svg",
       descripcion: "Gestiona el cronograma de tutorías, tutores y administra la información de cada estudiante."
     }
   ];
