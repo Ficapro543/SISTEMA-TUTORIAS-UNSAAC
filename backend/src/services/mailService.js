@@ -27,7 +27,7 @@ async function createTransporter() {
 
 async function sendAdminApprovalEmail(adminEmail, pendingUserId) {
   const transporter = await createTransporter();
-  const approvalLink = `${process.env.FRONTEND_URL}/aprobarRegistro/${pendingUserId}`;
+  const approvalLink = `${process.env.FRONTEND_URL}/solicitudes_registro/${pendingUserId}`;
 
   const info = await transporter.sendMail({
     from: process.env.MAIL_FROM,
@@ -45,9 +45,9 @@ async function sendAdminApprovalEmail(adminEmail, pendingUserId) {
   return info;
 }
 
-async function sendUserActivationEmail(userEmail, userId) {
+async function sendUserActivationEmail(userEmail, token) {
   const transporter = await createTransporter();
-  const activationLink = `${process.env.FRONTEND_URL}/activarCuenta/${userId}`;
+  const activationLink = `${process.env.FRONTEND_URL}/verificado/${token}`;
 
   const info = await transporter.sendMail({
     from: process.env.MAIL_FROM,

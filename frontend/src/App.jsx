@@ -6,6 +6,7 @@ import Register from "./pages/Registro.jsx";
 import RegisterConfirmation from "./pages/RegistroConfirmacion.jsx";
 import CuentaVerificada from "./pages/CuentaVerificada.jsx";
 import AprobarRegistro from "./pages/AprobarRegistro.jsx";
+import SolicitudDetalle from "./pages/SolicitudDetalle.jsx";
 import MainPage from "./pages/MainPageRoles.jsx";
 import BackendStatus from "./pages/BackendStatus.jsx";
 import { Navigate } from "react-router-dom";
@@ -21,8 +22,9 @@ function App() {
         <Route path="/login2" element={<Login2 />} />
         <Route path="/registro" element={<Register />} />
         <Route path="/confirmacion" element={<RegisterConfirmation />} />
-        <Route path="/verificado" element={<CuentaVerificada />} />
+        <Route path="/verificado/:token" element={<CuentaVerificada />} />
         <Route path="/solicitudes_registro" element={<AprobarRegistro />} />
+        <Route path="/solicitudes_registro/:token" element={<SolicitudDetalle />} />
         <Route path="/mainpage" element={<MainPage />} />
         <Route path="/recuperar" element={<RecuperarPassword />} />
         <Route path="/recuperar/verificar" element={<VerificarCodigo />} />
