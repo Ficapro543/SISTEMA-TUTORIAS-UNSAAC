@@ -199,9 +199,9 @@ function CuentaVerificada() {
   // Icono por rol
   const getIconForRole = (roleName) => {
     const iconMap = {
-      "Tutor": "tutorIcon.svg",
-      "Evaluador": "evaluadorIcon.svg",
-      "Administrador": "administradorIcon.svg"
+      "Tutor": "/tutorIcon.svg",
+      "Evaluador": "/evaluadorIcon.svg",
+      "Administrador": "/administradorIcon.svg"
     };
     return iconMap[roleName] || "tutorIcon.svg"; //Default
   };

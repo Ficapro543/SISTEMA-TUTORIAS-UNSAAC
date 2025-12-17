@@ -6,6 +6,8 @@ function RecuperarPassword() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
   // Solo valida que termine en unsaac.edu.pe — la validación extra la haremos aparte
   const baseEmailRegex = /^[a-zA-Z0-9._%+-]+@unsaac\.edu\.pe$/;
@@ -13,6 +15,7 @@ function RecuperarPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setMessage("");
 
     if (!email) {
       setError("Por favor, ingresa tu correo institucional.");
@@ -46,8 +49,10 @@ function RecuperarPassword() {
       return;
     }
 
+    setLoading(true)
+
     // **Si todo está bien → enviar al backend**
-    /*try {
+    try {
       const response = await fetch(
         "http://localhost:3001/api/auth/forgot-password",
         {
@@ -57,16 +62,21 @@ function RecuperarPassword() {
         }
       );
 
+      const data = await response.json();
+
       if (response.ok) {
-        navigate("/recuperar/enviado");
+        setMessage(data.message || "Se ha enviado un código de verificación a tu correo.");
+        setTimeout(()=>{
+          navigate("/recuperar/verificar",{state: {email}});
+        },2000);
       } else {
-        const data = await response.json();
         setError(data.message || "No se pudo procesar la solicitud.");
       }
     } catch (err) {
       setError("Error al conectar con el servidor.");
-    }*/
-    navigate("/recuperar/verificar", { state: { email } });
+    } finally{
+      setLoading(false);
+    }
   };
 
   return (
@@ -87,12 +97,18 @@ function RecuperarPassword() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className={error ? "input-error" : ""}
+            disabled={loading}
           />
 
           {error && <p className="error-message">{error}</p>}
+          {message && <p className = "success-message">{message}</p>}
 
-          <button type="submit" className="recover-btn">
-            Enviar código
+          <button 
+            type="submit" 
+            className="recover-btn"
+            disabled={loading}
+          >
+            {loading ? "Enviando..." : "Enviar código"}
           </button>
         </form>
 
