@@ -4,7 +4,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
+  background: linear-gradient(
+    135deg,
+    var(--color-secondary),
+    var(--color-primary)
+  );
   font-family: var(--font-main);
   color: var(--color-text-light);
   padding: 30px;
@@ -37,17 +41,27 @@
 }
 
 .formGroup label {
+  display: block;
   margin-bottom: 6px;
-  font-weight: bold;
-  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text);
+  font-size: 0.9rem;
 }
 
 .formGroup input {
   width: 100%;
   padding: 12px;
-  border: 2px solid var(--color-primary);
   border-radius: var(--radius);
-  font-size: 1rem;
+  background-color: var(--color-gray-light);
+  font-size: 0.95rem;
+  border: 2px solid transparent;
+  transition: var(--transition);
+}
+
+.formGroup input:focus {
+  border-color: var(--color-secondary);
+  outline: none;
+  background-color: white;
 }
 
 /*Estilos para errores*/
@@ -58,7 +72,7 @@
   width: full;
 }
 
-.inputError {
+.formGroup input.inputError {
   border-color: crimson;
   background-color: #ffe6e6;
 }
