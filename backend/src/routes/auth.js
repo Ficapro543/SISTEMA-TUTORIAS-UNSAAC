@@ -10,13 +10,10 @@ const {
 
 router.post('/login', login);
 router.get('/activarCuenta/:token', activateAccount);
-<<<<<<< HEAD
-=======
 
 router.post('/forgot-password',sendResetCode);
 router.post('/verify-code',verifyResetCode);
 router.post('/resend-code',resendResetCode);
 router.post('/reset-password',resetPassword);
->>>>>>> 31c11758dedee6a1020539582df055909da6196a
 
 module.exports = router;
