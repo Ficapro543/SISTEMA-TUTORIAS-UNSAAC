@@ -58,6 +58,61 @@
   transition: var(--transition);
 }
 
+/*Contraseña*/
+/* Contenedor Contraseña*/
+.passwordInputWrapper{
+    position: relative;
+    width: 100%;
+}
+
+.passwordInput{
+    width: 100%;
+    padding: 12px;
+    border-radius: var(--radius);
+    background-color: var(--color-gray-light);
+    font-size: 0.95rem;
+    border: 2px solid transparent;
+    padding-right: 45px;
+    transition: var(--transition);
+}
+
+.passwordInput:focus{
+    border-color: var(--color-secondary);
+    outline: none;
+    background-color: white;
+}
+
+/*Boton*/
+.togglePasswordBtn{
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.togglePasswordBtn:hover{
+    background-color: var(--color-gray-light);
+}
+
+.togglePasswordBtn img{
+    width: 20px;
+    height: 20px;
+    filter: brightness(0) saturate(100%) invert(23%) sepia(98%) saturate(1385%) hue-rotate(195deg) brightness(93%) contrast(101%);
+}
+
+.togglePasswordBtn:hover img{
+    filter: brightness(0) saturate(100%) invert(23%) sepia(98%) saturate(1385%) hue-rotate(195deg) brightness(73%) contrast(101%);
+}
+
 .formGroup input:focus {
   border-color: var(--color-secondary);
   outline: none;
