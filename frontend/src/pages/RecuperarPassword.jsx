@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/components/Recuperar.css";
+import styles from "../styles/components/RecuperarPassword.module.css";
 
 function RecuperarPassword() {
   const navigate = useNavigate();
@@ -80,39 +80,39 @@ function RecuperarPassword() {
   };
 
   return (
-    <div className="recover-page">
-      <div className="recover-container">
-        <img src="./alerta.jpg" alt="alerta" className="warning-icon" />
+    <div className={styles.recoverPage}>
+      <div className={styles.recoverContainer}>
+        <img src="./alerta.jpg" alt="alerta" className={styles.warningIcon} />
         <h2>Restablecer contraseña</h2>
-        <p className="recover-text">
+        <p className={styles.recoverText}>
           Te enviaremos un enlace temporal a tu correo electrónico para que
           puedas crear una nueva contraseña
         </p>
 
-        <form onSubmit={handleSubmit} className="recover-form">
+        <form onSubmit={handleSubmit} className={styles.recoverForm}>
           <h4>Correo Electrónico</h4>
           <input
             type="text"
             placeholder="codigo@unsaac.edu.pe"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className={error ? "input-error" : ""}
+            className={error ? styles.inputError : ""}
             disabled={loading}
           />
 
-          {error && <p className="error-message">{error}</p>}
-          {message && <p className = "success-message">{message}</p>}
+          {error && <p className={styles.errorMessage}>{error}</p>}
+          {message && <p className = {styles.successMessage}>{message}</p>}
 
           <button 
             type="submit" 
-            className="recover-btn"
+            className={styles.recoverBtn}
             disabled={loading}
           >
             {loading ? "Enviando..." : "Enviar código"}
           </button>
         </form>
 
-        <button className="back-btn" onClick={() => navigate("/login")}>
+        <button className={styles.backBtn} onClick={() => navigate("/login")}>
           ← Volver al inicio de sesión
         </button>
       </div>
