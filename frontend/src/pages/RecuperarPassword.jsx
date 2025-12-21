@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/components/Recuperar.css";
+import styles from "../styles/components/RecuperarPassword.module.css";
 
 function RecuperarPassword() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
   // Solo valida que termine en unsaac.edu.pe — la validación extra la haremos aparte
   const baseEmailRegex = /^[a-zA-Z0-9._%+-]+@unsaac\.edu\.pe$/;
@@ -13,6 +15,7 @@ function RecuperarPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setMessage("");
 
     if (!email) {
       setError("Por favor, ingresa tu correo institucional.");
@@ -46,8 +49,10 @@ function RecuperarPassword() {
       return;
     }
 
+    setLoading(true)
+
     // **Si todo está bien → enviar al backend**
-    /*try {
+    try {
       const response = await fetch(
         "http://localhost:3001/api/auth/forgot-password",
         {
@@ -57,46 +62,57 @@ function RecuperarPassword() {
         }
       );
 
+      const data = await response.json();
+
       if (response.ok) {
-        navigate("/recuperar/enviado");
+        setMessage(data.message || "Se ha enviado un código de verificación a tu correo.");
+        setTimeout(()=>{
+          navigate("/recuperar/verificar",{state: {email}});
+        },2000);
       } else {
-        const data = await response.json();
         setError(data.message || "No se pudo procesar la solicitud.");
       }
     } catch (err) {
       setError("Error al conectar con el servidor.");
-    }*/
-    navigate("/recuperar/verificar", { state: { email } });
+    } finally{
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="recover-page">
-      <div className="recover-container">
-        <img src="./alerta.jpg" alt="alerta" className="warning-icon" />
+    <div className={styles.recoverPage}>
+      <div className={styles.recoverContainer}>
+        <img src="./alerta.jpg" alt="alerta" className={styles.warningIcon} />
         <h2>Restablecer contraseña</h2>
-        <p className="recover-text">
+        <p className={styles.recoverText}>
           Te enviaremos un enlace temporal a tu correo electrónico para que
           puedas crear una nueva contraseña
         </p>
 
-        <form onSubmit={handleSubmit} className="recover-form">
+        <form onSubmit={handleSubmit} className={styles.recoverForm}>
           <h4>Correo Electrónico</h4>
           <input
             type="text"
             placeholder="codigo@unsaac.edu.pe"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className={error ? "input-error" : ""}
+            className={error ? styles.inputError : ""}
+            disabled={loading}
           />
 
-          {error && <p className="error-message">{error}</p>}
+          {error && <p className={styles.errorMessage}>{error}</p>}
+          {message && <p className = {styles.successMessage}>{message}</p>}
 
-          <button type="submit" className="recover-btn">
-            Enviar código
+          <button 
+            type="submit" 
+            className={styles.recoverBtn}
+            disabled={loading}
+          >
+            {loading ? "Enviando..." : "Enviar código"}
           </button>
         </form>
 
-        <button className="back-btn" onClick={() => navigate("/login")}>
+        <button className={styles.backBtn} onClick={() => navigate("/login")}>
           ← Volver al inicio de sesión
         </button>
       </div>
