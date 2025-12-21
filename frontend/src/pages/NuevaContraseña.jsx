@@ -1,26 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/components/NuevaContrasena.css";
 
-function NuevaContraseña() {
+function NuevaContrasena() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const email = location.state?.email || null;
 
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [isValidEmail, setIsValidEmail] = useState(true);
 
-  useEffect(()=>{
-    if(!email){
-      navigate("/recuperar");
-    }
-  },[email,navigate]);
-  
   const requisitos = {
     minLength: password.length >= 8,
     hasUpper: /[A-Z]/.test(password),
@@ -37,47 +26,24 @@ function NuevaContraseña() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-
-    if (!contraseñaValida){
-      setError("Por favor, cumple con todos los requisitos de contraseña.");
-      return;
-    };
-
-    if(!email){
-      setError("Error: No se encontró el correo asociado.");
-      return;
-    }
-
-    setLoading(true);
+    if (!contraseñaValida) return;
 
     try {
       const response = await fetch("http://localhost:3001/api/auth/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ password }),
       });
 
-      const data = await response.json();
-
       if (response.ok) {
-        //alert("¡Contraseña cambiada exitosamente! Ahora puedes iniciar sesión.");
         navigate("/login");
       } else {
-        setError(data.message || "Error al cambiar la contraseña.");
+        console.log("Error del servidor");
       }
     } catch (err) {
-      setError("Error de conexión con el servidor.");
-    } finally {
-      setLoading(false);
+      console.log("Error de conexión");
     }
   };
-
-  //Si no hay email, redigir:
-  if(!email){
-    navigate("/recuperar");
-    return null;
-  }
 
   return (
     <div className="nueva-page">
@@ -86,8 +52,6 @@ function NuevaContraseña() {
         <p className="sub-text">
           Crea una contraseña segura para tu cuenta
         </p>
-
-        {error && <div className = "alert error">{error}</div>}
 
         <form onSubmit={handleSubmit} className="form-container">
 
@@ -100,7 +64,6 @@ function NuevaContraseña() {
               onChange={(e) => setPassword(e.target.value)}
               className={!contraseñaValida && password ? "input-error" : ""}
               placeholder="********"
-              disabled={loading}
             />
             <span
               className="toggle"
@@ -139,7 +102,6 @@ function NuevaContraseña() {
                   ? "input-error"
                   : ""
               }
-              disabled={loading}
             />
             <span
               className="toggle"
@@ -157,9 +119,9 @@ function NuevaContraseña() {
           <button
             type="submit"
             className={`submit-btn ${!contraseñaValida ? "disabled" : ""}`}
-            disabled={!contraseñaValida || loading}
+            disabled={!contraseñaValida}
           >
-            {loading ? "Procesando..." : "Reestablecer Contraseña"}
+            Restablecer Contraseña
           </button>
         </form>
       </div>
@@ -167,4 +129,4 @@ function NuevaContraseña() {
   );
 }
 
-export default NuevaContraseña;
+export default NuevaContrasena;

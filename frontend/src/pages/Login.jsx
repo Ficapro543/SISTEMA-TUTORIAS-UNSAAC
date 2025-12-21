@@ -9,7 +9,6 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
 
   // Solo correos institucionales @unsaac.edu.pe
   const emailRegex = /^[a-zA-Z0-9._%+-]+@unsaac\.edu\.pe$/;
@@ -96,26 +95,13 @@ function Login() {
 
           <div className={styles.formGroup}>
             <label>Contraseña</label>
-            <div className = {styles.passwordInputWrapper}>
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Ingresa tu contraseña"
-                value={password}
-                onChange={(e)=>setPassword(e.target.value)}
-                className={`${error && !password ? styles.inputError : ""} ${styles.passwordInput}`}
-              />
-
-              <button
-                type="button"
-                className={styles.togglePasswordBtn}
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                <img
-                  src = {showPassword ? "/hidden.svg" : "/view.svg"}
-                  alt = {showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-                />
-              </button>
-            </div>
+            <input 
+              type="password" 
+              placeholder="Ingresa tu contraseña" 
+              value={password}
+              onChange={(e)=> setPassword(e.target.value)}
+              className={error && !password ? styles.inputError:""}
+            />
           </div>
           
           {error && <p className={styles.errorMessage}>{error}</p>}

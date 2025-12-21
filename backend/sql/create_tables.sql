@@ -39,14 +39,3 @@ CREATE TABLE activation_tokens (
     used BOOLEAN DEFAULT FALSE,
     used_at TIMESTAMP
 );
-
--- Tabla para códigos de recuperación
-CREATE TABLE IF NOT EXISTS password_reset_tokens (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    code VARCHAR(6) NOT NULL,
-    expires_at TIMESTAMP NOT NULL,
-    created_at TIMESTAMP DEFAULT now(),
-    used BOOLEAN DEFAULT FALSE,
-    used_at TIMESTAMP
-);
