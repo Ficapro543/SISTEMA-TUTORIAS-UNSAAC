@@ -242,5 +242,66 @@ async function decideRol(req, res, next) {
   }
 }
 
+async function getSemestresCerrados(req, res, next){
+  try {
+    const { rows } = await pool.query(
+      `SELECT id, nombre 
+       FROM semestres 
+       WHERE cerrado = true
+       ORDER BY nombre DESC`
+    );
 
-module.exports = { createPendingUser, approvePendingUser, getAllPendingUser, getOnePendingUser, rejectOnePendingUser, decideRol };
+    res.json(rows);
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function getTutoriasPorSemestre(req, res, next){
+  const { semestreId } = req.query;
+
+  if (!semestreId) {
+    return res.status(400).json({ message: 'semestreId requerido' });
+  }
+
+  try {
+    const { rows } = await pool.query(
+      `SELECT id, estudiante, tutor, tipo, fecha
+       FROM tutorias
+       WHERE semestre_id = $1
+       ORDER BY fecha DESC`,
+      [semestreId]
+    );
+
+    res.json(rows);
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function getTutoriaDetalle(req, res, next){
+  try {
+    const { rows } = await pool.query(
+      `SELECT *
+       FROM tutorias
+       WHERE id = $1`,
+      [req.params.id]
+    );
+
+    if (!rows.length) {
+      return res.status(404).json({ message: 'Tutoría no encontrada' });
+    }
+
+    res.json(rows[0]);
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { 
+  createPendingUser, 
+  approvePendingUser, 
+  getSemestresCerrados, 
+  getTutoriasPorSemestre, 
+  getTutoriaDetalle 
+};
