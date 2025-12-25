@@ -1,0 +1,405 @@
+/* Página principal */
+.detailPage {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
+    font-family: var(--font-main);
+    color: var(--color-text-light);
+    padding: 40px;
+}
+
+/* Contenedor principal */
+.detailContainer {
+    background-color: var(--color-text-light);
+    color: var(--color-secondary);
+    padding: 45px 70px;
+    border-radius: 25px;
+    margin: 40px auto;
+    width: 600px;
+    max-width: 90%;
+    box-shadow: var(--shadow);
+    text-align: center;
+}
+
+/* Header */
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--color-gray-light);
+}
+
+.header h1 {
+    font-size: 2.2rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--color-secondary);
+}
+
+.header p {
+    font-size: 1.1rem;
+    color: var(--color-gray);
+    margin-bottom: 20px;
+}
+
+/* Botón volver */
+.backButton {
+    width: auto;
+    background: var(--color-primary);
+    color: var(--color-text-light);
+    padding: 12px 24px;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.backButton:hover {
+    background: var(--color-secondary);
+}
+
+/* Títulos de sección */
+.sectionTitle {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--color-secondary);
+    margin-bottom: 20px;
+    text-align: left;
+    border-bottom: 2px solid var(--color-gray-light);
+    padding-bottom: 10px;
+}
+
+/* Sección de información */
+.infoSection {
+    margin-bottom: 30px;
+    text-align: left;
+}
+
+.infoCard {
+    background-color: var(--color-gray-light);
+    border-radius: var(--radius);
+    padding: 25px;
+    margin-bottom: 20px;
+    border: 2px solid transparent;
+    transition: var(--transition);
+}
+
+.infoCard:hover {
+    border-color: var(--color-primary);
+}
+
+.infoRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.infoRow:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.infoRow strong {
+    color: var(--color-secondary);
+    font-weight: 600;
+}
+
+.infoRow span {
+    color: var(--color-gray);
+}
+
+/* Badge pendiente */
+.badgePendiente {
+    background-color: #f39c12;
+    color: white;
+    padding: 6px 12px;
+    border-radius: var(--radius);
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+/* Sección de roles */
+.rolesSection {
+    margin-bottom: 30px;
+    text-align: left;
+}
+
+.noRoles {
+    text-align: center;
+    padding: 20px;
+    background-color: var(--color-gray-light);
+    border-radius: var(--radius);
+    color: var(--color-gray);
+}
+
+.rolesList {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.rolItem {
+    background-color: var(--color-gray-light);
+    border-radius: var(--radius);
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 4px solid var(--color-primary);
+    transition: var(--transition);
+}
+
+.rolItem:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.rolInfo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.rolIcon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--color-text-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+}
+
+.rolIcon img {
+    width: 24px;
+    height: 24px;
+    filter: brightness(0) saturate(100%) invert(23%) sepia(98%) saturate(1385%) hue-rotate(195deg) brightness(93%) contrast(101%);
+}
+
+.rolNombre {
+    font-weight: 600;
+    color: var(--color-secondary);
+    font-size: 1.1rem;
+}
+
+.rolAcciones {
+    display: flex;
+    gap: 10px;
+}
+
+/* Botones de roles */
+.btnAprobarRol,
+.btnRechazarRol {
+    padding: 8px 16px;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: bold;
+    transition: var(--transition);
+}
+
+.btnAprobarRol {
+    background-color: rgba(46, 204, 113, 0.1);
+    color: #27ae60;
+    border: 2px solid rgba(46, 204, 113, 0.3);
+}
+
+.btnAprobarRol:hover {
+    background-color: #27ae60;
+    color: white;
+}
+
+.btnRechazarRol {
+    background-color: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+    border: 2px solid rgba(231, 76, 60, 0.3);
+}
+
+.btnRechazarRol:hover {
+    background-color: #e74c3c;
+    color: white;
+}
+
+/* Acciones globales */
+.accionesGlobales {
+    margin-top: 40px;
+    text-align: left;
+}
+
+.accionesButtons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btnAprobarTodo,
+.btnRechazarTodo {
+    padding: 15px 30px;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: var(--transition);
+    min-width: 250px;
+}
+
+.btnAprobarTodo {
+    background-color: rgba(46, 204, 113, 0.1);
+    color: #27ae60;
+    border: 2px solid rgba(46, 204, 113, 0.3);
+}
+
+.btnAprobarTodo:hover {
+    background-color: #27ae60;
+    color: white;
+}
+
+.btnRechazarTodo {
+    background-color: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+    border: 2px solid rgba(231, 76, 60, 0.3);
+}
+
+.btnRechazarTodo:hover {
+    background-color: #e74c3c;
+    color: white;
+}
+
+/* Estados de carga y error */
+.loadingContainer,
+.errorContainer,
+.noData {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid var(--color-gray-light);
+    border-top: 4px solid var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.errorContainer h3,
+.noData h3 {
+    color: #e74c3c;
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+}
+
+.errorContainer p,
+.noData p {
+    color: var(--color-gray);
+    margin-bottom: 20px;
+}
+
+.errorIcon {
+    width: 60px;
+    height: 60px;
+    background: rgba(231, 76, 60, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    padding: 10px;
+}
+
+.errorIcon img {
+    width: 30px;
+    height: 30px;
+    filter: brightness(0) saturate(100%) invert(36%) sepia(75%) saturate(1239%) hue-rotate(336deg) brightness(92%) contrast(92%);
+}
+
+/* Estados de roles */
+.rolAprobado {
+    background-color: rgba(46, 204, 113, 0.1);
+    border-left-color: #27ae60;
+}
+
+.rolRechazado {
+    background-color: rgba(231, 76, 60, 0.1);
+    border-left-color: #e74c3c;
+}
+
+/* Botones de roles confirmados */
+.btnAprobadoConfirmado {
+    background-color: #27ae60 !important;
+    color: white !important;
+    border: 2px solid #27ae60 !important;
+    cursor: default !important;
+}
+
+.btnRechazadoConfirmado {
+    background-color: #e74c3c !important;
+    color: white !important;
+    border: 2px solid #e74c3c !important;
+    cursor: default !important;
+}
+
+/* Estado de botones globales deshabilitados */
+.btnAprobarTodo:disabled,
+.btnRechazarTodo:disabled {
+    opacity: 0.7;
+    cursor: not-allowed !important;
+}
+
+/* Mensaje de todos los roles decididos */
+.todosDecididos {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: rgba(46, 204, 113, 0.1);
+    border-radius: var(--radius);
+    border: 2px solid rgba(46, 204, 113, 0.3);
+    text-align: center;
+}
+
+.todosDecididos p {
+    color: #27ae60;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Mensaje de decisión confirmada */
+.decisionConfirmada {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: var(--color-gray-light);
+    border-radius: var(--radius);
+    text-align: center;
+}
+
+.decisionConfirmada p {
+    color: var(--color-secondary);
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Ajustes para botones de roles */
+.rolAcciones button {
+    min-width: 120px;
+}
+
+/* Para botón único cuando ya hay decisión */
+.rolAcciones button:only-child {
+    min-width: 140px;
+}

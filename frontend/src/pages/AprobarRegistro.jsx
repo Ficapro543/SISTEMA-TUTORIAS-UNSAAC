@@ -7,7 +7,6 @@ function AprobarRegistro() {
   const [solicitudes, setSolicitudes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   // Datos de prueba
   const mockSolicitudes = [
     {
@@ -45,20 +44,28 @@ function AprobarRegistro() {
   ]
 
   useEffect(()=>{
-    //Simular carga de datos del backend
+    //Carga de datos del backend
     const fetchSolicitudes = async () =>{
       try{
         setLoading(true);
         //// Backend
-        // const response = await fetch ('/api/solicitudes');
-        // const data = await response.json;
-        setTimeout(()=>{
-          setSolicitudes(mockSolicitudes);
-          setLoading(false);
-        },1000);
+        const res = await fetch('http://localhost:3001/api/admin/solicitudes');
+        const data = await res.json();
+        // Aquí mapeamos para que coincida con lo que tu UI espera
+        const solicitudesFormateadas = data.map(item => ({
+          id: item.id,
+          nombre: `${item.first_name} ${item.last_name}`,
+          email: item.email,
+          fechaSolicitud: item.created_at,
+          rolesSolicitados: Array.isArray(item.roles) ? item.roles : [], // evita errores
+          estado: "pendiente",
+        }));
+        setSolicitudes(solicitudesFormateadas);
+        
       }catch(err){
         console.error("Error al cargar solicitudes:",err);
         setError("No se pudieron cargar las solicitudes. Intenta nuevamente.");
+      }finally{
         setLoading(false);
       }
     };
@@ -91,26 +98,29 @@ function AprobarRegistro() {
   };
 
   // Funcion para aprobar/rechazar toda la solicitud
-  const handleSolicitudDecision = (solicitudId, decision) =>{
+  const handleSolicitudDecision = async (solicitudId, decision) =>{
     console.log(`Solicitud ${solicitudId}: ${decision}`);
-    // Aquí iría la llamada al backend
-    // await fetch(`/api/solicitudes/${solicitudId}`, {
-    //   method: 'PUT',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ decision })
-    // });
+    if(decision === 'aprobada'){
+      await fetch('http://localhost:3001/api/admin/aprobar',{
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ pendingUserId: solicitudId })
+      });
+    }else{
+      await fetch('http://localhost:3001/api/admin/rechazar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pendingUserId: solicitudId })
+    });
+    }
 
     // Remover de la lista (temporal)
     setSolicitudes(prev => prev.filter(s => s.id !== solicitudId));
-    
-    alert(`Solicitud ${solicitudId} ${decision === 'aprobada' ? 'aprobada' : 'rechazada'} completamente`);
   };
 
   // Funcion para ver detalles
   const verDetalles = (solicitud) => {
-    console.log("Ver detalles: ",solicitud);
-    // Podrías navegar a una página de detalles o mostrar un modal
-    alert(`Detalles de ${solicitud.nombre}:\nEmail: ${solicitud.email}\nRoles: ${solicitud.rolesSolicitados.join(", ")}`);
+    navigate(`/solicitudes_registro/${solicitud.id}`);
   }
 
   // Función para volver atras

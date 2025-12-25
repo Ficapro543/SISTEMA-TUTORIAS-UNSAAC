@@ -72,7 +72,7 @@ function VerificarCodigo() {
 
       if (response.ok) {
         setSuccess("Código verificado correctamente.");
-        setTimeout(() => navigate("/nueva-contrasena", { state: { email } }), 1200);
+        setTimeout(() => navigate("/recuperar/nueva", { state: { email } }), 3000);
       } else {
         const data = await response.json();
         setError(data.message || "El código ingresado no es válido.");
