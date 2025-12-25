@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import styles from "../styles/components/CuentaVerificada.module.css";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import styles from "../styles/pages/CuentaVerificada.module.css";
 
 function CuentaVerificada() {
   const navigate = useNavigate();

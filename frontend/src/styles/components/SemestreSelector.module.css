@@ -1,0 +1,33 @@
+.formGroup{
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 25px;
+}
+
+.formGroup label{
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.formGroup select {
+  padding: 12px;
+  border-radius: var(--radius);
+  background: var(--color-gray-light);
+  border: 2px solid transparent;
+  transition: var(--transition);
+
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  background-image: url("data:image/svg+xml;utf8,<svg fill='gray' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 20px;
+}
+
+.formGroup select:focus {
+  border-color: var(--color-secondary);
+  outline: none;
+  background-color: white;
+}

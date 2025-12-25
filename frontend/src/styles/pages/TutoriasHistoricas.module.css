@@ -1,0 +1,25 @@
+.page{
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
+  padding: 40px;
+  font-family: var(--font-main);
+}
+
+.container{
+  background: var(--color-text-light);
+  color: var(--color-secondary);
+  padding: 40px 60px;
+  border-radius: 25px;
+  max-width: 900px;
+  margin: auto;
+  box-shadow: var(--shadow);
+}
+
+.subtitle{
+  color: var(--color-gray);
+  margin-bottom: 25px;
+}
+
+.errorMessage{
+  color: crimson;
+}

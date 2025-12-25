@@ -12,7 +12,8 @@ import { Navigate } from "react-router-dom";
 import RecuperarPassword from "./pages/RecuperarPassword.jsx";
 import VerificarCodigo from "./pages/VerificarCodigo.jsx";
 import NuevaContrasena from "./pages/NuevaContraseña.jsx";
-
+//---- SISTEMA ----
+import TutoriasHistoricas from "./pages/TutoriasHistoricas.jsx";
 function App() {
   return (
     <Layout>
@@ -29,6 +30,7 @@ function App() {
         <Route path="/recuperar/nueva" element={<NuevaContrasena />} />
         <Route path="/ping" element={<BackendStatus />} />
         <Route path="*" element={<Navigate to="/ping" replace />} />
+        <Route path="/tutoriasHistoricas"  element={<TutoriasHistoricas roles={{ administrador: true }} />} />
       </Routes>
     </Layout>
   );

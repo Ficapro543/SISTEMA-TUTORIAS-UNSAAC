@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import "../styles/components/NuevaContrasena.css";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "../styles/pages/NuevaContrasena.css";
 
 function NuevaContraseña() {
   const navigate = useNavigate();

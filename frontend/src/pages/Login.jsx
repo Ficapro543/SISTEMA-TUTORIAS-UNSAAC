@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import styles from "../styles/components/Login.module.css";
+import styles from "../styles/pages/Login.module.css";
 
 function Login() {
   const navigate = useNavigate();
@@ -10,6 +10,7 @@ function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // Solo correos institucionales @unsaac.edu.pe
   const emailRegex = /^[a-zA-Z0-9._%+-]+@unsaac\.edu\.pe$/;
@@ -17,25 +18,26 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
     
     // Validación básica
     if (!email && !password) {
       setError("Por favor rellena tus credenciales.");
+      setLoading(false);
       return;
-    }
-
-    else if (!email) {
+    } else if (!email) {
       setError("Por favor, ingresa tu correo institucional.");
+      setLoading(false);
       return;
-    }
-
-    else if (!password){
+    } else if (!password){
       setError("Por favor, ingresa tu contraseña.");
+      setLoading(false);
       return;
     }
 
     if (!emailRegex.test(email)) {
       setError("El correo ingresado no es válido.");
+      setLoading(false);
       return;
     }
 
@@ -44,18 +46,23 @@ function Login() {
       const response = await fetch("http://localhost:3001/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-        credentials: "include", // Mantiene la sesion segura (cookie JWT)
+        body: JSON.stringify({ email, password })
       });
 
       const data = await response.json();
+
       if (response.ok) {
         //Credenciales correctas
         const roles = data.roles; // {administrador: 1, tutor: 0, verificador: 0}
-
-
-        //TODO: CAMBIAR ESTA MADRE AL MAINPAGE
-        localStorage.setItem("userRoles",JSON.stringify(roles));
+        localStorage.setItem('accessToken',data.accessToken);
+        localStorage.setItem('refreshToken',data.refreshToken);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        // Guardamos el access token para futuras peticiones
+        //axios.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
+        // Guardar también los roles si los necesitas por separado
+        if (data.user && data.user.roles) {
+          localStorage.setItem('userRoles', JSON.stringify(data.user.roles));
+        }
         navigate("/mainpage");
         
       } else {
@@ -64,6 +71,9 @@ function Login() {
       }
     } catch (err) {
       setError("Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+      console.error("Login error:", err);
+    } finally{
+      setLoading(false);
     }
   }
 
@@ -103,6 +113,7 @@ function Login() {
                 value={password}
                 onChange={(e)=>setPassword(e.target.value)}
                 className={`${error && !password ? styles.inputError : ""} ${styles.passwordInput}`}
+                autoComplete="current-password"
               />
 
               <button
@@ -120,8 +131,8 @@ function Login() {
           
           {error && <p className={styles.errorMessage}>{error}</p>}
 
-          <button type="submit" className={styles.loginBtn}>
-            Ingresar
+          <button type="submit" className={styles.loginBtn} disabled={loading}>
+            {loading ? "Cargando..." : "Ingresar"}
           </button>
 
           <p className={styles.forgotPassword} onClick={handleForgotPassword}>
