@@ -299,9 +299,13 @@ async function getTutoriaDetalle(req, res, next){
 }
 
 module.exports = { 
-  createPendingUser, 
-  approvePendingUser, 
-  getSemestresCerrados, 
-  getTutoriasPorSemestre, 
-  getTutoriaDetalle 
+  createPendingUser,
+  approvePendingUser,
+  getAllPendingUser,
+  getOnePendingUser,
+  rejectOnePendingUser,
+  decideRol,
+  getSemestresCerrados,
+  getTutoriasPorSemestre,
+  getTutoriaDetalle,
 };
