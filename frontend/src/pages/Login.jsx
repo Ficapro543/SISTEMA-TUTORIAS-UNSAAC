@@ -18,6 +18,7 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     setError("");
     // Validación básica
     if (!email && !password) {
@@ -42,11 +43,10 @@ function Login() {
 
     // Envio al backend usando api
     try {
-      setLoading(true);
       const response = await api.post('/auth/login', {
         email,
         password
-      });
+      })
 
       const data = response.data;
 
@@ -59,18 +59,15 @@ function Login() {
       if (data.user && data.user.roles) {
         localStorage.setItem('userRoles', JSON.stringify(data.user.roles));
 
-        // Configurar el header para la instancia de api
         api.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
 
-        // Navegamos segun el rol
         if (data.user.roles.administrador) {
           navigate("/admin");
         } else {
           navigate("/mainpage");
         }
       } else {
-        // Credenciales incorrectas o data malformada
-        setError(data.message || "Error al obtener datos del usuario.");
+        setError(data.message || "Correo o contraseña incorrectos.");
       }
 
     } catch (err) {
