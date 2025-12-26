@@ -1,6 +1,6 @@
 import React, {useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import styles from "../styles/components/AprobarRegistro.module.css";
+import styles from "../styles/pages/AprobarRegistro.module.css";
 
 function AprobarRegistro() {
   const navigate = useNavigate();

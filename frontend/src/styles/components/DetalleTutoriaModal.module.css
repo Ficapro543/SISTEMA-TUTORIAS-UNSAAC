@@ -1,0 +1,230 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7); /* Oscurecemos el fondo */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(3px); /* Efecto de desenfoque */
+}
+
+.modal {
+  background: white;
+  border-radius: var(--radius);
+  width: 85vw; /* Ancho del 85% de la pantalla */
+  max-width: 1000px; /* Máximo ancho */
+  max-height: 85vh; /* Altura máxima */
+  overflow-y: auto;
+  box-shadow: var(--shadow);
+  animation: modalAppear 0.3s ease-out;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@keyframes modalAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 30px;
+  border-bottom: 1px solid #e9ecef;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  color: white;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.modalHeader h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.headerCloseBtn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.headerCloseBtn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
+}
+
+.modalContent {
+  padding: 25px 30px;
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Dos columnas para más ancho */
+  gap: 30px;
+}
+
+/* Primera columna: Información General */
+.modalContent > div:first-child {
+  grid-column: 1;
+}
+
+/* Segunda columna: Observaciones y demás */
+.modalContent > div:not(:first-child) {
+  grid-column: 2;
+}
+
+.section {
+  margin-bottom: 25px;
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  border-left: 4px solid var(--color-primary);
+}
+
+.section h4 {
+  margin-bottom: 15px;
+  color: var(--color-secondary);
+  font-size: 1.1rem;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.infoItem {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.infoItem:last-child {
+  border-bottom: none;
+}
+
+.infoItem strong {
+  color: var(--color-gray);
+  font-size: 0.85rem;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.infoItem span {
+  color: var(--color-text-dark);
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.observacion {
+  margin-bottom: 15px;
+  background: white;
+  padding: 15px;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+}
+
+.observacion:last-child {
+  margin-bottom: 0;
+}
+
+.observacion strong {
+  color: var(--color-primary);
+  font-size: 0.9rem;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.observacion p {
+  margin: 0;
+  padding: 0;
+  color: var(--color-text-dark);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.tipo {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.tipo.academica {
+  background: linear-gradient(135deg, #d4edda, #c3e6cb);
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.tipo.personal {
+  background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+}
+
+.tipo.profesional {
+  background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.tipo.general {
+  background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.modalFooter {
+  padding: 20px 30px;
+  border-top: 1px solid #e9ecef;
+  text-align: center;
+  background: #f8f9fa;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+.closeButton {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 150px;
+  box-shadow: 0 4px 15px rgba(0, 78, 146, 0.3);
+}
+
+.closeButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 78, 146, 0.4);
+  opacity: 0.95;
+}
+
+.closeButton:active {
+  transform: translateY(0);
+}
