@@ -65,7 +65,6 @@ CREATE TABLE IF NOT EXISTS tutores (
 
 CREATE TABLE IF NOT EXISTS estudiante (
     codigo_estudiante VARCHAR(20) PRIMARY KEY,
-
     nombre_estudiante VARCHAR(100) NOT NULL,
     apellido_estudiante VARCHAR(100) NOT NULL
 );

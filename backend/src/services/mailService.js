@@ -5,62 +5,92 @@ let transporter;
 
 async function createTransporter() {
   if (!transporter) {
+    const host = (process.env.MAIL_HOST || process.env.EMAIL_HOST || '').trim();
+    const user = (process.env.MAIL_USER || process.env.EMAIL_USER || '').trim();
+    const pass = (process.env.MAIL_PASS || '').replace(/\s/g, '');
+    const port = Number(process.env.MAIL_PORT || process.env.EMAIL_PORT);
+    const secure = (process.env.MAIL_SECURE || process.env.EMAIL_SECURE) === 'true';
+
     transporter = nodemailer.createTransport({
-      host: process.env.MAIL_HOST,
-      port: Number(process.env.MAIL_PORT),
-      secure: process.env.MAIL_SECURE === 'true',
+      host: host,
+      port: port,
+      secure: secure,
       auth: {
-        user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASS
+        user: user,
+        pass: pass
       }
     });
 
     try {
-      await transporter.verify();
-      console.log('Mail transporter listo');
+      if (host && host !== 'localhost') {
+        await transporter.verify();
+        console.log('✅ Mail transporter listo');
+      } else {
+        console.log('ℹ️ SMTP no configurado. Los correos se imprimirán en consola.');
+        transporter = null;
+      }
     } catch (err) {
-      console.error('Error verificando transporter:', err);
+      console.warn('⚠️ No se pudo conectar al SMTP. Verifica tus datos en el .env.', err.message);
+      transporter = null;
     }
   }
   return transporter;
 }
 
+async function sendMailFallback(options) {
+  console.log('--- ENVIANDO CORREO (Simulación/Fallback) ---');
+  console.log(`De: ${options.from}`);
+  console.log(`Para: ${options.to}`);
+  console.log(`Asunto: ${options.subject}`);
+  console.log(`Contenido:\n${options.html}`);
+  console.log('---------------------------------------------');
+  return { messageId: 'simulated-' + Date.now() };
+}
+
 async function sendAdminApprovalEmail(adminEmail, pendingUserId) {
   const transporter = await createTransporter();
-  const approvalLink = `${process.env.FRONTEND_URL}/solicitudes_registro/${pendingUserId}`;
+  const approvalLink = `${process.env.FRONTEND_URL}/admin`; // Enlace directo al dashboard para el admin
 
-  const info = await transporter.sendMail({
-    from: process.env.MAIL_FROM,
+  const mailOptions = {
+    from: process.env.MAIL_FROM || process.env.EMAIL_FROM || 'no-reply@unsaac.edu.pe',
     to: adminEmail,
     subject: 'Nueva solicitud de registro',
     html: `
       <p>Un usuario ha solicitado acceso al sistema.</p>
       <p>ID de solicitud: <strong>${pendingUserId}</strong></p>
-      <p>Revisar y aprobar: 
+      <p>Revisar y aprobar en el dashboard: 
         <a href="${approvalLink}" target="_blank">${approvalLink}</a>
       </p>`
-  });
+  };
 
-  console.log('Admin email enviado:', info.messageId);
+  const info = transporter
+    ? await transporter.sendMail(mailOptions)
+    : await sendMailFallback(mailOptions);
+
+  console.log('Admin email procesado:', info.messageId);
   return info;
 }
 
 async function sendUserActivationEmail(userEmail, token) {
   const transporter = await createTransporter();
-  const activationLink = `${process.env.FRONTEND_URL}/verificado/${token}`;
+  const activationLink = `${process.env.FRONTEND_URL}/login`; // Directo a login ya que se activará automáticamente
 
-  const info = await transporter.sendMail({
-    from: process.env.MAIL_FROM,
+  const mailOptions = {
+    from: process.env.MAIL_FROM || process.env.EMAIL_FROM || 'no-reply@unsaac.edu.pe',
     to: userEmail,
-    subject: 'Activación de cuenta',
+    subject: 'Cuenta activada - Acceso concedido',
     html: `
-      <p>Tu cuenta ha sido aprobada por un administrador.</p>
-      <p>Activa tu cuenta aquí:
+      <p>Tu cuenta ha sido aprobada por un administrador y ya está activa.</p>
+      <p>Puedes iniciar sesión aquí:
         <a href="${activationLink}" target="_blank">${activationLink}</a>
       </p>`
-  });
+  };
 
-  console.log('User activation email enviado:', info.messageId);
+  const info = transporter
+    ? await transporter.sendMail(mailOptions)
+    : await sendMailFallback(mailOptions);
+
+  console.log('User activation email procesado:', info.messageId);
   return info;
 }
 

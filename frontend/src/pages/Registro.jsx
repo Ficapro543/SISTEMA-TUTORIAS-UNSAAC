@@ -1,6 +1,6 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import styles from "../styles/components/Registro.module.css"
+import styles from "../styles/pages/Registro.module.css"
 
 function Register() {
   const navigate = useNavigate();
@@ -14,7 +14,7 @@ function Register() {
   const [rol, setRol] = useState([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [tooltip, setTooltip] = useState({visible: false, content: "", x: 0, y: 0, align: 'center'});
+  const [tooltip, setTooltip] = useState({ visible: false, content: "", x: 0, y: 0, align: 'center' });
 
   // Estados para mostrar contraseña
   const [showPassword, setShowPassword] = useState(false);
@@ -24,32 +24,32 @@ function Register() {
   const emailRegex = /^[a-zA-Z0-9._%+-]+@unsaac\.edu\.pe$/;
 
   // Validacion contraseña
-  const validarPassword = (pass)=>{
-    if(pass.length < 8 || pass.length > 64){
+  const validarPassword = (pass) => {
+    if (pass.length < 8 || pass.length > 64) {
       return "La contraseña debe tener entre 8 y 64 caracteres.";
     }
-    if(!/(?=.*[a-z])/.test(pass)){
+    if (!/(?=.*[a-z])/.test(pass)) {
       return "La contraseña debe contener al menos una letra minúscula.";
     }
-    if(!/(?=.*[A-Z])/.test(pass)){
+    if (!/(?=.*[A-Z])/.test(pass)) {
       return "La contraseña debe contener al menos una letra mayúscula.";
     }
-    if(!/(?=.*\d)/.test(pass)){
+    if (!/(?=.*\d)/.test(pass)) {
       return "La contraseña debe contener al menos un número.";
     }
-    if(!/(?=.*[@$!%*?&])/.test(pass)){
+    if (!/(?=.*[@$!%*?&])/.test(pass)) {
       return "La contraseña debe contener al menos un carácter especial (@$!%*?&).";
     }
     return null;
   };
 
   // Funciones de manejo
-  const handleRolClick = (rolSeleccionado) =>{
-    setRol((prev)=>
+  const handleRolClick = (rolSeleccionado) => {
+    setRol((prev) =>
       prev.includes(rolSeleccionado)
         ? prev.filter((r) => r !== rolSeleccionado)
         : [...prev, rolSeleccionado]
-      );
+    );
   };
 
   const handleTooltipShow = (content, event, type = 'rol') => {
@@ -75,38 +75,38 @@ function Register() {
     setSuccess("");
 
     // Validaciones
-    if(!nombres || !apellidos || !correo || !password || !confirmar){
+    if (!nombres || !apellidos || !correo || !password || !confirmar) {
       setError("Por favor, completa todos los campos.");
       return;
     }
 
-    if(!emailRegex.test(correo)){
+    if (!emailRegex.test(correo)) {
       setError("El correo debe ser institucional (@unsaac.edu.pe).");
       return;
     }
 
     // Validar contraseña con la función
     const errorPassword = validarPassword(password);
-    if(errorPassword){
+    if (errorPassword) {
       setError(errorPassword);
       return;
     }
 
-    if(password !== confirmar){
+    if (password !== confirmar) {
       setError("Las contraseñas no coinciden.");
       return;
     }
 
-    if(rol.length === 0){
+    if (rol.length === 0) {
       setError("Por favor, selecciona al menos un rol.");
       return;
     }
 
     // TEMPORAL: Simulando éxito sin backend
     const simulateSuccess = false; //Cambiar a falso para probar errores
-    if(simulateSuccess){
-      navigate("/confirmacion",{
-        state:{
+    if (simulateSuccess) {
+      navigate("/confirmacion", {
+        state: {
           email: correo,
           nombres: nombres,
         }
@@ -115,7 +115,7 @@ function Register() {
     }
 
     //Envio al backend (COMENTADO TEMPORALMENTE)
-    try{
+    try {
       const response = await fetch("http://localhost:3001/api/admin/solicitud", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -130,20 +130,18 @@ function Register() {
 
 
       const data = await response.json();
-      if(response.ok)
-      {
-        navigate("/confirmacion", { 
-          state: { 
+      if (response.ok) {
+        navigate("/confirmacion", {
+          state: {
             email: correo,
             nombres: nombres
           }
         });
       }
-      else
-      {
+      else {
         setError(data.message || "Error en el registro. Inténtalo de nuevo.");
       }
-    } catch(err){
+    } catch (err) {
       setError("No se pudo conectar con el servidor.");
     }
   };
@@ -155,13 +153,13 @@ function Register() {
   // Datos de los roles
   const rolesData = [
     {
-      id: "Tutor",
+      id: "tutor",
       nombre: "Tutor",
       imagen: "/tutorIcon.svg",
       descripcion: "Registra y actualiza las tutorías de sus estudiantes; emite constancias y listados de tutorados."
     },
     {
-      id: "evaluador", 
+      id: "verificador",
       nombre: "Evaluador",
       imagen: "/evaluadorIcon.svg",
       descripcion: "Verifica el seguimiento de estudiantes tutorados y revisa el trabajo realizado por cada tutor."
@@ -191,7 +189,7 @@ function Register() {
                 type="text"
                 placeholder="Ingrese su nombre"
                 value={nombres}
-                onChange={(e)=>setNombres(e.target.value)}
+                onChange={(e) => setNombres(e.target.value)}
                 className={error && !nombres ? styles.inputError : ""}
               />
             </div>
@@ -202,7 +200,7 @@ function Register() {
                 type="text"
                 placeholder="Ingrese sus apellidos"
                 value={apellidos}
-                onChange={(e)=>setApellidos(e.target.value)}
+                onChange={(e) => setApellidos(e.target.value)}
                 className={error && !apellidos ? styles.inputError : ""}
               />
             </div>
@@ -210,8 +208,8 @@ function Register() {
 
           <div className={styles.formGroup}>
             <label>Correo electrónico</label>
-            <input 
-              type="text" 
+            <input
+              type="text"
               placeholder="ejemplo@unsaac.edu.pe"
               value={correo}
               onChange={(e) => setCorreo(e.target.value)}
@@ -222,16 +220,16 @@ function Register() {
           <div className={styles.formGroup}>
             <div className={styles.passwordLabelContainer}>
               <label>Contraseña</label>
-              <div 
+              <div
                 className={styles.infoIcon}
-                onMouseEnter={(e)=>handleTooltipShow(passwordRequisitos, e, 'password')}
+                onMouseEnter={(e) => handleTooltipShow(passwordRequisitos, e, 'password')}
                 onMouseLeave={handleTooltipHide}
               >
-                <img src="/info-icon.svg" alt="Información"/>
+                <img src="/info-icon.svg" alt="Información" />
               </div>
             </div>
             <div className={styles.passwordInputWrapper}>
-              <input 
+              <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Ingrese su contraseña"
                 value={password}
@@ -254,7 +252,7 @@ function Register() {
           <div className={styles.formGroup}>
             <label>Confirmar contraseña</label>
             <div className={styles.passwordInputWrapper}>
-              <input 
+              <input
                 type={showConfirmPassword ? "text" : "password"}
                 placeholder="Confirme su contraseña"
                 value={confirmar}
@@ -281,18 +279,18 @@ function Register() {
               <div
                 key={rolItem.id}
                 className={`${styles.rolCard} ${rol.includes(rolItem.id) ? styles.activo : ""}`}
-                onClick={()=>handleRolClick(rolItem.id)}
+                onClick={() => handleRolClick(rolItem.id)}
               >
                 <div className={styles.rolIcon}>
-                  <img src={rolItem.imagen} alt={rolItem.nombre}/>
+                  <img src={rolItem.imagen} alt={rolItem.nombre} />
                 </div>
                 <div className={styles.rolName}>{rolItem.nombre}</div>
                 <div
                   className={styles.infoIcon}
-                  onMouseEnter={(e)=>handleTooltipShow(rolItem.descripcion, e, 'rol')}
+                  onMouseEnter={(e) => handleTooltipShow(rolItem.descripcion, e, 'rol')}
                   onMouseLeave={handleTooltipHide}
                 >
-                  <img src="/info-icon.svg" alt="Información"/>
+                  <img src="/info-icon.svg" alt="Información" />
                 </div>
               </div>
             ))}
@@ -328,7 +326,7 @@ function Register() {
           <button
             type="button"
             className={styles.googleBtn}
-            onClick={()=>
+            onClick={() =>
               alert("🔐 Conexión con Google pendiente de backend.")
             }
           >

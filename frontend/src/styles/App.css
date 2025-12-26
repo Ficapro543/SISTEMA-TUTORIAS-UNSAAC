@@ -39,6 +39,8 @@
   /* filter: brightness(0) saturate(100%) invert(23%) sepia(98%) saturate(1385%) hue-rotate(195deg) brightness(93%) contrast(101%); */
 }
 
+/*
 .google-btn:hover img{
-  /* filter: brightness(0) invert(1); */
-}
+  filter: brightness(0) invert(1);
+} 
+*/
