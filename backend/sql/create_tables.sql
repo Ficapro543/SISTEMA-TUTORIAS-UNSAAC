@@ -95,10 +95,6 @@ CREATE TABLE IF NOT EXISTS tutor_asignacion (
         ON DELETE RESTRICT
 );
 
-CREATE UNIQUE INDEX uq_asignacion_activa
-ON tutor_asignacion (codigo_estudiante, semestre)
-WHERE estado = 'activo';
-
 CREATE TABLE IF NOT EXISTS cronogramas (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
@@ -169,3 +165,77 @@ CREATE TABLE IF NOT EXISTS derivaciones (
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
+
+/*Indices*/
+CREATE UNIQUE INDEX uq_asignacion_activa IF NOT EXISTS uq_asignacion_activa
+ON tutor_asignacion (codigo_estudiante, semestre)
+WHERE estado = 'activo';
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_cronograma_tutor_fecha_hora
+ON cronogramas (tutor_user_id, fecha, hora);
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_cronograma_ambiente_fecha_hora
+ON cronogramas (fecha, hora, ambiente)
+WHERE ambiente IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_cronograma_semestre
+ON cronogramas (semestre);
+
+CREATE INDEX IF NOT EXISTS idx_tutoria_cronograma
+ON tutorias (cronograma_id);
+
+CREATE INDEX IF NOT EXISTS idx_cronograma_tutor
+ON cronogramas (tutor_user_id);
+
+/*Funciones*/
+CREATE OR REPLACE FUNCTION set_fecha_actualizacion()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.fecha_actualizacion = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION bloquear_edicion_tutoria_fuera_fecha()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM cronogramas c
+        WHERE c.id = OLD.cronograma_id
+          AND (c.fecha + c.hora) < CURRENT_TIMESTAMP
+    ) THEN
+        RAISE EXCEPTION 'No se puede modificar tutorías de fechas pasadas';
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION bloquear_edicion_cronograma_pasado()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (OLD.fecha + OLD.hora) < CURRENT_TIMESTAMP THEN
+        RAISE EXCEPTION 'No se puede modificar cronogramas de fechas pasadas';
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+/*TRIGGERS*/
+CREATE TRIGGER trg_update_fecha_tutoria
+BEFORE UPDATE ON tutorias
+FOR EACH ROW
+WHEN (OLD IS DISTINCT FROM NEW)
+EXECUTE FUNCTION set_fecha_actualizacion();
+
+CREATE TRIGGER trg_bloquear_edicion_tutoria
+BEFORE UPDATE ON tutorias
+FOR EACH ROW
+EXECUTE FUNCTION bloquear_edicion_tutoria_fuera_fecha();
+
+CREATE TRIGGER trg_bloquear_edicion_cronograma
+BEFORE UPDATE ON cronogramas
+FOR EACH ROW
+EXECUTE FUNCTION bloquear_edicion_cronograma_pasado();
