@@ -52,99 +52,121 @@ CREATE TABLE IF NOT EXISTS password_reset_tokens (
 );
 
 CREATE TABLE IF NOT EXISTS tutores (
-    id_tutor SERIAL PRIMARY KEY,
-    id_usuario INTEGER NOT NULL,
+    user_id UUID PRIMARY KEY,
     cubiculo VARCHAR(50),
 
-    CONSTRAINT fk_tutores_usuario
-        FOREIGN KEY (id_usuario)
-        REFERENCES usuarios(id)
+    CONSTRAINT fk_tutores_user
+        FOREIGN KEY (user_id)
+        REFERENCES users(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS estudiante (
-    codigo_estudiante VARCHAR(20) NOT NULL UNIQUE,
+    codigo_estudiante VARCHAR(20) PRIMARY KEY,
+
     nombre_estudiante VARCHAR(100) NOT NULL,
     apellido_estudiante VARCHAR(100) NOT NULL,
-    semestre VARCHAR(10) NOT NULL,
-    id_tutor INTEGER NOT NULL,
-
-    CONSTRAINT fk_tutorandos_tutor
-        FOREIGN KEY (id_tutor)
-        REFERENCES tutores(id_tutor)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS cronogramas (
-    id_cronograma VARCHAR(20) PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS tutor_asignacion (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    tutor_user_id UUID NOT NULL,
+    codigo_estudiante VARCHAR(20) NOT NULL,
     semestre VARCHAR(10) NOT NULL,
+
+    estado TEXT NOT NULL DEFAULT 'activo',
+    fecha_asignacion TIMESTAMP NOT NULL DEFAULT now(),
+    fecha_fin TIMESTAMP,
+
+    CONSTRAINT chk_estado_asignacion
+        CHECK (estado IN ('activo', 'finalizado')),
+
+    CONSTRAINT fk_asignacion_tutor
+        FOREIGN KEY (tutor_user_id)
+        REFERENCES tutores(user_id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+
+    CONSTRAINT fk_asignacion_estudiante
+        FOREIGN KEY (codigo_estudiante)
+        REFERENCES estudiante(codigo_estudiante)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
+);
+
+CREATE UNIQUE INDEX uq_asignacion_activa
+ON tutor_asignacion (codigo_estudiante, semestre)
+WHERE estado = 'activo';
+
+CREATE TABLE IF NOT EXISTS cronogramas (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    tutor_user_id UUID NOT NULL,
+    codigo_estudiante VARCHAR(20) NOT NULL,
+
     fecha DATE NOT NULL,
-    estado TEXT NOT NULL DEFAULT 'Creado',
+    hora TIME NOT NULL,
+    ambiente VARCHAR(100),
+
+    semestre VARCHAR(10) NOT NULL,
+    estado TEXT NOT NULL DEFAULT 'programada',
+
+    created_at TIMESTAMP DEFAULT now(),
 
     CONSTRAINT chk_estado_cronograma
-        CHECK (estado IN ('Creado', 'En Curso', 'Concluido'))
+        CHECK (estado IN ('programada', 'realizada', 'cancelada')),
+
+    CONSTRAINT fk_cronograma_tutor
+        FOREIGN KEY (tutor_user_id)
+        REFERENCES tutores(user_id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+
+    CONSTRAINT fk_cronograma_estudiante
+        FOREIGN KEY (codigo_estudiante)
+        REFERENCES estudiante(codigo_estudiante)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
 );
 
 CREATE TABLE IF NOT EXISTS tutorias (
-    id_tutoria SERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
-    id_tutor INTEGER NOT NULL,
-    codigo_estudiante INTEGER NOT NULL,
-    id_cronograma VARCHAR(20) NOT NULL,
+    cronograma_id UUID NOT NULL,
 
-    obs_personal TEXT,
     obs_academico TEXT,
+    obs_personal TEXT,
     obs_profesional TEXT,
     resumen_general TEXT,
 
-    requiere_derivacion BOOLEAN NOT NULL DEFAULT FALSE,
-    especialidad_derivacion VARCHAR(100),
-    motivo_derivacion TEXT,
+    requiere_derivacion BOOLEAN DEFAULT FALSE,
 
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     modalidad TEXT NOT NULL DEFAULT 'Asignada',
 
-    CONSTRAINT chk_modalidad_tutoria
-        CHECK (modalidad IN ('Solicitada', 'Asignada')),
-
-    CONSTRAINT fk_tutorias_tutor
-        FOREIGN KEY (id_tutor)
-        REFERENCES tutores(id_tutor)
+    CONSTRAINT fk_tutoria_cronograma
+        FOREIGN KEY (cronograma_id)
+        REFERENCES cronogramas(id)
         ON UPDATE CASCADE
-        ON DELETE RESTRICT,
-
-    CONSTRAINT fk_tutorias_tutorando
-        FOREIGN KEY (id_tutorando)
-        REFERENCES estudiante(id_tutorando)
-        ON UPDATE CASCADE
-        ON DELETE RESTRICT,
-
-    CONSTRAINT fk_tutorias_cronograma
-        FOREIGN KEY (id_cronograma)
-        REFERENCES cronogramas(id_cronograma)
-        ON UPDATE CASCADE
-        ON DELETE RESTRICT,
-
-    CONSTRAINT uq_tutoria_semestre
-        UNIQUE (id_tutor, id_tutorando, id_cronograma)
+        ON DELETE RESTRICT
 );
 
 CREATE TABLE IF NOT EXISTS derivaciones (
-    id_derivacion SERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
-    id_tutoria INTEGER NOT NULL,
+    tutoria_id UUID NOT NULL,
     especialidad VARCHAR(100) NOT NULL,
     motivo TEXT NOT NULL,
 
     fecha_derivacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_derivacion_tutoria
-        FOREIGN KEY (id_tutoria)
-        REFERENCES tutorias(id_tutoria)
+        FOREIGN KEY (tutoria_id)
+        REFERENCES tutorias(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
