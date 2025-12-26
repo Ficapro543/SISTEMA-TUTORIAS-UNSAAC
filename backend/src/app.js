@@ -25,6 +25,7 @@ app.get("/api/ping", (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/assignments', require('./routes/assignments'));
 
 // Error handler:
 app.use((err, req, res, next) => {

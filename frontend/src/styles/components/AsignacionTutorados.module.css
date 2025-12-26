@@ -1,0 +1,352 @@
+/* src/styles/components/AsignacionTutorados.module.css */
+
+.pageContainer {
+    min-height: 100vh;
+    background-color: white;
+    color: #1a1a1a;
+    font-family: var(--font-main, sans-serif);
+}
+
+.header {
+    padding: 12px 60px;
+    border-bottom: 1px solid #f3f3f3;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 50;
+}
+
+.headerLeft {
+    display: flex;
+    flex-direction: column;
+}
+
+.headerTitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    margin: 0;
+}
+
+.headerSubtitle {
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #94a3b8;
+    letter-spacing: 0.1em;
+    margin-top: 2px;
+}
+
+.headerRight {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.userInfo {
+    text-align: right;
+    margin-right: 16px;
+}
+
+.userName {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin: 0;
+}
+
+.userBadge {
+    font-size: 10px;
+    background-color: #eff6ff;
+    color: #1d4ed8;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.navButton {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background-color: white;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.navButton:hover {
+    background-color: #f9fafb;
+}
+
+.mainContent {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 32px 60px;
+}
+
+.sectionHeader {
+    margin-bottom: 40px;
+}
+
+.sectionTitle {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.sectionDescription {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin: 0;
+}
+
+.card {
+    background-color: white;
+    border-radius: 12px;
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    padding: 32px;
+    margin-bottom: 24px;
+}
+
+.cardTitle {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 4px;
+}
+
+.cardDescription {
+    font-size: 0.75rem;
+    color: #6b7280;
+    font-weight: 500;
+    margin-bottom: 24px;
+}
+
+.semesterBadge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #16a34a;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.inputWrapper {
+    position: relative;
+    width: 100%;
+}
+
+.inputIcon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #cbd5e1;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 12px 16px 12px 48px;
+    background-color: rgba(248, 250, 252, 0.5);
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.searchInput:focus {
+    outline: none;
+    background-color: white;
+    box-shadow: 0 0 0 4px rgba(219, 234, 254, 0.5);
+    border-color: #60a5fa;
+}
+
+.dropdownResults {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: white;
+    border: 1px solid #f1f5f9;
+    margin-top: 8px;
+    border-radius: 12px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    z-index: 20;
+    overflow: hidden;
+}
+
+.tutorResult {
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f8fafc;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.tutorResult:hover {
+    background-color: rgba(239, 246, 255, 0.5);
+}
+
+.tutorResult:last-child {
+    border-bottom: none;
+}
+
+.selectedTutorPanel {
+    background-color: rgba(239, 246, 255, 0.5);
+    border: 1px solid #dbeafe;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.infoAlert {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background-color: rgba(248, 250, 252, 0.5);
+    border: 1px solid #f1f5f9;
+    border-radius: 12px;
+    margin-bottom: 24px;
+}
+
+.tableCard {
+    background-color: white;
+    border-radius: 12px;
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.tableHeader {
+    padding: 32px;
+    border-bottom: 1px solid #f8fafc;
+}
+
+.tableContainer {
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+}
+
+.table thead tr {
+    background-color: rgba(248, 250, 252, 0.5);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #94a3b8;
+    border-bottom: 1px solid #f8fafc;
+}
+
+.table th {
+    padding: 24px;
+}
+
+.table td {
+    padding: 24px;
+    font-size: 0.875rem;
+    font-weight: 700;
+}
+
+.table rowHover:hover {
+    background-color: #f9fafb;
+}
+
+.selectedRow {
+    background-color: rgba(239, 246, 255, 0.3);
+}
+
+.footerActions {
+    padding: 24px;
+    border-top: 1px solid #f8fafc;
+    background-color: rgba(248, 250, 252, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.primaryButton {
+    padding: 10px 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: white;
+    background-color: #1f2937;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.primaryButton:hover:not(:disabled) {
+    background-color: black;
+}
+
+.primaryButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.secondaryButton {
+    padding: 10px 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #6b7280;
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.secondaryButton:hover:not(:disabled) {
+    background-color: #f9fafb;
+}
+
+.checkbox {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 1px solid #d1d5db;
+    cursor: pointer;
+}
+
+.toast {
+    position: fixed;
+    bottom: 48px;
+    right: 48px;
+    padding: 24px;
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    z-index: 50;
+}

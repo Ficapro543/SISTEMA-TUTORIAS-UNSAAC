@@ -19,8 +19,6 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setLoading(true);
-    
     // Validación básica
     if (!email && !password) {
       setError("Por favor rellena tus credenciales.");
@@ -59,6 +57,16 @@ function Login() {
       // Guardar roles por separado
       if (data.user && data.user.roles) {
         localStorage.setItem('userRoles', JSON.stringify(data.user.roles));
+
+        if (roles.administrador) {
+          navigate("/admin");
+        } else {
+          navigate("/mainpage");
+        }
+
+      } else {
+        // Credenciales incorrectas
+        setError(data.message || "Correo o contraseña incorrectos.");
       }
 
       api.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
@@ -128,12 +136,12 @@ function Login() {
 
           <div className={styles.formGroup}>
             <label>Contraseña</label>
-            <div className = {styles.passwordInputWrapper}>
+            <div className={styles.passwordInputWrapper}>
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Ingresa tu contraseña"
                 value={password}
-                onChange={(e)=>setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value)}
                 className={`${error && !password ? styles.inputError : ""} ${styles.passwordInput}`}
                 autoComplete="current-password"
                 disabled={loading}
@@ -146,13 +154,13 @@ function Login() {
                 disabled={loading}
               >
                 <img
-                  src = {showPassword ? "/hidden.svg" : "/view.svg"}
-                  alt = {showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  src={showPassword ? "/hidden.svg" : "/view.svg"}
+                  alt={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                 />
               </button>
             </div>
           </div>
-          
+
           {error && <p className={styles.errorMessage}>{error}</p>}
 
           <button type="submit" className={styles.loginBtn} disabled={loading}>

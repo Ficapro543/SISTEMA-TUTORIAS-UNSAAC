@@ -8,6 +8,18 @@ async function createPendingUser(req, res, next) {
   try {
     const { first_name, last_name, email, password, roles } = req.body;
 
+    // 1. Verificar si ya existe en la tabla de usuarios definitivos
+    const userCheck = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+    if (userCheck.rowCount > 0) {
+      return res.status(400).json({ message: 'Este correo ya está registrado y activo.' });
+    }
+
+    // 2. Verificar si ya existe una solicitud pendiente
+    const pendingCheck = await pool.query('SELECT id FROM pending_users WHERE email = $1', [email]);
+    if (pendingCheck.rowCount > 0) {
+      return res.status(400).json({ message: 'Ya existe una solicitud pendiente para este correo. Por favor, espera la aprobación del administrador.' });
+    }
+
     const hashed = await bcrypt.hash(password, 10);
     const id = uuidv4();
 
@@ -17,7 +29,7 @@ async function createPendingUser(req, res, next) {
       [id, first_name, last_name, email, hashed, roles]
     );
 
-    // enviar notificación a un administrador
+    // enviar notificación a administradores
     const adminEmail = process.env.ADMIN_EMAIL;
     await sendAdminApprovalEmail(adminEmail, id);
      
@@ -43,15 +55,39 @@ async function createPendingUser(req, res, next) {
   }
 }
 
+async function getPendingUsers(req, res, next) {
+  try {
+    console.log('GET /api/admin/solicitudes - Fetching pending users...');
+    const result = await pool.query('SELECT id, first_name, last_name, email, roles, created_at FROM pending_users ORDER BY created_at DESC');
+    console.log(`Found ${result.rows.length} pending users.`);
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error fetching pending users:', err);
+    next(err);
+  }
+}
+
+async function getPendingUserDetail(req, res, next) {
+  try {
+    const { id } = req.params;
+    const result = await pool.query('SELECT * FROM pending_users WHERE id = $1', [id]);
+    if (result.rowCount === 0) return res.status(404).json({ message: 'Solicitud no encontrada' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    next(err);
+  }
+}
+
 async function approvePendingUser(req, res, next) {
   try {
-    const { pendingUserId } = req.body;
+    const { pendingUserId, roles } = req.body; // allow overriding roles during approval
 
     const q = await pool.query(`SELECT * FROM pending_users WHERE id=$1`, [pendingUserId]);
     if (q.rowCount === 0)
       return res.status(404).json({ message: 'Solicitud no encontrada' });
 
     const pendingUser = q.rows[0];
+    const finalRoles = roles || pendingUser.roles;
 
     // Crear decisiones para todos los roles como aprobados
     const rolesDecisiones = pendingUser.roles.map(rol => ({
@@ -78,8 +114,8 @@ async function approvePendingUser(req, res, next) {
         pendingUser.last_name,
         pendingUser.email,
         pendingUser.password_hash,
-        pendingUser.roles,
-        false
+        finalRoles,
+        true // ACTIVACIÓN DIRECTA
       ]
     );
 
@@ -178,6 +214,19 @@ async function rejectOnePendingUser(req, res, next) {
     await pool.query(`DELETE FROM pending_users WHERE id=$1`, [pendingUserId]);
 
     res.json({ message: 'Solicitud rechazada' });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function rejectPendingUser(req, res, next) {
+  try {
+    const { pendingUserId } = req.body;
+    const result = await pool.query('DELETE FROM pending_users WHERE id = $1 RETURNING email', [pendingUserId]);
+    if (result.rowCount === 0) return res.status(404).json({ message: 'Solicitud no encontrada' });
+
+    // Optionally send an email notifying rejection
+    res.json({ message: 'Solicitud rechazada y eliminada.' });
   } catch (err) {
     next(err);
   }
@@ -407,7 +456,10 @@ module.exports = {
   approvePendingUser,
   getAllPendingUser,
   getOnePendingUser,
+  getPendingUsers
+  getPendingUserDetail,
   rejectOnePendingUser,
+  rejectPendingUser,
   decideRol,
   getSemestresCerrados,
   getTutoriasPorSemestre,
