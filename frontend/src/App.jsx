@@ -1,4 +1,4 @@
-import { Routes, Route, BrowserRouter } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Layout from "./pages/Layout.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Registro.jsx";
@@ -8,17 +8,15 @@ import AprobarRegistro from "./pages/AprobarRegistro.jsx";
 import SolicitudDetalle from "./pages/SolicitudDetalle.jsx";
 import MainPage from "./pages/MainPageRoles.jsx";
 import BackendStatus from "./pages/BackendStatus.jsx";
-import { Navigate } from "react-router-dom";
 import RecuperarPassword from "./pages/RecuperarPassword.jsx";
 import VerificarCodigo from "./pages/VerificarCodigo.jsx";
 import NuevaContrasena from "./pages/NuevaContraseña.jsx";
+
 //---- SISTEMA ----
 import TutoriasHistoricas from "./pages/TutoriasHistoricas.jsx";
 import TestJWT from "./componentes/TestJWT.jsx";
 import AsignacionTutorados from "./pages/AsignacionTutorados.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
-
-// NUEVO: importar la pantalla de asignación
 import AsignarTutorados from "./pages/AsignarTutorados.jsx";
 
 function App() {
@@ -37,11 +35,11 @@ function App() {
       <Route path="/recuperar/nueva" element={<Layout><NuevaContrasena /></Layout>} />
       <Route path="/ping" element={<Layout><BackendStatus /></Layout>} />
 
-       {/* NUEVA RUTA: módulo Administrador -> Asignaciones */}
+      {/* NUEVA RUTA: módulo Administrador -> Asignaciones */}
       <Route path="/administrador/asignaciones" element={<AsignarTutorados />} />
 
       <Route path="*" element={<Navigate to="/ping" replace />} />
-      <Route path="/tutoriasHistoricas"  element={<TutoriasHistoricas roles={{ administrador: true }} />} />
+      <Route path="/tutoriasHistoricas" element={<TutoriasHistoricas roles={{ administrador: true }} />} />
       <Route path="/test-jwt" element={<TestJWT />} />
     </Routes>
   );

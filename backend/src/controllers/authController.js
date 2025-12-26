@@ -21,11 +21,11 @@ async function login(req, res, next) {
       return res.status(401).json({ message: 'Usuario o contraseña incorrectos.' });
 
     const user = userQuery.rows[0];
-    console.log('🔍 Usuario encontrado:', { 
-      id: user.id, 
-      email: user.email, 
+    console.log('🔍 Usuario encontrado:', {
+      id: user.id,
+      email: user.email,
       is_active: user.is_active,
-      roles: user.roles 
+      roles: user.roles
     });
     //3. Verificar si está activo
     if (!user.is_active)
@@ -37,7 +37,7 @@ async function login(req, res, next) {
       return res.status(401).json({ message: 'Usuario o contraseña incorrectos.' });
     console.log(`🔍 Contraseña válida: ${validPassword}`);
     //5. Crear payload para los tokens
-    const payload = { 
+    const payload = {
       id: user.id,
       email: user.email,
       roles: user.roles,
@@ -53,13 +53,24 @@ async function login(req, res, next) {
 
     //7. Guardar refresh token en la bdd
     const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate()+7); //7 Dias
-    console.log('🔍 Guardando refresh token en BD...');
-    await pool.query(
-      `INSERT INTO refresh_tokens (user_id, token, expires_at)
-       VALUES ($1,$2,$3)`,
-      [user.id, refreshToken, expiresAt]
-    );
+    expiresAt.setDate(expiresAt.getDate() + 7); //7 Dias
+    console.log('🔍 Guardando refresh token en BD...', { userId: user.id, expiresAt });
+    try {
+      await pool.query(
+        `INSERT INTO refresh_tokens (user_id, token, expires_at)
+         VALUES ($1,$2,$3)`,
+        [user.id, refreshToken, expiresAt]
+      );
+      console.log('✅ Refresh token guardado correctamente');
+    } catch (dbErr) {
+      console.error('❌ ERROR ESPECÍFICO AL GUARDAR TOKEN:', {
+        msg: dbErr.message,
+        code: dbErr.code,
+        detail: dbErr.detail,
+        sql: dbErr.query
+      });
+      throw dbErr; // Re-lanzar para que el catch general lo maneje
+    }
 
     //8. Enviar respuesta
     const rolesBoolean = {
@@ -83,7 +94,12 @@ async function login(req, res, next) {
     })
 
   } catch (err) {
-    console.error('🔥 ERROR en login:', err);
+    console.error('🔥 ERROR CRÍTICO EN LOGIN:', {
+      message: err.message,
+      code: err.code,
+      detail: err.detail,
+      stack: err.stack
+    });
     next(err);
   }
 }
@@ -115,7 +131,7 @@ async function activateAccount(req, res, next) {
     if (q.rowCount === 0) {
       await client.query('ROLLBACK');
       console.log("❌ Token NO encontrado en la base de datos");
-      return res.status(404).json({ 
+      return res.status(404).json({
         message: 'Token inválido o expirado'
       });
     }
@@ -127,7 +143,7 @@ async function activateAccount(req, res, next) {
       console.log("⚠️ Token ya usado anteriormente");
       await client.query('ROLLBACK');
 
-      return res.status(200).json({ 
+      return res.status(200).json({
         message: 'La cuenta ya fue activada anteriormente con este enlace.',
         user: {
           id: tokenData.user_id_exists,
@@ -144,8 +160,8 @@ async function activateAccount(req, res, next) {
     if (tokenData.expires_at < new Date()) {
       console.log("⚠️ Token expirado");
       await client.query('ROLLBACK');
-      return res.status(400).json({ 
-        message: 'Token expirado. Solicite un nuevo enlace de activación.' 
+      return res.status(400).json({
+        message: 'Token expirado. Solicite un nuevo enlace de activación.'
       });
     }
 
@@ -160,8 +176,8 @@ async function activateAccount(req, res, next) {
         [token]
       );
       await client.query('COMMIT');
-      
-      return res.status(200).json({ 
+
+      return res.status(200).json({
         message: 'La cuenta ya estaba activada anteriormente',
         user: {
           id: tokenData.user_id_exists,
@@ -195,16 +211,16 @@ async function activateAccount(req, res, next) {
     if (updateResult.rowCount === 0) {
       await client.query('ROLLBACK');
       console.log("⚠️ No se pudo activar el usuario (posible condición de carrera)");
-      return res.status(409).json({ 
-        message: 'No se pudo activar la cuenta. Intente nuevamente.' 
+      return res.status(409).json({
+        message: 'No se pudo activar la cuenta. Intente nuevamente.'
       });
     }
     await client.query('COMMIT');
-    
+
     const user = updateResult.rows[0];
     console.log("✅ Cuenta activada exitosamente para:", user.email);
 
-    res.json({ 
+    res.json({
       message: '¡Cuenta activada exitosamente!',
       user: {
         id: user.id,
@@ -217,18 +233,18 @@ async function activateAccount(req, res, next) {
     });
 
   } catch (err) {
-    await client.query('ROLLBACK').catch(()=>{}); //Rollback
+    await client.query('ROLLBACK').catch(() => { }); //Rollback
     console.error("Error en activateAccount:", err);
 
     // Manejar deadlocks
     if (err.code === '40P01') { // deadlock_detected
-      return res.status(409).json({ 
-        message: 'Intente nuevamente en unos segundos.' 
+      return res.status(409).json({
+        message: 'Intente nuevamente en unos segundos.'
       });
     }
 
     next(err);
-  }finally{
+  } finally {
     client.release(); //Liberar conexion siempre
   }
 }
@@ -287,7 +303,7 @@ async function refreshToken(req, res, next) {
 
     // 6. Opcional: rotar refresh token (mejor seguridad)
     const newRefreshToken = signRefreshToken(payload);
-    
+
     // Actualizar refresh token en BD
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7);
@@ -309,12 +325,12 @@ async function refreshToken(req, res, next) {
   }
 }
 
-async function logout(req, res, next){
+async function logout(req, res, next) {
   try {
     const { refreshToken } = req.body;
 
     if (!refreshToken) {
-      return res.status(400).json({message: 'Refresh token requerido'})
+      return res.status(400).json({ message: 'Refresh token requerido' })
     }
 
     // Eliminamos refresh token de la bdd
@@ -337,7 +353,7 @@ async function getProfile(req, res, next) {
 
     // El usuario ya está adjunto por el middleware authenticateToken
     res.json({
-      user:{
+      user: {
         ...req.user,
         roles: rolesBoolean
       }
@@ -347,8 +363,8 @@ async function getProfile(req, res, next) {
   }
 }
 
-module.exports = { 
-  login, 
+module.exports = {
+  login,
   activateAccount,
   refreshToken,
   logout,
