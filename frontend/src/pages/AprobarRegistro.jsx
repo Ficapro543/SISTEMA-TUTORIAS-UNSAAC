@@ -49,7 +49,7 @@ function AprobarRegistro() {
       try{
         setLoading(true);
         //// Backend
-        const res = await fetch('http://localhost:3001/api/admin/solicitudes');
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/solicitudes`);
         const data = await res.json();
         // Aquí mapeamos para que coincida con lo que tu UI espera
         const solicitudesFormateadas = data.map(item => ({
@@ -101,13 +101,13 @@ function AprobarRegistro() {
   const handleSolicitudDecision = async (solicitudId, decision) =>{
     console.log(`Solicitud ${solicitudId}: ${decision}`);
     if(decision === 'aprobada'){
-      await fetch('http://localhost:3001/api/admin/aprobar',{
+      await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/aprobar`,{
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ pendingUserId: solicitudId })
       });
     }else{
-      await fetch('http://localhost:3001/api/admin/rechazar', {
+      await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/rechazar`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ pendingUserId: solicitudId })

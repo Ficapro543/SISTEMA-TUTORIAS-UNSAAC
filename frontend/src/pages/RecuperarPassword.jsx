@@ -54,7 +54,7 @@ function RecuperarPassword() {
     // **Si todo está bien → enviar al backend**
     try {
       const response = await fetch(
-        "http://localhost:3001/api/auth/forgot-password",
+        `${import.meta.env.VITE_API_BASE_URL}/auth/forgot-password`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

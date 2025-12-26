@@ -4,7 +4,7 @@ export default function BackendStatus() {
   const [message, setMessage] = useState("Cargando...");
 
   useEffect(() => {
-    fetch("http://localhost:3001/api/ping")
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/ping`)
       .then((res) => res.json())
       .then((data) => setMessage(data.message))
       .catch(() => setMessage("Error al conectar con el backend 😥"));

@@ -40,7 +40,7 @@ function App() {
       <Route path="/administrador/asignaciones" element={<AsignarTutorados />} />
       <Route path="/admin/cambio-tutor" element={<CambioTutorados />} />
 
-      <Route path="*" element={<Navigate to="/ping" replace />} />
+      <Route path="*" element={<Navigate to="/login" replace />} />
       <Route path="/tutoriasHistoricas" element={<TutoriasHistoricas roles={{ administrador: true }} />} />
       <Route path="/test-jwt" element={<TestJWT />} />
     </Routes>

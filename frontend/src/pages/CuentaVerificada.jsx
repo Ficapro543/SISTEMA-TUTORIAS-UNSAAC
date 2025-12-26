@@ -32,7 +32,7 @@ function CuentaVerificada() {
         setActivationStatus('activating');
         console.log("Activando cuenta con token:", token);
         
-        const response = await fetch(`http://localhost:3001/api/auth/activarCuenta/${token}`,{
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/activarCuenta/${token}`,{
           // Agregar headers para prevenir cache
           headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -66,7 +66,7 @@ function CuentaVerificada() {
             // Esperar y reintentar una sola vez
             await new Promise(resolve => setTimeout(resolve, 1000));
 
-            const retryResponse = await fetch(`http://localhost:3001/api/auth/activarCuenta/${token}`, {
+            const retryResponse = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/activarCuenta/${token}`, {
               headers: {
                 'Cache-Control': 'no-cache, no-store, must-revalidate',
                 'Pragma': 'no-cache'

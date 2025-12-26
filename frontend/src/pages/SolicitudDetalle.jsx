@@ -15,7 +15,7 @@ function SolicitudDetalle() {
         const fetchDetalle = async () => {
             try {
                 setLoading(true);
-                const res = await fetch(`http://localhost:3001/api/admin/solicitud/${token}`);
+                const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/solicitud/${token}`);
                 
                 if (!res.ok) {
                     // Obtener más detalles del error
@@ -87,7 +87,7 @@ function SolicitudDetalle() {
         }));
 
         try {
-            const res = await fetch(`http://localhost:3001/api/admin/solicitud/${solicitud.id}/rol/${rol}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/solicitud/${solicitud.id}/rol/${rol}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ decision })
@@ -147,7 +147,7 @@ function SolicitudDetalle() {
         try {
             // Enviar cada decisión de rol individualmente
             const promises = solicitud.rolesSolicitados.map(rol =>
-                fetch(`http://localhost:3001/api/admin/solicitud/${solicitud.id}/rol/${rol}`, {
+                fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/solicitud/${solicitud.id}/rol/${rol}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ decision: rolDecision })
@@ -158,13 +158,13 @@ function SolicitudDetalle() {
             
             // Luego ejecutar la acción global
             if (decision === 'aprobada') {
-                await fetch('http://localhost:3001/api/admin/aprobar', {
+                await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/aprobar`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ pendingUserId: solicitud.id })
                 });
             } else {
-                await fetch('http://localhost:3001/api/admin/rechazar', {
+                await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/rechazar`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ pendingUserId: solicitud.id })

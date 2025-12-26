@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:3001/api/admin";
+const API_URL = `${import.meta.env.VITE_API_BASE_URL}/admin` || "http://localhost:3001/api/admin";
 
 export async function getPendingRequests() {
     const res = await fetch(`${API_URL}/solicitudes`);

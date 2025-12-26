@@ -64,7 +64,7 @@ function VerificarCodigo() {
     try {
       setLoading(true);
 
-      const response = await fetch("http://localhost:3001/api/auth/verify-code", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/verify-code`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, code: fullCode }),
@@ -93,7 +93,7 @@ function VerificarCodigo() {
     setTimer(60); // reset timer
 
     try {
-      const response = await fetch("http://localhost:3001/api/auth/resend-code", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/resend-code`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
