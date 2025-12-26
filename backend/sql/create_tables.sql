@@ -1,5 +1,6 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
+-- Tablas
 CREATE TABLE IF NOT EXISTS pending_users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     first_name TEXT NOT NULL,
@@ -66,7 +67,7 @@ CREATE TABLE IF NOT EXISTS estudiante (
     codigo_estudiante VARCHAR(20) PRIMARY KEY,
 
     nombre_estudiante VARCHAR(100) NOT NULL,
-    apellido_estudiante VARCHAR(100) NOT NULL,
+    apellido_estudiante VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS tutor_asignacion (
@@ -96,19 +97,16 @@ CREATE TABLE IF NOT EXISTS tutor_asignacion (
         ON DELETE RESTRICT
 );
 
-CREATE UNIQUE INDEX uq_asignacion_activa
-ON tutor_asignacion (codigo_estudiante, semestre)
-WHERE estado = 'activo';
-
 CREATE TABLE IF NOT EXISTS cronogramas (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     tutor_user_id UUID NOT NULL,
-    codigo_estudiante VARCHAR(20) NOT NULL,
+    codigo_estudiante VARCHAR(20) NOT NULL, 
+    asignacion_id UUID NOT NULL,
 
     fecha DATE NOT NULL,
     hora TIME NOT NULL,
-    ambiente VARCHAR(100),
+    ambiente VARCHAR(100) NOT NULL,
 
     semestre VARCHAR(10) NOT NULL,
     estado TEXT NOT NULL DEFAULT 'programada',
@@ -127,6 +125,12 @@ CREATE TABLE IF NOT EXISTS cronogramas (
     CONSTRAINT fk_cronograma_estudiante
         FOREIGN KEY (codigo_estudiante)
         REFERENCES estudiante(codigo_estudiante)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+
+    CONSTRAINT fk_cronograma_asignacion
+        FOREIGN KEY (asignacion_id)
+        REFERENCES tutor_asignacion(id)
         ON UPDATE CASCADE
         ON DELETE RESTRICT
 );
@@ -170,3 +174,111 @@ CREATE TABLE IF NOT EXISTS derivaciones (
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
+
+-- Índices para optimizar consultas
+CREATE UNIQUE INDEX IF NOT EXISTS uq_asignacion_activa
+ON tutor_asignacion (codigo_estudiante, semestre)
+WHERE estado = 'activo';
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_cronograma_tutor_fecha_hora
+ON cronogramas (tutor_user_id, fecha, hora);
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_cronograma_ambiente_fecha_hora
+ON cronogramas (fecha, hora, ambiente);
+
+CREATE INDEX IF NOT EXISTS idx_cronograma_semestre
+ON cronogramas (semestre);
+
+CREATE INDEX IF NOT EXISTS idx_tutoria_cronograma
+ON tutorias (cronograma_id);
+
+-- Triggers y funciones de reglas de negocio
+CREATE OR REPLACE FUNCTION set_fecha_actualizacion()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.fecha_actualizacion = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_update_fecha_tutoria
+BEFORE UPDATE ON tutorias
+FOR EACH ROW
+EXECUTE FUNCTION set_fecha_actualizacion();
+
+CREATE OR REPLACE FUNCTION bloquear_edicion_tutoria_fuera_fecha()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM cronogramas c
+        WHERE c.id = OLD.cronograma_id
+          AND c.fecha < CURRENT_DATE
+    ) THEN
+        RAISE EXCEPTION 'No se puede modificar tutorías de fechas pasadas';
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_bloquear_edicion_tutoria
+BEFORE UPDATE ON tutorias
+FOR EACH ROW
+EXECUTE FUNCTION bloquear_edicion_tutoria_fuera_fecha();
+
+CREATE OR REPLACE FUNCTION bloquear_edicion_cronograma_pasado()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF OLD.fecha < CURRENT_DATE THEN
+        RAISE EXCEPTION 'No se puede modificar cronogramas de fechas pasadas';
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_bloquear_edicion_cronograma
+BEFORE UPDATE ON cronogramas
+FOR EACH ROW
+EXECUTE FUNCTION bloquear_edicion_cronograma_pasado();
+
+CREATE OR REPLACE FUNCTION validar_asignacion_cronograma()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM tutor_asignacion ta
+        WHERE ta.id = NEW.asignacion_id
+          AND ta.estado = 'activo'
+          AND ta.semestre = NEW.semestre
+          AND ta.tutor_user_id = NEW.tutor_user_id
+          AND ta.codigo_estudiante = NEW.codigo_estudiante
+    ) THEN
+        RAISE EXCEPTION
+        'La asignación no es válida: tutor, estudiante, semestre o estado incorrecto';
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_validar_asignacion_cronograma
+BEFORE INSERT OR UPDATE ON cronogramas
+FOR EACH ROW
+EXECUTE FUNCTION validar_asignacion_cronograma();
+
+CREATE OR REPLACE FUNCTION bloquear_delete_cronograma_realizado()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF OLD.estado = 'realizada' THEN
+        RAISE EXCEPTION 'No se puede eliminar un cronograma ya realizado';
+    END IF;
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_bloquear_delete_cronograma
+BEFORE DELETE ON cronogramas
+FOR EACH ROW
+EXECUTE FUNCTION bloquear_delete_cronograma_realizado();
