@@ -232,23 +232,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-/*TRIGGERS*/
-CREATE TRIGGER trg_update_fecha_tutoria
-BEFORE UPDATE ON tutorias
-FOR EACH ROW
-WHEN (OLD IS DISTINCT FROM NEW)
-EXECUTE FUNCTION set_fecha_actualizacion();
-
-CREATE TRIGGER trg_bloquear_edicion_tutoria
-BEFORE UPDATE ON tutorias
-FOR EACH ROW
-EXECUTE FUNCTION bloquear_edicion_tutoria_fuera_fecha();
-
-CREATE TRIGGER trg_bloquear_edicion_cronograma
-BEFORE UPDATE ON cronogramas
-FOR EACH ROW
-EXECUTE FUNCTION bloquear_edicion_cronograma_pasado();
-
 CREATE OR REPLACE FUNCTION validar_asignacion_cronograma()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -269,11 +252,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trg_validar_asignacion_cronograma
-BEFORE INSERT OR UPDATE ON cronogramas
-FOR EACH ROW
-EXECUTE FUNCTION validar_asignacion_cronograma();
-
 CREATE OR REPLACE FUNCTION bloquear_delete_cronograma_realizado()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -283,6 +261,28 @@ BEGIN
     RETURN OLD;
 END;
 $$ LANGUAGE plpgsql;
+
+/*TRIGGERS*/
+CREATE TRIGGER trg_update_fecha_tutoria
+BEFORE UPDATE ON tutorias
+FOR EACH ROW
+WHEN (OLD IS DISTINCT FROM NEW)
+EXECUTE FUNCTION set_fecha_actualizacion();
+
+CREATE TRIGGER trg_bloquear_edicion_tutoria
+BEFORE UPDATE ON tutorias
+FOR EACH ROW
+EXECUTE FUNCTION bloquear_edicion_tutoria_fuera_fecha();
+
+CREATE TRIGGER trg_bloquear_edicion_cronograma
+BEFORE UPDATE ON cronogramas
+FOR EACH ROW
+EXECUTE FUNCTION bloquear_edicion_cronograma_pasado();
+
+CREATE TRIGGER trg_validar_asignacion_cronograma
+BEFORE INSERT OR UPDATE ON cronogramas
+FOR EACH ROW
+EXECUTE FUNCTION validar_asignacion_cronograma();
 
 CREATE TRIGGER trg_bloquear_delete_cronograma
 BEFORE DELETE ON cronogramas
