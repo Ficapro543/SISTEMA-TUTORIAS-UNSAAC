@@ -330,9 +330,9 @@ async function logout(req, res, next){
 async function getProfile(req, res, next) {
   try {
     const rolesBoolean = {
-      administrador: user.roles.includes('administrador'),
-      tutor: user.roles.includes('tutor'),
-      verificador: user.roles.includes('verificador')
+      administrador: req.user.roles.includes('administrador'),
+      tutor: req.user.roles.includes('tutor'),
+      verificador: req.user.roles.includes('verificador')
     };
 
     // El usuario ya está adjunto por el middleware authenticateToken

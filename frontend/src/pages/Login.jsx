@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../utils/api"; // Importar el api configurado
 import styles from "../styles/pages/Login.module.css";
 
 function Login() {
@@ -41,37 +42,57 @@ function Login() {
       return;
     }
 
-    // Envio al backend
+    // Envio al backend usando api
     try {
-      const response = await fetch("http://localhost:3001/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
-      });
+      const response = await api.post('/auth/login',{
+        email,
+        password
+      })
 
-      const data = await response.json();
+      const data = response.data;
 
-      if (response.ok) {
-        //Credenciales correctas
-        const roles = data.roles; // {administrador: 1, tutor: 0, verificador: 0}
-        localStorage.setItem('accessToken',data.accessToken);
-        localStorage.setItem('refreshToken',data.refreshToken);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        // Guardamos el access token para futuras peticiones
-        //axios.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
-        // Guardar también los roles si los necesitas por separado
-        if (data.user && data.user.roles) {
-          localStorage.setItem('userRoles', JSON.stringify(data.user.roles));
-        }
-        navigate("/mainpage");
-        
-      } else {
-        // Credenciales incorrectas
-        setError(data.message || "Correo o contraseña incorrectos.");
+      // Credenciales correctas
+      localStorage.setItem('accessToken', data.accessToken);
+      localStorage.setItem('refreshToken', data.refreshToken);
+      localStorage.setItem('user', JSON.stringify(data.user));
+
+      // Guardar roles por separado
+      if (data.user && data.user.roles) {
+        localStorage.setItem('userRoles', JSON.stringify(data.user.roles));
       }
+
+      api.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
+
+      //Navegamos
+      navigate("/mainpage");
+
     } catch (err) {
-      setError("Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+      // Manejo de errores con axios
       console.error("Login error:", err);
+      
+      // Axios envuelve la respuesta en error.response
+      if (err.response) {
+        // El servidor respondió con un código de error
+        const errorMessage = err.response.data?.message || 
+                            err.response.data?.error ||
+                            "Credenciales incorrectas";
+        setError(errorMessage);
+        
+        // Mostrar detalles en consola para debugging
+        console.error("Response error:", {
+          status: err.response.status,
+          data: err.response.data
+        });
+      } else if (err.request) {
+        // La petición fue hecha pero no hubo respuesta
+        console.error("No response received:", err.request);
+        setError("No se pudo conectar con el servidor. Verifica tu conexión.");
+      } else {
+        // Algo pasó al configurar la petición
+        console.error("Request setup error:", err.message);
+        setError("Error al configurar la petición.");
+      }
+
     } finally{
       setLoading(false);
     }
@@ -100,7 +121,8 @@ function Login() {
               value={email}
               onChange={(e)=> setEmail(e.target.value)}
               className={error && !emailRegex.test(email)?styles.inputError:""}
-              autoComplete="off"
+              autoComplete="email"
+              disabled={loading}
             />
           </div>
 
@@ -114,12 +136,14 @@ function Login() {
                 onChange={(e)=>setPassword(e.target.value)}
                 className={`${error && !password ? styles.inputError : ""} ${styles.passwordInput}`}
                 autoComplete="current-password"
+                disabled={loading}
               />
 
               <button
                 type="button"
                 className={styles.togglePasswordBtn}
                 onClick={() => setShowPassword(!showPassword)}
+                disabled={loading}
               >
                 <img
                   src = {showPassword ? "/hidden.svg" : "/view.svg"}
@@ -135,7 +159,7 @@ function Login() {
             {loading ? "Cargando..." : "Ingresar"}
           </button>
 
-          <p className={styles.forgotPassword} onClick={handleForgotPassword}>
+          <p className={styles.forgotPassword} onClick={!loading ? handleForgotPassword: undefined}>
             ¿Olvidaste tu contraseña?
           </p>
         </form>
@@ -151,7 +175,11 @@ function Login() {
 
         <div className={styles.registerSection}>
           <p>¿No tienes cuenta?</p>
-          <button className={styles.registerBtn} onClick={handleRegister}>
+          <button 
+            className={styles.registerBtn} 
+            onClick={!loading ? handleRegister: undefined}
+            disabled={loading}
+          >
             Registrarse aquí
           </button>
         </div>

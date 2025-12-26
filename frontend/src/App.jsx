@@ -14,6 +14,7 @@ import VerificarCodigo from "./pages/VerificarCodigo.jsx";
 import NuevaContrasena from "./pages/NuevaContraseña.jsx";
 //---- SISTEMA ----
 import TutoriasHistoricas from "./pages/TutoriasHistoricas.jsx";
+import TestJWT from "./componentes/TestJWT.jsx";
 function App() {
   return (
     <Layout>
@@ -31,6 +32,7 @@ function App() {
         <Route path="/ping" element={<BackendStatus />} />
         <Route path="*" element={<Navigate to="/ping" replace />} />
         <Route path="/tutoriasHistoricas"  element={<TutoriasHistoricas roles={{ administrador: true }} />} />
+        <Route path="/test-jwt" element={<TestJWT />} />
       </Routes>
     </Layout>
   );
