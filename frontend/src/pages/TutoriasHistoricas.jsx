@@ -1,13 +1,41 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import styles from "../styles/pages/TutoriasHistoricas.module.css";
+import api from "../utils/api";
 
 import SemestreSelector from "../componentes/SemestreSelector";
 import TablaTutorias from "../componentes/TablaTutorias";
 import DetalleTutoriaModal from "../componentes/DetalleTutoriaModal";
 
 function TutoriasHistoricas({ roles }) {
-  if (!roles?.administrador) {
-    return <p className={styles.errorMessage}>No autorizado</p>;
+  // Verificar roles desde localStorage
+  const [userRoles, setUserRoles] = useState(roles || {});
+  // Verifica si el usuario es administrador
+  useEffect(() => {
+    // Si roles no viene por props, intentar obtener de localStorage
+    if (!roles) {
+      try {
+        const storedRoles = localStorage.getItem('userRoles');
+        if (storedRoles) {
+          const parsedRoles = JSON.parse(storedRoles);
+          // Convertir array de roles a objeto {administrador: true, ...}
+          const rolesObj = {};
+          if (Array.isArray(parsedRoles)) {
+            parsedRoles.forEach(role => {
+              rolesObj[role.toLowerCase()] = true;
+            });
+          }
+          setUserRoles(rolesObj);
+        }
+      } catch (error) {
+        console.error('Error obteniendo roles:', error);
+      }
+    }
+  }, [roles]);
+
+  if (!userRoles?.administrador) {
+    return console.error("Acceso denegado: Se requieren permisos de administrador")
   }
 
   const [semestres, setSemestres] = useState([]);
@@ -25,18 +53,19 @@ function TutoriasHistoricas({ roles }) {
 
   const cargarSemestres = async () => {
     try {
-        const res = await fetch("http://localhost:3001/api/admin/semestres", {
-            credentials: "include" // 🔑 importante para auth
-        });
+      const response = await api.get('/admin/semestres');
+      setSemestres(response.data);
 
-        if (!res.ok) {
-        throw new Error("Error al cargar semestres");
-        }
-
-        const data = await res.json();
-        setSemestres(data);
     } catch (err) {
-        setError(err.message);
+      console.error('Error cargando semestres:', err);
+      if(err.response?.status === 401){
+        setError('Sesión expirada. Por favor, inicia sesión nuevamente');
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 5000);
+      }else{
+        setError(err.response?.data?.message || 'Error al cargar semestres');
+      }
     }
   };
 
@@ -45,41 +74,30 @@ function TutoriasHistoricas({ roles }) {
     setError("");
 
     try {
-        const res = await fetch(
-        `http://localhost:3001/api/admin/tutorias?semestreId=${semestreId}`,
-        {
-            credentials: "include"
-        }
-        );
+        const response = await api.get('/admin/tutorias',{
+          params: {semestreId}
+        });
+        setTutorias(response.data);
 
-        if (!res.ok) {
-        throw new Error("Error al cargar tutorías");
-        }
-
-        const data = await res.json();
-        setTutorias(data);
     } catch (err) {
-        setError(err.message);
+      console.error('Error cargando tutorías:', err);
+      if (err.response?.status === 401) {
+        setError('Sesión expirada. Por favor, inicia sesión nuevamente.');
+      } else {
+        setError(err.response?.data?.message || 'Error al cargar tutorías');
+      }
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 
   const cargarDetalleTutoria = async (id) => {
     try {
-        const res = await fetch(
-        `http://localhost:3001/api/admin/tutorias/${id}`,
-        { credentials: "include" }
-        );
-
-        if (!res.ok) {
-        throw new Error("Error al cargar detalle");
-        }
-
-        const data = await res.json();
-        setTutoriaSeleccionada(data);
+      const response = await api.get(`/admin/tutorias/${id}`);
+      setTutoriaSeleccionada(response.data);
     } catch (err) {
-        setError(err.message);
+      console.error('Error cargando detalle:', err);
+      setError(err.response?.data?.message || 'Error al cargar el detalle');
     }
   };
 
@@ -111,6 +129,12 @@ function TutoriasHistoricas({ roles }) {
             tutorias={tutorias}
             onVerDetalle={cargarDetalleTutoria}
           />
+        )}
+
+        {!loading && semestreSeleccionado && tutorias.length === 0 && !error && (
+          <p>
+            No hay tutorías registradas para este semestre.
+          </p>
         )}
 
         <DetalleTutoriaModal

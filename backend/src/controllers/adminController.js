@@ -260,6 +260,9 @@ async function getSemestresCerrados(req, res, next){
 async function getTutoriasPorSemestre(req, res, next){
   const { semestreId } = req.query;
 
+  console.log('🔍 GET /admin/tutorias - semestreId:', semestreId);
+  console.log('🔍 Usuario autenticado:', req.user);
+
   if (!semestreId) {
     return res.status(400).json({ message: 'semestreId requerido' });
   }
@@ -273,8 +276,11 @@ async function getTutoriasPorSemestre(req, res, next){
       [semestreId]
     );
 
+    console.log('📊 Tutorías encontradas:', rows.length);
+
     res.json(rows);
   } catch (err) {
+    console.error('❌ Error en getTutoriasPorSemestre:', err);
     next(err);
   }
 }
