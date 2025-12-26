@@ -1,5 +1,6 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
+-- Tablas
 CREATE TABLE IF NOT EXISTS pending_users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     first_name TEXT NOT NULL,
@@ -99,11 +100,12 @@ CREATE TABLE IF NOT EXISTS cronogramas (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     tutor_user_id UUID NOT NULL,
-    codigo_estudiante VARCHAR(20) NOT NULL,
+    codigo_estudiante VARCHAR(20) NOT NULL, 
+    asignacion_id UUID NOT NULL,
 
     fecha DATE NOT NULL,
     hora TIME NOT NULL,
-    ambiente VARCHAR(100),
+    ambiente VARCHAR(100) NOT NULL,
 
     semestre VARCHAR(10) NOT NULL,
     estado TEXT NOT NULL DEFAULT 'programada',
@@ -122,6 +124,12 @@ CREATE TABLE IF NOT EXISTS cronogramas (
     CONSTRAINT fk_cronograma_estudiante
         FOREIGN KEY (codigo_estudiante)
         REFERENCES estudiante(codigo_estudiante)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+
+    CONSTRAINT fk_cronograma_asignacion
+        FOREIGN KEY (asignacion_id)
+        REFERENCES tutor_asignacion(id)
         ON UPDATE CASCADE
         ON DELETE RESTRICT
 );
@@ -166,8 +174,8 @@ CREATE TABLE IF NOT EXISTS derivaciones (
         ON DELETE CASCADE
 );
 
-/*Indices*/
-CREATE UNIQUE INDEX uq_asignacion_activa IF NOT EXISTS uq_asignacion_activa
+-- Índices para optimizar consultas
+CREATE UNIQUE INDEX IF NOT EXISTS uq_asignacion_activa
 ON tutor_asignacion (codigo_estudiante, semestre)
 WHERE estado = 'activo';
 
@@ -188,6 +196,7 @@ CREATE INDEX IF NOT EXISTS idx_cronograma_tutor
 ON cronogramas (tutor_user_id);
 
 /*Funciones*/
+-- Triggers y funciones de reglas de negocio
 CREATE OR REPLACE FUNCTION set_fecha_actualizacion()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -239,3 +248,43 @@ CREATE TRIGGER trg_bloquear_edicion_cronograma
 BEFORE UPDATE ON cronogramas
 FOR EACH ROW
 EXECUTE FUNCTION bloquear_edicion_cronograma_pasado();
+
+CREATE OR REPLACE FUNCTION validar_asignacion_cronograma()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM tutor_asignacion ta
+        WHERE ta.id = NEW.asignacion_id
+          AND ta.estado = 'activo'
+          AND ta.semestre = NEW.semestre
+          AND ta.tutor_user_id = NEW.tutor_user_id
+          AND ta.codigo_estudiante = NEW.codigo_estudiante
+    ) THEN
+        RAISE EXCEPTION
+        'La asignación no es válida: tutor, estudiante, semestre o estado incorrecto';
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_validar_asignacion_cronograma
+BEFORE INSERT OR UPDATE ON cronogramas
+FOR EACH ROW
+EXECUTE FUNCTION validar_asignacion_cronograma();
+
+CREATE OR REPLACE FUNCTION bloquear_delete_cronograma_realizado()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF OLD.estado = 'realizada' THEN
+        RAISE EXCEPTION 'No se puede eliminar un cronograma ya realizado';
+    END IF;
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_bloquear_delete_cronograma
+BEFORE DELETE ON cronogramas
+FOR EACH ROW
+EXECUTE FUNCTION bloquear_delete_cronograma_realizado();
