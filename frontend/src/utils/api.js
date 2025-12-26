@@ -37,7 +37,7 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
-    Promise.reject(error)
+    return Promise.reject(error);
   }
 );
 
@@ -48,9 +48,9 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     // Si el error NO es de autenticación o ya reintentamos
-    if (!error.response || 
-        ![401, 403].includes(error.response.status) || 
-        originalRequest._retry) {
+    if (!error.response ||
+      ![401, 403].includes(error.response.status) ||
+      originalRequest._retry) {
       return Promise.reject(error);
     }
 
@@ -79,7 +79,7 @@ api.interceptors.response.use(
 
     try {
       const refreshToken = localStorage.getItem('refreshToken');
-      
+
       if (!refreshToken) {
         throw new Error('No refresh token available');
       }
@@ -112,12 +112,12 @@ api.interceptors.response.use(
       // Error en refresh, limpiar todo
       processQueue(refreshError, null);
       localStorage.clear();
-      
+
       // Solo redirigir si estamos en el navegador
       if (typeof window !== 'undefined') {
         window.location.href = '/login';
       }
-      
+
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;

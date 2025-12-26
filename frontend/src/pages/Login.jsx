@@ -28,7 +28,7 @@ function Login() {
       setError("Por favor, ingresa tu correo institucional.");
       setLoading(false);
       return;
-    } else if (!password){
+    } else if (!password) {
       setError("Por favor, ingresa tu contraseña.");
       setLoading(false);
       return;
@@ -42,10 +42,11 @@ function Login() {
 
     // Envio al backend usando api
     try {
-      const response = await api.post('/auth/login',{
+      setLoading(true);
+      const response = await api.post('/auth/login', {
         email,
         password
-      })
+      });
 
       const data = response.data;
 
@@ -58,34 +59,32 @@ function Login() {
       if (data.user && data.user.roles) {
         localStorage.setItem('userRoles', JSON.stringify(data.user.roles));
 
-        if (roles.administrador) {
+        // Configurar el header para la instancia de api
+        api.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
+
+        // Navegamos segun el rol
+        if (data.user.roles.administrador) {
           navigate("/admin");
         } else {
           navigate("/mainpage");
         }
-
       } else {
-        // Credenciales incorrectas
-        setError(data.message || "Correo o contraseña incorrectos.");
+        // Credenciales incorrectas o data malformada
+        setError(data.message || "Error al obtener datos del usuario.");
       }
-
-      api.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
-
-      //Navegamos
-      navigate("/mainpage");
 
     } catch (err) {
       // Manejo de errores con axios
       console.error("Login error:", err);
-      
+
       // Axios envuelve la respuesta en error.response
       if (err.response) {
         // El servidor respondió con un código de error
-        const errorMessage = err.response.data?.message || 
-                            err.response.data?.error ||
-                            "Credenciales incorrectas";
+        const errorMessage = err.response.data?.message ||
+          err.response.data?.error ||
+          "Credenciales incorrectas";
         setError(errorMessage);
-        
+
         // Mostrar detalles en consola para debugging
         console.error("Response error:", {
           status: err.response.status,
@@ -101,7 +100,7 @@ function Login() {
         setError("Error al configurar la petición.");
       }
 
-    } finally{
+    } finally {
       setLoading(false);
     }
   }
@@ -127,8 +126,8 @@ function Login() {
               type="text"
               placeholder="ejemplo@unsaac.edu.pe"
               value={email}
-              onChange={(e)=> setEmail(e.target.value)}
-              className={error && !emailRegex.test(email)?styles.inputError:""}
+              onChange={(e) => setEmail(e.target.value)}
+              className={error && !emailRegex.test(email) ? styles.inputError : ""}
               autoComplete="email"
               disabled={loading}
             />
@@ -167,7 +166,7 @@ function Login() {
             {loading ? "Cargando..." : "Ingresar"}
           </button>
 
-          <p className={styles.forgotPassword} onClick={!loading ? handleForgotPassword: undefined}>
+          <p className={styles.forgotPassword} onClick={!loading ? handleForgotPassword : undefined}>
             ¿Olvidaste tu contraseña?
           </p>
         </form>
@@ -183,9 +182,9 @@ function Login() {
 
         <div className={styles.registerSection}>
           <p>¿No tienes cuenta?</p>
-          <button 
-            className={styles.registerBtn} 
-            onClick={!loading ? handleRegister: undefined}
+          <button
+            className={styles.registerBtn}
+            onClick={!loading ? handleRegister : undefined}
             disabled={loading}
           >
             Registrarse aquí

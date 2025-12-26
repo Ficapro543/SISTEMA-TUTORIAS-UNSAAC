@@ -32,7 +32,7 @@ async function createPendingUser(req, res, next) {
     // enviar notificación a administradores
     const adminEmail = process.env.ADMIN_EMAIL;
     await sendAdminApprovalEmail(adminEmail, id);
-     
+
     // === PARA PRODUCCION ===
     // const adminsQuery = await pool.query(`
     //   SELECT email
@@ -99,7 +99,7 @@ async function approvePendingUser(req, res, next) {
     await pool.query(
       `UPDATE pending_users 
        SET roles_decisiones=$1 
-       WHERE id=$2`, 
+       WHERE id=$2`,
       [JSON.stringify(rolesDecisiones), pendingUserId]
     );
 
@@ -129,14 +129,14 @@ async function approvePendingUser(req, res, next) {
       VALUES (gen_random_uuid(), $1, $2, $3)`,
       [newUserId, activationToken, expiration]
     );
-    
+
     // Eliminar de pending_users
     await pool.query(`DELETE FROM pending_users WHERE id=$1`, [pendingUserId]);
 
     // Enviar correo con token, NO con userId
     await sendUserActivationEmail(pendingUser.email, activationToken);
 
-    res.json({ 
+    res.json({
       message: 'Usuario aprobado y correo de activación enviado',
       userId: newUserId,
       email: pendingUser.email
@@ -148,7 +148,7 @@ async function approvePendingUser(req, res, next) {
   }
 }
 
-async function getAllPendingUser(req, res, next){
+async function getAllPendingUser(req, res, next) {
   try {
     const q = await pool.query(`
       SELECT id, first_name, last_name, email, roles, created_at
@@ -161,13 +161,13 @@ async function getAllPendingUser(req, res, next){
   }
 }
 
-async function getOnePendingUser(req, res, next){
+async function getOnePendingUser(req, res, next) {
   try {
     const { id } = req.params;
     const q = await pool.query(
       `SELECT id, first_name, last_name, email, roles, created_at, 
        roles_decisiones
-       FROM pending_users WHERE id=$1`, 
+       FROM pending_users WHERE id=$1`,
       [id]
     );
 
@@ -207,7 +207,7 @@ async function rejectOnePendingUser(req, res, next) {
     await pool.query(
       `UPDATE pending_users 
        SET roles_decisiones=$1 
-       WHERE id=$2`, 
+       WHERE id=$2`,
       [JSON.stringify(rolesDecisiones), pendingUserId]
     );
 
@@ -240,10 +240,10 @@ async function decideRol(req, res, next) {
 
     // Obtener usuario pendiente
     const q = await pool.query(
-      `SELECT roles, roles_decisiones FROM pending_users WHERE id=$1`, 
+      `SELECT roles, roles_decisiones FROM pending_users WHERE id=$1`,
       [pendingUserId]
     );
-    
+
     if (q.rowCount === 0) return res.status(404).json({ message: 'Solicitud no encontrada' });
 
     const user = q.rows[0];
@@ -259,7 +259,7 @@ async function decideRol(req, res, next) {
     let rolEncontrado = false;
     let nuevasDecisiones = [];
     if (rolesDecisiones && rolesDecisiones.length > 0) {
-        nuevasDecisiones = rolesDecisiones.map(item => {
+      nuevasDecisiones = rolesDecisiones.map(item => {
         if (item.rol === rol) {
           rolEncontrado = true;
           return { rol, decision };
@@ -277,13 +277,13 @@ async function decideRol(req, res, next) {
     await pool.query(
       `UPDATE pending_users 
        SET roles_decisiones=$1 
-       WHERE id=$2`, 
+       WHERE id=$2`,
       [JSON.stringify(nuevasDecisiones), pendingUserId]
     );
 
-    res.json({ 
-      message: `Rol ${rol} ${decision}`, 
-      roles_decisiones: nuevasDecisiones 
+    res.json({
+      message: `Rol ${rol} ${decision}`,
+      roles_decisiones: nuevasDecisiones
     });
   } catch (err) {
     console.error("Error en decideRol:", err);
@@ -291,7 +291,7 @@ async function decideRol(req, res, next) {
   }
 }
 
-async function getSemestresCerrados(req, res, next){
+async function getSemestresCerrados(req, res, next) {
   try {
     // Obtener semestres únicos de cronogramas con tutorías realizadas
     const { rows } = await pool.query(
@@ -322,7 +322,7 @@ async function getSemestresCerrados(req, res, next){
   }
 }
 
-async function getTutoriasPorSemestre(req, res, next){
+async function getTutoriasPorSemestre(req, res, next) {
   const { semestre } = req.query; // Cambiado de semestreId a semestre (string)
 
   console.log('🔍 GET /admin/tutorias - semestre:', semestre);
@@ -368,7 +368,7 @@ async function getTutoriasPorSemestre(req, res, next){
   }
 }
 
-async function getTutoriaDetalle(req, res, next){
+async function getTutoriaDetalle(req, res, next) {
   try {
     const { rows } = await pool.query(
       `SELECT 
@@ -414,7 +414,7 @@ async function getTutoriaDetalle(req, res, next){
     }
 
     const tutoria = rows[0];
-    
+
     // Formatear la respuesta
     const respuesta = {
       id: tutoria.id,
@@ -451,12 +451,12 @@ async function getTutoriaDetalle(req, res, next){
   }
 }
 
-module.exports = { 
+module.exports = {
   createPendingUser,
   approvePendingUser,
   getAllPendingUser,
   getOnePendingUser,
-  getPendingUsers
+  getPendingUsers,
   getPendingUserDetail,
   rejectOnePendingUser,
   rejectPendingUser,
