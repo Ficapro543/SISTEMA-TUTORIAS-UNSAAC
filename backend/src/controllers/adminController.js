@@ -244,36 +244,70 @@ async function decideRol(req, res, next) {
 
 async function getSemestresCerrados(req, res, next){
   try {
+    // Obtener semestres únicos de cronogramas con tutorías realizadas
     const { rows } = await pool.query(
-      `SELECT id, nombre 
-       FROM semestres 
-       WHERE cerrado = true
-       ORDER BY nombre DESC`
+      `SELECT DISTINCT 
+        c.semestre,
+        MIN(c.fecha) as fecha_inicio,
+        MAX(c.fecha) as fecha_fin
+       FROM cronogramas c
+       INNER JOIN tutorias t ON t.cronograma_id = c.id
+       WHERE c.estado = 'realizada'
+       GROUP BY c.semestre
+       ORDER BY c.semestre DESC`
     );
 
-    res.json(rows);
+    // Formatear los semestres para el frontend
+    const semestresFormateados = rows.map((row, index) => ({
+      id: index + 1, // ID temporal ya que no tenemos tabla de semestres
+      nombre: row.semestre,
+      fecha_inicio: row.fecha_inicio,
+      fecha_fin: row.fecha_fin,
+      cerrado: true // Asumimos que todos los semestres con tutorías realizadas están cerrados
+    }));
+
+    res.json(semestresFormateados);
   } catch (err) {
+    console.error('Error en getSemestresCerrados:', err);
     next(err);
   }
 }
 
 async function getTutoriasPorSemestre(req, res, next){
-  const { semestreId } = req.query;
+  const { semestre } = req.query; // Cambiado de semestreId a semestre (string)
 
-  console.log('🔍 GET /admin/tutorias - semestreId:', semestreId);
+  console.log('🔍 GET /admin/tutorias - semestre:', semestre);
   console.log('🔍 Usuario autenticado:', req.user);
 
-  if (!semestreId) {
-    return res.status(400).json({ message: 'semestreId requerido' });
+  if (!semestre) {
+    return res.status(400).json({ message: 'Semestre requerido' });
   }
 
   try {
     const { rows } = await pool.query(
-      `SELECT id, estudiante, tutor, tipo, fecha
-       FROM tutorias
-       WHERE semestre_id = $1
-       ORDER BY fecha DESC`,
-      [semestreId]
+      `SELECT 
+        t.id,
+        CONCAT(e.nombre_estudiante, ' ', e.apellido_estudiante) as estudiante,
+        CONCAT(u.first_name, ' ', u.last_name) as tutor,
+        -- Determinar el tipo de tutoría basado en las observaciones
+        CASE 
+          WHEN t.obs_academico IS NOT NULL AND t.obs_academico != '' THEN 'ACADEMICA'
+          WHEN t.obs_personal IS NOT NULL AND t.obs_personal != '' THEN 'PERSONAL'
+          WHEN t.obs_profesional IS NOT NULL AND t.obs_profesional != '' THEN 'PROFESIONAL'
+          ELSE 'GENERAL'
+        END as tipo,
+        c.fecha,
+        t.fecha_registro,
+        t.resumen_general
+       FROM tutorias t
+       INNER JOIN cronogramas c ON t.cronograma_id = c.id
+       INNER JOIN tutores tu ON c.tutor_user_id = tu.user_id
+       INNER JOIN users u ON tu.user_id = u.id
+       INNER JOIN estudiante e ON c.codigo_estudiante = e.codigo_estudiante
+       WHERE c.semestre = $1
+       AND c.estado = 'realizada'
+       ORDER BY c.fecha DESC, t.fecha_registro DESC`,
+      [semestre]
     );
 
     console.log('📊 Tutorías encontradas:', rows.length);
@@ -288,9 +322,41 @@ async function getTutoriasPorSemestre(req, res, next){
 async function getTutoriaDetalle(req, res, next){
   try {
     const { rows } = await pool.query(
-      `SELECT *
-       FROM tutorias
-       WHERE id = $1`,
+      `SELECT 
+        t.id,
+        CONCAT(e.nombre_estudiante, ' ', e.apellido_estudiante) as estudiante,
+        e.codigo_estudiante,
+        CONCAT(u.first_name, ' ', u.last_name) as tutor,
+        u.email as tutor_email,
+        c.fecha,
+        c.hora,
+        c.ambiente,
+        c.semestre,
+        -- Determinar el tipo de tutoría
+        CASE 
+          WHEN t.obs_academico IS NOT NULL AND t.obs_academico != '' THEN 'ACADEMICA'
+          WHEN t.obs_personal IS NOT NULL AND t.obs_personal != '' THEN 'PERSONAL'
+          WHEN t.obs_profesional IS NOT NULL AND t.obs_profesional != '' THEN 'PROFESIONAL'
+          ELSE 'GENERAL'
+        END as tipo,
+        t.obs_academico,
+        t.obs_personal,
+        t.obs_profesional,
+        t.resumen_general,
+        t.requiere_derivacion,
+        t.modalidad,
+        t.fecha_registro,
+        t.fecha_actualizacion,
+        -- Información de derivación si existe
+        d.especialidad as derivacion_especialidad,
+        d.motivo as derivacion_motivo
+       FROM tutorias t
+       INNER JOIN cronogramas c ON t.cronograma_id = c.id
+       INNER JOIN tutores tu ON c.tutor_user_id = tu.user_id
+       INNER JOIN users u ON tu.user_id = u.id
+       INNER JOIN estudiante e ON c.codigo_estudiante = e.codigo_estudiante
+       LEFT JOIN derivaciones d ON t.id = d.tutoria_id
+       WHERE t.id = $1`,
       [req.params.id]
     );
 
@@ -298,8 +364,40 @@ async function getTutoriaDetalle(req, res, next){
       return res.status(404).json({ message: 'Tutoría no encontrada' });
     }
 
-    res.json(rows[0]);
+    const tutoria = rows[0];
+    
+    // Formatear la respuesta
+    const respuesta = {
+      id: tutoria.id,
+      estudiante: tutoria.estudiante,
+      codigo_estudiante: tutoria.codigo_estudiante,
+      tutor: tutoria.tutor,
+      tutor_email: tutoria.tutor_email,
+      fecha: `${tutoria.fecha} ${tutoria.hora}`,
+      semestre: tutoria.semestre,
+      tipo: tutoria.tipo,
+      modalidad: tutoria.modalidad,
+      ambiente: tutoria.ambiente,
+      observaciones: {
+        academico: tutoria.obs_academico,
+        personal: tutoria.obs_personal,
+        profesional: tutoria.obs_profesional,
+        general: tutoria.resumen_general
+      },
+      requiere_derivacion: tutoria.requiere_derivacion,
+      derivacion: tutoria.derivacion_especialidad ? {
+        especialidad: tutoria.derivacion_especialidad,
+        motivo: tutoria.derivacion_motivo
+      } : null,
+      fechas: {
+        registro: tutoria.fecha_registro,
+        actualizacion: tutoria.fecha_actualizacion
+      }
+    };
+
+    res.json(respuesta);
   } catch (err) {
+    console.error('Error en getTutoriaDetalle:', err);
     next(err);
   }
 }

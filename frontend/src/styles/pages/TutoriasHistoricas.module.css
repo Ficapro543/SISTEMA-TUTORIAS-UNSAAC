@@ -1,25 +1,189 @@
-.page{
+.page {
   min-height: 100vh;
   background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
-  padding: 40px;
+  padding: 40px 20px;
   font-family: var(--font-main);
 }
 
-.container{
-  background: var(--color-text-light);
+.container {
+  background: white;
+  border-radius: 16px;
+  padding: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  box-shadow: 0 8px 32px rgba(0, 33, 71, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header {
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(0, 78, 146, 0.1);
+}
+
+.title {
   color: var(--color-secondary);
-  padding: 40px 60px;
-  border-radius: 25px;
-  max-width: 900px;
-  margin: auto;
-  box-shadow: var(--shadow);
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.5px;
 }
 
-.subtitle{
+.subtitle {
   color: var(--color-gray);
-  margin-bottom: 25px;
+  font-size: 1.1rem;
+  margin: 0;
+  line-height: 1.5;
+  opacity: 0.9;
 }
 
-.errorMessage{
-  color: crimson;
+.mainContent {
+  margin-top: 8px;
+}
+
+/* Estados de carga */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  color: white;
+  text-align: center;
+}
+
+.loadingSpinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loadingState {
+  text-align: center;
+  padding: 32px;
+  color: var(--color-gray);
+  font-size: 1.1rem;
+  background: rgba(0, 78, 146, 0.03);
+  border-radius: 8px;
+  margin: 24px 0;
+}
+
+/* Acceso denegado */
+.accessDenied {
+  max-width: 500px;
+  margin: 60px auto;
+  padding: 40px;
+  background: white;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 33, 71, 0.15);
+}
+
+.accessDenied h2 {
+  color: var(--color-secondary);
+  margin-bottom: 16px;
+  font-size: 1.8rem;
+}
+
+.accessMessage {
+  color: var(--color-gray);
+  font-size: 1.1rem;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.errorText {
+  color: #dc3545;
+  font-size: 0.95rem;
+  margin: 16px 0;
+  padding: 12px;
+  background: rgba(220, 53, 69, 0.05);
+  border-radius: 8px;
+  border-left: 4px solid #dc3545;
+}
+
+.returnButton {
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.returnButton:hover {
+  background: var(--color-secondary);
+}
+
+/* Alertas de error */
+.errorAlert {
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.05), rgba(200, 35, 51, 0.03));
+  border: 1px solid rgba(220, 53, 69, 0.2);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin: 24px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.errorAlert p {
+  color: #dc3545;
+  margin: 0;
+  font-weight: 500;
+  flex: 1;
+}
+
+.dismissButton {
+  background: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+  border: 1px solid rgba(220, 53, 69, 0.3);
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dismissButton:hover {
+  background: rgba(220, 53, 69, 0.2);
+}
+
+/* Sección de resultados */
+.resultsSection {
+  margin-top: 32px;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 32px;
+  color: var(--color-gray);
+  font-size: 1.1rem;
+  background: rgba(0, 78, 146, 0.03);
+  border-radius: 8px;
+  margin: 24px 0;
+  border: 1px dashed rgba(0, 78, 146, 0.2);
+}
+
+.instructions {
+  text-align: center;
+  padding: 24px;
+  color: var(--color-secondary);
+  font-size: 1.1rem;
+  font-weight: 500;
+  background: linear-gradient(135deg, rgba(0, 78, 146, 0.03), rgba(0, 33, 71, 0.02));
+  border-radius: 8px;
+  margin: 32px 0;
+  border: 1px solid rgba(0, 78, 146, 0.1);
 }
