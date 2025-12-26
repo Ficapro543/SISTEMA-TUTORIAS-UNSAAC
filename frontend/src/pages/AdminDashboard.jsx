@@ -4,7 +4,8 @@ import {
     FaColumns, FaProjectDiagram, FaFileAlt, FaChartLine,
     FaUsers, FaCalendarAlt, FaChalkboardTeacher, FaCommentDots,
     FaSearch, FaBell, FaQuestionCircle, FaCog, FaSignOutAlt,
-    FaClipboardList, FaArrowLeft, FaCheck, FaTimes, FaInbox
+    FaClipboardList, FaArrowLeft, FaCheck, FaTimes, FaInbox,
+    FaExchangeAlt
 } from "react-icons/fa";
 import { getDashboardStats } from "../services/assignmentService";
 import { getPendingRequests, getRequestDetail, approveRequest, rejectRequest } from "../services/adminService";
@@ -150,16 +151,6 @@ export default function AdminDashboard() {
                     <div className={styles.statInfo}>
                         <span className={styles.statLabel}>Estudiantes totales</span>
                         <span className={styles.statValue}>{loading ? "..." : stats.students}</span>
-                    </div>
-                </div>
-
-                <div className={styles.statCard} style={{ cursor: 'pointer', border: '1px solid #dbeafe' }} onClick={() => navigate("/asignaciones")}>
-                    <div className={styles.statIconWrapper} style={{ backgroundColor: '#eff6ff', color: '#3b82f6' }}>
-                        <FaProjectDiagram />
-                    </div>
-                    <div className={styles.statInfo}>
-                        <span className={styles.statLabel}>Asignación de Tutores</span>
-                        <span className={styles.statValue} style={{ fontSize: '1.25rem' }}>Ir al módulo</span>
                     </div>
                 </div>
 
@@ -381,6 +372,9 @@ export default function AdminDashboard() {
                         </div>
                         <div className={styles.navItem} onClick={() => navigate("/asignaciones")}>
                             <FaProjectDiagram /> Asignación Tutores
+                        </div>
+                        <div className={styles.navItem} onClick={() => navigate("/admin/cambio-tutor")}>
+                            <FaExchangeAlt /> Cambio de Tutor
                         </div>
                         <div className={styles.navItem}>
                             <FaCommentDots /> Notes

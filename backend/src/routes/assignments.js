@@ -6,7 +6,9 @@ const {
     getTutors,
     getUnassignedStudents,
     assignStudents,
-    getDashboardStats
+    getDashboardStats,
+    getStudentsByTutor,
+    transferStudents
 } = require('../controllers/assignmentController');
 
 const {
@@ -21,7 +23,9 @@ router.get('/semesters', getAllSemesters);
 router.get('/stats', getDashboardStats);
 router.get('/tutors', getTutors);
 router.get('/students/unassigned', getUnassignedStudents);
+router.get('/tutor/:tutorId/students', getStudentsByTutor);
 router.post('/', assignStudents);
+router.put('/transfer', transferStudents);
 
 // Development/Debug Routes
 router.get('/debug/seed', debugSeed);
