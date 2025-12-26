@@ -17,6 +17,7 @@ import TutoriasHistoricas from "./pages/TutoriasHistoricas.jsx";
 import TestJWT from "./componentes/TestJWT.jsx";
 import AsignacionTutorados from "./pages/AsignacionTutorados.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
+import CambioTutorados from "./pages/CambioTutorados.jsx";
 import AsignarTutorados from "./pages/AsignarTutorados.jsx";
 
 function App() {
@@ -37,6 +38,7 @@ function App() {
 
       {/* NUEVA RUTA: módulo Administrador -> Asignaciones */}
       <Route path="/administrador/asignaciones" element={<AsignarTutorados />} />
+      <Route path="/admin/cambio-tutor" element={<CambioTutorados />} />
 
       <Route path="*" element={<Navigate to="/ping" replace />} />
       <Route path="/tutoriasHistoricas" element={<TutoriasHistoricas roles={{ administrador: true }} />} />
