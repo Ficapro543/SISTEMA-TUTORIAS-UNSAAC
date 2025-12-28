@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaSearch, FaCheckCircle, FaHome, FaSignOutAlt, FaInfoCircle, FaChevronDown, FaUsers, FaArrowLeft } from "react-icons/fa";
-import { getActiveSemester, getSemesters, getTutors, getUnassignedStudents, assignStudents } from "../services/assignmentService";
+import { getActiveSemester, getSemesters, getTutors, getUnassignedStudents, assignStudents } from "../../services/assignmentService";
 import styles from "../styles/components/AsignacionTutorados.module.css";
 
 export default function AsignacionTutorados() {

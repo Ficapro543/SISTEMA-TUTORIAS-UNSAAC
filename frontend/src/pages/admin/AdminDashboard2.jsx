@@ -7,8 +7,8 @@ import {
     FaClipboardList, FaArrowLeft, FaCheck, FaTimes, FaInbox,
     FaExchangeAlt
 } from "react-icons/fa";
-import { getDashboardStats } from "../services/assignmentService";
-import { getPendingRequests, getRequestDetail, approveRequest, rejectRequest } from "../services/adminService";
+import { getDashboardStats } from "../../services/assignmentService";
+import { getPendingRequests, getRequestDetail, approveRequest, rejectRequest } from "../../services/adminService";
 import styles from "../styles/components/AdminDashboard.module.css";
 
 export default function AdminDashboard() {

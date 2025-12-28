@@ -6,8 +6,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../componentes/ui/tabs
 import { House, Settings, GraduationCap, UserCheck, LogOut } from 'lucide-react';
 
 // Importación de Dashboards específicos
-import AdminDashboard from './admin/AdminDashboard';
-import TutorDashboard from './tutor/TutorDashboard';
+import AdminDashboard from './AdminDashboard';
+import TutorDashboard from '../tutor/tutorDashboard';
 import VerificadorDashboard from './verificador/VerificadorDashboard';
 
 const Dashboard = () => {
