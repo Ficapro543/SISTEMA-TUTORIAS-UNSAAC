@@ -16,6 +16,34 @@ function DetalleTutoriaModal({ tutoria, onClose }) {
     });
   };
 
+  // Función para formatear el nombre del semestre
+  const formatSemesterName = (semestre) => {
+    if (!semestre) return 'No disponible';
+    
+    // Formato académico estándar
+    if (semestre.match(/^\d{4}-\d$/)) {
+      const [year, period] = semestre.split('-');
+      const periodNames = {
+        '1': 'I',
+        '2': 'II',
+        '3': 'Verano'
+      };
+      return `${year} - Semestre ${periodNames[period] || period}`;
+    }
+    
+    return semestre;
+  };
+
+  // Obtener clase para el tipo de tutoría
+  const getTipoClass = (tipo) => {
+    switch(tipo?.toUpperCase()) {
+      case 'ACADEMICA': return styles.tipoAcademica;
+      case 'PERSONAL': return styles.tipoPersonal;
+      case 'PROFESIONAL': return styles.tipoProfesional;
+      default: return styles.tipoGeneral;
+    }
+  };
+
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
@@ -33,131 +61,199 @@ function DetalleTutoriaModal({ tutoria, onClose }) {
             <div className={styles.grid}>
               <div className={styles.infoItem}>
                 <strong>Estudiante:</strong>
-                <span>{tutoria.estudiante} ({tutoria.codigo_estudiante})</span>
+                <div className={styles.studentInfo}>
+                  <span className={styles.studentName}>{tutoria.estudiante}</span>
+                  {tutoria.codigo_estudiante && (
+                    <span className={styles.studentCode}>
+                      Código: {tutoria.codigo_estudiante}
+                    </span>
+                  )}
+                </div>
               </div>
+              
               <div className={styles.infoItem}>
                 <strong>Tutor:</strong>
-                <span>{tutoria.tutor}</span>
-                {tutoria.tutor_email && (
-                  <span style={{ fontSize: '0.85rem', color: '#666', marginTop: '2px' }}>
-                    {tutoria.tutor_email}
-                  </span>
-                )}
+                <div className={styles.tutorInfo}>
+                  <span className={styles.tutorName}>{tutoria.tutor}</span>
+                  {tutoria.tutor_email && (
+                    <span className={styles.tutorEmail}>
+                      {tutoria.tutor_email}
+                    </span>
+                  )}
+                </div>
               </div>
+              
               <div className={styles.infoItem}>
                 <strong>Semestre:</strong>
-                <span style={{ 
-                  fontWeight: 'bold', 
-                  color: 'var(--color-primary)',
-                  fontSize: '1.1rem'
-                }}>
-                  {tutoria.semestre}
+                <span className={styles.semesterBadge}>
+                  {formatSemesterName(tutoria.semestre)}
                 </span>
               </div>
+              
               <div className={styles.infoItem}>
                 <strong>Fecha y Hora:</strong>
-                <span style={{ fontWeight: '500' }}>
+                <span className={styles.dateTime}>
                   {formatDate(tutoria.fecha)}
                 </span>
               </div>
+              
               <div className={styles.infoItem}>
                 <strong>Tipo de Tutoría:</strong>
-                <span className={`${styles.tipo} ${styles[tutoria.tipo?.toLowerCase()] || styles.general}`}>
+                <span className={`${styles.tipoBadge} ${getTipoClass(tutoria.tipo)}`}>
                   {tutoria.tipo || 'GENERAL'}
                 </span>
               </div>
+              
               <div className={styles.infoItem}>
                 <strong>Modalidad:</strong>
                 <span>{tutoria.modalidad || 'No especificada'}</span>
               </div>
-              <div className={styles.infoItem}>
-                <strong>Ambiente/Lugar:</strong>
-                <span>{tutoria.ambiente || 'No especificado'}</span>
-              </div>
+              
+              {tutoria.ambiente && (
+                <div className={styles.infoItem}>
+                  <strong>Ambiente/Lugar:</strong>
+                  <span>{tutoria.ambiente}</span>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Columna 2: Observaciones y Detalles */}
+          {/* Columna 2: Observaciones por categoría */}
           <div>
-            {/* Observaciones */}
+            {/* Observaciones organizadas */}
             <div className={styles.section}>
-              <h4>📝 Observaciones</h4>
-              {tutoria.observaciones?.academico && (
-                <div className={styles.observacion}>
-                  <strong>🔬 Académico:</strong>
-                  <p>{tutoria.observaciones.academico}</p>
-                </div>
-              )}
-              {tutoria.observaciones?.personal && (
-                <div className={styles.observacion}>
-                  <strong>👤 Personal:</strong>
-                  <p>{tutoria.observaciones.personal}</p>
-                </div>
-              )}
-              {tutoria.observaciones?.profesional && (
-                <div className={styles.observacion}>
-                  <strong>💼 Profesional:</strong>
-                  <p>{tutoria.observaciones.profesional}</p>
-                </div>
-              )}
-              {tutoria.observaciones?.general && (
-                <div className={styles.observacion}>
-                  <strong>📋 Resumen General:</strong>
-                  <p>{tutoria.observaciones.general}</p>
-                </div>
-              )}
-              
-              {!tutoria.observaciones?.academico && 
-               !tutoria.observaciones?.personal && 
-               !tutoria.observaciones?.profesional && 
-               !tutoria.observaciones?.general && (
-                <div className={styles.observacion}>
-                  <p style={{ color: '#666', fontStyle: 'italic' }}>
-                    No hay observaciones registradas para esta tutoría.
-                  </p>
-                </div>
-              )}
+              <h4>📋 Observaciones por Área</h4>
+              <div className={styles.observacionesGrid}>
+                {tutoria.observaciones?.academico && (
+                  <div className={styles.observacionCategoria}>
+                    <div className={`${styles.observacionHeader} ${styles.academico}`}>
+                      <span className={styles.observacionIcon}>📚</span>
+                      <h5 className={styles.observacionTitle}>Académico</h5>
+                    </div>
+                    <div className={styles.observacionContent}>
+                      <p>{tutoria.observaciones.academico}</p>
+                    </div>
+                  </div>
+                )}
+                
+                {tutoria.observaciones?.personal && (
+                  <div className={styles.observacionCategoria}>
+                    <div className={`${styles.observacionHeader} ${styles.personal}`}>
+                      <span className={styles.observacionIcon}>👤</span>
+                      <h5 className={styles.observacionTitle}>Personal</h5>
+                    </div>
+                    <div className={styles.observacionContent}>
+                      <p>{tutoria.observaciones.personal}</p>
+                    </div>
+                  </div>
+                )}
+                
+                {tutoria.observaciones?.profesional && (
+                  <div className={styles.observacionCategoria}>
+                    <div className={`${styles.observacionHeader} ${styles.profesional}`}>
+                      <span className={styles.observacionIcon}>💼</span>
+                      <h5 className={styles.observacionTitle}>Profesional</h5>
+                    </div>
+                    <div className={styles.observacionContent}>
+                      <p>{tutoria.observaciones.profesional}</p>
+                    </div>
+                  </div>
+                )}
+                
+                {tutoria.observaciones?.general && (
+                  <div className={styles.observacionCategoria}>
+                    <div className={`${styles.observacionHeader} ${styles.general}`}>
+                      <span className={styles.observacionIcon}>📋</span>
+                      <h5 className={styles.observacionTitle}>Resumen General</h5>
+                    </div>
+                    <div className={styles.observacionContent}>
+                      <p>{tutoria.observaciones.general}</p>
+                    </div>
+                  </div>
+                )}
+                
+                {!tutoria.observaciones?.academico && 
+                 !tutoria.observaciones?.personal && 
+                 !tutoria.observaciones?.profesional && 
+                 !tutoria.observaciones?.general && (
+                  <div className={styles.noObservaciones}>
+                    <span className={styles.noObservacionesIcon}>📝</span>
+                    <p className={styles.noObservacionesText}>
+                      No hay observaciones registradas para esta tutoría.
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Derivación (si existe) */}
             {tutoria.requiere_derivacion && tutoria.derivacion && (
               <div className={styles.section}>
                 <h4>🔄 Derivación</h4>
-                <div className={styles.grid}>
-                  <div className={styles.infoItem}>
+                <div className={styles.derivacionInfo}>
+                  <div className={styles.derivacionItem}>
+                    <strong>Estado:</strong>
+                    <span className={styles.derivacionStatus}>Derivado</span>
+                  </div>
+                  <div className={styles.derivacionItem}>
                     <strong>Especialidad:</strong>
-                    <span style={{ color: '#d63384', fontWeight: '500' }}>
+                    <span className={styles.derivacionValue}>
                       {tutoria.derivacion.especialidad}
                     </span>
                   </div>
-                  <div className={styles.infoItem}>
-                    <strong>Motivo:</strong>
-                    <span>{tutoria.derivacion.motivo}</span>
-                  </div>
+                  {tutoria.derivacion.motivo && (
+                    <div className={styles.derivacionItem}>
+                      <strong>Motivo:</strong>
+                      <span className={styles.derivacionValue}>
+                        {tutoria.derivacion.motivo}
+                      </span>
+                    </div>
+                  )}
+                  {tutoria.derivacion.observaciones && (
+                    <div className={styles.derivacionItem}>
+                      <strong>Observaciones:</strong>
+                      <span className={styles.derivacionValue}>
+                        {tutoria.derivacion.observaciones}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
 
             {/* Información de Registro */}
             <div className={styles.section}>
-              <h4>📅 Registro</h4>
-              <div className={styles.grid}>
-                <div className={styles.infoItem}>
+              <h4>📅 Información de Registro</h4>
+              <div className={styles.registroGrid}>
+                <div className={styles.registroItem}>
                   <strong>Registrado el:</strong>
-                  <span>{formatDate(tutoria.fechas?.registro)}</span>
+                  <span className={styles.registroDate}>
+                    {formatDate(tutoria.fechas?.registro)}
+                  </span>
                 </div>
                 {tutoria.fechas?.actualizacion && (
-                  <div className={styles.infoItem}>
-                    <strong>Última Actualización:</strong>
-                    <span>{formatDate(tutoria.fechas.actualizacion)}</span>
+                  <div className={styles.registroItem}>
+                    <strong>Última actualización:</strong>
+                    <span className={styles.registroDate}>
+                      {formatDate(tutoria.fechas.actualizacion)}
+                    </span>
                   </div>
                 )}
+                <div className={styles.registroItem}>
+                  <strong>Accesibilidad:</strong>
+                  <span className={styles.registroAccess}>Solo lectura</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         <div className={styles.modalFooter}>
+          <div className={styles.footerInfo}>
+            <span className={styles.footerText}>
+              Registro histórico - No modificable
+            </span>
+          </div>
           <button className={styles.closeButton} onClick={onClose}>
             Cerrar Vista
           </button>

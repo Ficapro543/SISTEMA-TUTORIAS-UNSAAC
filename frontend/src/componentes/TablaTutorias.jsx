@@ -1,7 +1,7 @@
 import { useState } from "react";
 import styles from "../styles/components/TablaTutorias.module.css";
 
-function TablaTutorias({ tutorias, onVerDetalle }) {
+function TablaTutorias({ tutorias, onVerDetalle, modo = "semestre" }) {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
 
   // Función para ordenar la tabla
@@ -76,7 +76,9 @@ function TablaTutorias({ tutorias, onVerDetalle }) {
     <div className={styles.tableContainer}>
       <div className={styles.tableHeader}>
         <div className={styles.tableInfo}>
-          <h4 className={styles.tableTitle}>Registros de Tutorías</h4>
+          <h4 className={styles.tableTitle}>
+            {modo === "semestre" ? "Tutorías del Semestre" : "Historial del Estudiante"}
+          </h4>
           <span className={styles.tableCount}>
             {tutorias.length} {tutorias.length === 1 ? 'registro' : 'registros'} encontrados
           </span>
@@ -87,27 +89,44 @@ function TablaTutorias({ tutorias, onVerDetalle }) {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th 
-                className={`${styles.sortable} ${sortConfig.key === 'estudiante' ? styles.sorted : ''}`}
-                onClick={() => requestSort('estudiante')}
-              >
-                Estudiante
-                {sortConfig.key === 'estudiante' && (
-                  <span className={styles.sortIndicator}>
-                    {sortConfig.direction === 'ascending' ? '↑' : '↓'}
-                  </span>
-                )}
-              </th>
-              <th 
-                className={`${styles.sortable} ${sortConfig.key === 'tutor' ? styles.sorted : ''}`}
-                onClick={() => requestSort('tutor')}
-              >
-                Tutor
-                {sortConfig.key === 'tutor' && (
-                  <span className={styles.sortIndicator}>
-                    {sortConfig.direction === 'ascending' ? '↑' : '↓'}
-                  </span>
-                )}
+              {modo === "estudiante" && (
+                <th
+                  className={`${styles.sortable} ${sortConfig.key === 'semestre' ? styles.sorted : ''}`}
+                  onClick={() => requestSort('semestre')}
+                >
+                  Semestre
+                  {sortConfig.key === 'semestre' && (
+                    <span className={styles.sortIndicator}>
+                      {sortConfig.direction === 'ascending' ? '↑' : '↓'}
+                    </span>
+                  )}
+                </th>
+              )}
+
+              {modo === "semestre" && (
+                <th
+                  className={`${styles.sortable} ${sortConfig.key === 'estudiante' ? styles.sorted : ''}`}
+                  onClick={() => requestSort('estudiante')}
+                >
+                  Estudiante
+                  {sortConfig.key === 'estudiante' && (
+                    <span className={styles.sortIndicator}>
+                      {sortConfig.direction === 'ascending' ? '↑' : '↓'}
+                    </span>
+                  )}
+                </th>
+              )}
+              
+              <th
+                  className={`${styles.sortable} ${sortConfig.key === 'tutor' ? styles.sorted : ''}`}
+                  onClick={() => requestSort('tutor')}
+                >
+                  Tutor
+                  {sortConfig.key === 'tutor' && (
+                    <span className={styles.sortIndicator}>
+                      {sortConfig.direction === 'ascending' ? '↑' : '↓'}
+                    </span>
+                  )}
               </th>
               <th>Tipo</th>
               <th 
@@ -127,12 +146,19 @@ function TablaTutorias({ tutorias, onVerDetalle }) {
           <tbody>
             {sortedTutorias.map((tutoria) => (
               <tr key={tutoria.id} className={styles.tableRow}>
-                <td className={styles.studentCell}>
-                  <div className={styles.studentName}>{tutoria.estudiante}</div>
-                  {tutoria.codigo_estudiante && (
-                    <div className={styles.studentCode}>{tutoria.codigo_estudiante}</div>
-                  )}
-                </td>
+                {modo === "estudiante" && (
+                  <td className={styles.semestreCell}>
+                    <div className={styles.semestreName}>{tutoria.semestre}</div>
+                  </td>
+                )}
+                {modo === "semestre" &&(
+                  <td className={styles.studentCell}>
+                    <div className={styles.studentName}>{tutoria.estudiante}</div>
+                      {tutoria.codigo_estudiante && (
+                        <div className={styles.studentCode}>{tutoria.codigo_estudiante}</div>
+                      )}
+                  </td>
+                )}
                 <td className={styles.tutorCell}>{tutoria.tutor}</td>
                 <td>
                   <span className={`${styles.tipoBadge} ${getTipoClass(tutoria.tipo)}`}>
