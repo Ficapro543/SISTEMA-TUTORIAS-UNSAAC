@@ -1,13 +1,23 @@
 const { Pool } = require('pg');
 
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    // Add SSL config if needed for some environments, but locally usually false
-    ssl: false
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === 'development'
+    ? {rejectUnauthorized: false}
+    : false,
+  
+  max: 10,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 30000
+});
+
+pool.on('connect', () => {
+  if(process.env.NODE_ENV === 'development')
+    console.log('✅ Nueva conexion a PostgreSQL creada');
 });
 
 pool.on('error', (err) => {
-    console.error('Unexpected error on idle client', err);
+  console.error('❌ Error inesperado en PostgreSQL', err);
 });
 
 module.exports = pool;

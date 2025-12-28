@@ -1,6 +1,9 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
--- Tablas
+-- =========================
+-- TABLAS
+-- =========================
+
 CREATE TABLE IF NOT EXISTS pending_users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     first_name TEXT NOT NULL,
@@ -31,7 +34,7 @@ CREATE TABLE IF NOT EXISTS refresh_tokens (
     created_at TIMESTAMP DEFAULT now()
 );
 
-CREATE TABLE activation_tokens (
+CREATE TABLE IF NOT EXISTS activation_tokens (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     token UUID NOT NULL,
@@ -41,7 +44,6 @@ CREATE TABLE activation_tokens (
     used_at TIMESTAMP
 );
 
--- Tabla para códigos de recuperación
 CREATE TABLE IF NOT EXISTS password_reset_tokens (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -55,7 +57,6 @@ CREATE TABLE IF NOT EXISTS password_reset_tokens (
 CREATE TABLE IF NOT EXISTS tutores (
     user_id UUID PRIMARY KEY,
     cubiculo VARCHAR(50),
-
     CONSTRAINT fk_tutores_user
         FOREIGN KEY (user_id)
         REFERENCES users(id)
@@ -71,11 +72,9 @@ CREATE TABLE IF NOT EXISTS estudiante (
 
 CREATE TABLE IF NOT EXISTS tutor_asignacion (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-
     tutor_user_id UUID NOT NULL,
     codigo_estudiante VARCHAR(20) NOT NULL,
     semestre VARCHAR(10) NOT NULL,
-
     estado TEXT NOT NULL DEFAULT 'activo',
     fecha_asignacion TIMESTAMP NOT NULL DEFAULT now(),
     fecha_fin TIMESTAMP,
@@ -98,18 +97,16 @@ CREATE TABLE IF NOT EXISTS tutor_asignacion (
 
 CREATE TABLE IF NOT EXISTS cronogramas (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-
     tutor_user_id UUID NOT NULL,
-    codigo_estudiante VARCHAR(20) NOT NULL, 
+    codigo_estudiante VARCHAR(20) NOT NULL,
     asignacion_id UUID NOT NULL,
 
     fecha DATE NOT NULL,
     hora TIME NOT NULL,
     ambiente VARCHAR(100) NOT NULL,
-
     semestre VARCHAR(10) NOT NULL,
-    estado TEXT NOT NULL DEFAULT 'programada',
 
+    estado TEXT NOT NULL DEFAULT 'programada',
     created_at TIMESTAMP DEFAULT now(),
 
     CONSTRAINT chk_estado_cronograma
@@ -136,7 +133,6 @@ CREATE TABLE IF NOT EXISTS cronogramas (
 
 CREATE TABLE IF NOT EXISTS tutorias (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-
     cronograma_id UUID NOT NULL,
 
     obs_academico TEXT,
@@ -145,10 +141,8 @@ CREATE TABLE IF NOT EXISTS tutorias (
     resumen_general TEXT,
 
     requiere_derivacion BOOLEAN DEFAULT FALSE,
-
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
     modalidad TEXT NOT NULL DEFAULT 'Asignada',
 
     CONSTRAINT fk_tutoria_cronograma
@@ -160,11 +154,9 @@ CREATE TABLE IF NOT EXISTS tutorias (
 
 CREATE TABLE IF NOT EXISTS derivaciones (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-
     tutoria_id UUID NOT NULL,
     especialidad VARCHAR(100) NOT NULL,
     motivo TEXT NOT NULL,
-
     fecha_derivacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_derivacion_tutoria
@@ -174,7 +166,10 @@ CREATE TABLE IF NOT EXISTS derivaciones (
         ON DELETE CASCADE
 );
 
--- Índices para optimizar consultas
+-- =========================
+-- ÍNDICES
+-- =========================
+
 CREATE UNIQUE INDEX IF NOT EXISTS uq_asignacion_activa
 ON tutor_asignacion (codigo_estudiante, semestre)
 WHERE estado = 'activo';
@@ -195,8 +190,10 @@ ON tutorias (cronograma_id);
 CREATE INDEX IF NOT EXISTS idx_cronograma_tutor
 ON cronogramas (tutor_user_id);
 
-/*Funciones*/
--- Triggers y funciones de reglas de negocio
+-- =========================
+-- FUNCIONES
+-- =========================
+
 CREATE OR REPLACE FUNCTION set_fecha_actualizacion()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -216,7 +213,6 @@ BEGIN
     ) THEN
         RAISE EXCEPTION 'No se puede modificar tutorías de fechas pasadas';
     END IF;
-
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -227,7 +223,6 @@ BEGIN
     IF (OLD.fecha + OLD.hora) < CURRENT_TIMESTAMP THEN
         RAISE EXCEPTION 'No se puede modificar cronogramas de fechas pasadas';
     END IF;
-
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -247,7 +242,6 @@ BEGIN
         RAISE EXCEPTION
         'La asignación no es válida: tutor, estudiante, semestre o estado incorrecto';
     END IF;
-
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -262,7 +256,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-/*TRIGGERS*/
+-- =========================
+-- TRIGGERS
+-- =========================
+
 CREATE TRIGGER trg_update_fecha_tutoria
 BEFORE UPDATE ON tutorias
 FOR EACH ROW

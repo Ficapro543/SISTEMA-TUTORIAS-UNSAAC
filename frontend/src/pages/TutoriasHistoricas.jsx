@@ -2,16 +2,29 @@ import { useEffect, useState } from "react";
 import styles from "../styles/pages/TutoriasHistoricas.module.css";
 import api from "../utils/api";
 
+import BusquedaSelector from "../componentes/BusquedaSelector";
 import SemestreSelector from "../componentes/SemestreSelector";
 import TablaTutorias from "../componentes/TablaTutorias";
 import DetalleTutoriaModal from "../componentes/DetalleTutoriaModal";
+import BusquedaEstudiante from "../componentes/BusquedaEstudiante";
 
 function TutoriasHistoricas({ roles }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loadingAuth, setLoadingAuth] = useState(true);
 
   const [semestres, setSemestres] = useState([]);
+  const [modoBusqueda, setModoBusqueda] = useState("semestre"); //semestre o estudiante
+
+  //Estados para busqueda por semestre
   const [semestreSeleccionado, setSemestreSeleccionado] = useState(null);
+  
+  //Estados para busqueda por estudiante
+  const [filtroEstudiante, setFiltroEstudiante] = useState({
+    codigo: "",
+    nombre: "",
+    apellido: ""
+  });
+
   const [tutorias, setTutorias] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -58,18 +71,40 @@ function TutoriasHistoricas({ roles }) {
     }
   };
 
-  const cargarTutorias = async (semestreNombre) => {
+  const cargarTutoriasPorSemestre = async (semestre) => {
     setLoading(true);
     setError("");
 
     try {
       const response = await api.get('/admin/tutorias', {
-        params: { semestre: semestreNombre }
+        params: { 
+          semestre: semestre?.nombre,
+        }
       });
       setTutorias(response.data);
     } catch (err) {
       handleApiError(err, 'cargar tutorías');
     } finally {
+      setLoading(false);
+    }
+  };
+
+  const cargarTutoriasPorEstudiante = async(filtros) =>{
+    setLoading(true);
+    setError("");
+
+    try{
+      const response = await api.get('/admin/tutorias/estudiante',{
+        params:{
+          codigo: filtros.codigo || undefined,
+          nombre: filtros.nombre || undefined,
+          apellido: filtros.apellido || undefined
+        }
+      });
+      setTutorias(response.data);
+    }catch(err){
+      handleApiError(err, 'cargar tutorias por estudiante');
+    }finally{
       setLoading(false);
     }
   };
@@ -83,12 +118,40 @@ function TutoriasHistoricas({ roles }) {
     }
   };
 
-  const handleSemestreChange = (semestre) => {
-    if (!semestre) return;
-    setSemestreSeleccionado(semestre);
+  const handleModoBusquedaChange = (modo) =>{
+    setModoBusqueda(modo);
     setTutorias([]);
-    cargarTutorias(semestre.nombre);
+    setSemestreSeleccionado(null);
+    setFiltroEstudiante({codigo: "", nombre: "", apellido: ""});
+    setError("");
+  }
+
+  const handleSemestreChange = (semestre) => {
+    setSemestreSeleccionado(semestre);
+    if(semestre){
+      cargarTutoriasPorSemestre(semestre);
+    }else{
+      setTutorias([]);
+    }
   };
+
+  const handleBuscarPorEstudiante = (filtros) => {
+    setFiltroEstudiante(filtros);
+    //Validamos que minimo haya un filtro
+    if(!filtros.codigo && !filtros.nombre && !filtros.apellido){
+      setError("Debe ingresar al menos un criterio de busqueda.");
+      return;
+    }
+
+    cargarTutoriasPorEstudiante(filtros);
+  }
+
+  const handleLimpiarBusqueda = () => {
+    setTutorias([]);
+    setSemestreSeleccionado(null);
+    setFiltroEstudiante({codigo: "", nombre: "", apellido: ""});
+    setError("");
+  }
 
   const handleApiError = (err, context) => {
     console.error(`Error al ${context}:`, err);
@@ -139,23 +202,57 @@ function TutoriasHistoricas({ roles }) {
         <header className={styles.header}>
           <h1 className={styles.title}>Tutorías Históricas</h1>
           <p className={styles.subtitle}>
-            Consulta de registros de acompañamiento académico por semestre
+            Consulte registros de acompañamiento académico por semestre o por estudiante
           </p>
         </header>
 
         <main className={styles.mainContent}>
-          <SemestreSelector
-            semestres={semestres}
-            onChange={handleSemestreChange}
+          {/* Selector de modo de busqueda */}
+          <BusquedaSelector
+            modo={modoBusqueda}
+            onChange={handleModoBusquedaChange}
           />
 
+          {/* Contenido según el modo seleccionado */}
+          <div className={styles.searchContent}>
+            {modoBusqueda === "semestre" ? (
+              <>
+                <SemestreSelector
+                  semestres={semestres}
+                  onChange={handleSemestreChange}
+                  value={semestreSeleccionado}
+                />
+                {semestreSeleccionado && tutorias.length === 0 && !loading && (
+                  <div className={styles.emptyState}>
+                    <p>No se encontraron tutorías para el semestre seleccionado.</p>
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                <BusquedaEstudiante
+                  onBuscar = {handleBuscarPorEstudiante}
+                  onLimpiar = {handleLimpiarBusqueda}
+                  valores = {filtroEstudiante}
+                />
+                {tutorias.length === 0 && !loading && filtroEstudiante.codigo && (
+                  <div className={styles.emptyState}>
+                    <p>No se encontraron tutorías para el estudiante especificado.</p>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+
+          {/* Estados de carga y error */}
           {loading && (
             <div className={styles.loadingState}>
+              <div className={styles.loadingSpinner}></div>
               <p>Cargando registros...</p>
             </div>
           )}
 
-          {error && (
+          {error && !loading && (
             <div className={styles.errorAlert}>
               <p>{error}</p>
               <button 
@@ -167,24 +264,32 @@ function TutoriasHistoricas({ roles }) {
             </div>
           )}
 
-          {semestreSeleccionado && !loading && !error && (
+          {/* Mostrar resultados si hay tutorias */}
+          {tutorias.length > 0 && !loading && !error && (
             <div className={styles.resultsSection}>
+              <div className={styles.resultsHeader}>
+                <h3>Resultados encontrados</h3>
+                <p className={styles.resultsCount}>
+                  {tutorias.length} {tutorias.length === 1 ? 'registro':'registros'} encontrados
+                </p>
+              </div>
               <TablaTutorias
                 tutorias={tutorias}
                 onVerDetalle={(tutoria) => cargarDetalleTutoria(tutoria.id)}
+                modo={modoBusqueda}
               />
             </div>
           )}
 
-          {semestreSeleccionado && tutorias.length === 0 && !loading && !error && (
-            <div className={styles.emptyState}>
-              <p>No se encontraron tutorías registradas para este semestre.</p>
-            </div>
-          )}
-
-          {!semestreSeleccionado && !loading && !error && semestres.length > 0 && (
+          {/* Instrucciones iniciales */}
+          {tutorias.length === 0 && !loading && !error && (
             <div className={styles.instructions}>
-              <p>Seleccione un semestre para consultar las tutorías realizadas.</p>
+              <p>
+                {modoBusqueda === "semestre"
+                  ? "Selecciona un semestre para consultar las tutorias realizadas."
+                  : "Ingrese los datos del estudiante para consultar su historial de tutorías."
+                }
+              </p>
             </div>
           )}
         </main>
