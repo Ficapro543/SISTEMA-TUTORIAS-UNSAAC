@@ -106,13 +106,13 @@ function DetalleTutoriaModal({ tutoria, onClose }) {
               
               <div className={styles.infoItem}>
                 <strong>Modalidad:</strong>
-                <span>{tutoria.modalidad || 'No especificada'}</span>
+                <span className={styles.modalidadText}>{tutoria.modalidad || 'No especificada'}</span>
               </div>
               
               {tutoria.ambiente && (
                 <div className={styles.infoItem}>
                   <strong>Ambiente/Lugar:</strong>
-                  <span>{tutoria.ambiente}</span>
+                  <span className={styles.ambienteText}>{tutoria.ambiente}</span>
                 </div>
               )}
             </div>

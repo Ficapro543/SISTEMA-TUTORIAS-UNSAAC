@@ -323,47 +323,273 @@ async function getSemestresCerrados(req, res, next) {
 }
 
 async function getTutoriasPorSemestre(req, res, next) {
-  const { semestre } = req.query; // Cambiado de semestreId a semestre (string)
-
-  console.log('🔍 GET /admin/tutorias - semestre:', semestre);
-  console.log('🔍 Usuario autenticado:', req.user);
+  const { semestre, codigo_estudiante, nombre } = req.query;
 
   if (!semestre) {
     return res.status(400).json({ message: 'Semestre requerido' });
   }
 
   try {
-    const { rows } = await pool.query(
-      `SELECT 
+    let filtros = [];
+    let values = [];
+    let idx = 1;
+
+    // Semestre (obligatorio)
+    filtros.push(`c.semestre = $${idx}`);
+    values.push(semestre);
+    idx++;
+
+    // Solo tutorías realizadas
+    filtros.push(`c.estado = 'realizada'`);
+
+    // Solo fechas válidas
+    filtros.push(`c.fecha IS NOT NULL`);
+
+    // Filtro por código de estudiante
+    if (codigo_estudiante) {
+      filtros.push(`e.codigo_estudiante = $${idx}`);
+      values.push(codigo_estudiante);
+      idx++;
+    }
+
+    // Filtro por nombre o apellido
+    if (nombre) {
+      filtros.push(`(
+        LOWER(e.nombre_estudiante) LIKE LOWER($${idx})
+        OR LOWER(e.apellido_estudiante) LIKE LOWER($${idx})
+        )`);
+      values.push(`%${nombre}%`);
+      idx++;
+    }
+
+    const query = `
+      SELECT 
         t.id,
-        CONCAT(e.nombre_estudiante, ' ', e.apellido_estudiante) as estudiante,
-        CONCAT(u.first_name, ' ', u.last_name) as tutor,
-        -- Determinar el tipo de tutoría basado en las observaciones
-        CASE 
+        CONCAT(e.nombre_estudiante, ' ', e.apellido_estudiante) AS estudiante,
+        e.codigo_estudiante,
+        CONCAT(u.first_name, ' ', u.last_name) AS tutor,
+        u.email as tutor_email,
+        c.semestre,
+        TO_CHAR(c.fecha, 'YYYY-MM-DD') AS fecha,
+        c.hora,
+        c.ambiente,
+        CASE
           WHEN t.obs_academico IS NOT NULL AND t.obs_academico != '' THEN 'ACADEMICA'
           WHEN t.obs_personal IS NOT NULL AND t.obs_personal != '' THEN 'PERSONAL'
           WHEN t.obs_profesional IS NOT NULL AND t.obs_profesional != '' THEN 'PROFESIONAL'
           ELSE 'GENERAL'
-        END as tipo,
-        c.fecha,
+        END AS tipo,
+        t.obs_academico,
+        t.obs_personal,
+        t.obs_profesional,
+        t.resumen_general,
+        t.requiere_derivacion,
+        t.modalidad,
         t.fecha_registro,
-        t.resumen_general
-       FROM tutorias t
-       INNER JOIN cronogramas c ON t.cronograma_id = c.id
-       INNER JOIN tutores tu ON c.tutor_user_id = tu.user_id
-       INNER JOIN users u ON tu.user_id = u.id
-       INNER JOIN estudiante e ON c.codigo_estudiante = e.codigo_estudiante
-       WHERE c.semestre = $1
-       AND c.estado = 'realizada'
-       ORDER BY c.fecha DESC, t.fecha_registro DESC`,
-      [semestre]
-    );
+        t.fecha_actualizacion,
+        d.especialidad as derivacion_especialidad,
+        d.motivo as derivacion_motivo
+      FROM tutorias t
+      INNER JOIN cronogramas c ON t.cronograma_id = c.id
+      INNER JOIN tutores tu ON c.tutor_user_id = tu.user_id
+      INNER JOIN users u ON tu.user_id = u.id
+      INNER JOIN estudiante e ON c.codigo_estudiante = e.codigo_estudiante
+      LEFT JOIN derivaciones d ON t.id = d.tutoria_id
+      WHERE ${filtros.join(' AND ')}
+      ORDER BY c.fecha DESC, t.fecha_registro DESC
+    `;
 
-    console.log('📊 Tutorías encontradas:', rows.length);
+    const { rows } = await pool.query(query, values);
 
-    res.json(rows);
+    // Formatear la respuesta de manera consistente
+    const tutoriasFormateadas = rows.map(t => ({
+      id: t.id,
+      estudiante: t.estudiante,
+      codigo_estudiante: t.codigo_estudiante,
+      tutor: t.tutor,
+      tutor_email: t.tutor_email,
+      semestre: t.semestre,
+      fecha: `${t.fecha} ${t.hora || ''}`,
+      tipo: t.tipo,
+      modalidad: t.modalidad,
+      ambiente: t.ambiente,
+      observaciones: {
+        academico: t.obs_academico,
+        personal: t.obs_personal,
+        profesional: t.obs_profesional,
+        general: t.resumen_general
+      },
+      requiere_derivacion: t.requiere_derivacion,
+      derivacion: t.derivacion_especialidad ? {
+        especialidad: t.derivacion_especialidad,
+        motivo: t.derivacion_motivo
+      } : null,
+      fechas: {
+        registro: t.fecha_registro,
+        actualizacion: t.fecha_actualizacion
+      }
+    }));
+
+    res.json(tutoriasFormateadas);
   } catch (err) {
     console.error('❌ Error en getTutoriasPorSemestre:', err);
+    next(err);
+  }
+}
+
+async function getTutoriasPorEstudiante(req, res, next) {
+  const { codigo, nombre, apellido } = req.query;
+
+  try {
+    // Validar que al menos haya un criterio de búsqueda
+    if (!codigo && !nombre && !apellido) {
+      return res.status(400).json({ 
+        message: 'Debe proporcionar al menos un criterio de búsqueda (código, nombre o apellido)' 
+      });
+    }
+
+    let filtros = [];
+    let values = [];
+    let idx = 1;
+
+    // Filtro por código de estudiante (exacto)
+    if (codigo) {
+      filtros.push(`e.codigo_estudiante = $${idx}`);
+      values.push(codigo);
+      idx++;
+    }
+
+    // Si se proporciona un valor en "nombre", puede ser nombre completo (nombre + apellido)
+    if (nombre && !apellido) {
+      // Intentar separar nombre y apellido si viene en un solo campo
+      const partes = nombre.trim().split(' ');
+      if (partes.length >= 2) {
+        // Si hay al menos dos partes, asumimos que la primera es nombre y las demás apellido
+        const primerNombre = partes[0];
+        const apellidos = partes.slice(1).join(' ');
+        
+        filtros.push(`(
+          (LOWER(e.nombre_estudiante) LIKE LOWER($${idx}) 
+           AND LOWER(e.apellido_estudiante) LIKE LOWER($${idx + 1}))
+          OR CONCAT(LOWER(e.nombre_estudiante), ' ', LOWER(e.apellido_estudiante)) LIKE LOWER($${idx})
+        )`);
+        values.push(`%${primerNombre}%`, `%${apellidos}%`);
+        idx += 2;
+      } else {
+        // Solo un término, buscar en ambos campos
+        filtros.push(`(
+          LOWER(e.nombre_estudiante) LIKE LOWER($${idx})
+          OR LOWER(e.apellido_estudiante) LIKE LOWER($${idx})
+        )`);
+        values.push(`%${nombre}%`);
+        idx++;
+      }
+    }
+
+    // Si se proporcionan nombre y apellido por separado
+    if (nombre && apellido) {
+      filtros.push(`(
+        LOWER(e.nombre_estudiante) LIKE LOWER($${idx})
+        AND LOWER(e.apellido_estudiante) LIKE LOWER($${idx + 1})
+      )`);
+      values.push(`%${nombre}%`, `%${apellido}%`);
+      idx += 2;
+    }
+
+    // Solo si se proporciona apellido solo (sin nombre)
+    if (!nombre && apellido) {
+      filtros.push(`LOWER(e.apellido_estudiante) LIKE LOWER($${idx})`);
+      values.push(`%${apellido}%`);
+      idx++;
+    }
+
+    // Solo tutorías realizadas
+    filtros.push(`c.estado = 'realizada'`);
+
+    // Solo fechas válidas
+    filtros.push(`c.fecha IS NOT NULL`);
+
+    // Construir la consulta SQL
+    const query = `
+      SELECT 
+        t.id,
+        CONCAT(e.nombre_estudiante, ' ', e.apellido_estudiante) AS estudiante,
+        e.codigo_estudiante,
+        CONCAT(u.first_name, ' ', u.last_name) AS tutor,
+        u.email as tutor_email,
+        c.semestre,
+        TO_CHAR(c.fecha, 'YYYY-MM-DD') AS fecha,
+        c.hora,
+        c.ambiente,
+        -- Determinar el tipo de tutoría basado en observaciones
+        CASE
+          WHEN t.obs_academico IS NOT NULL AND t.obs_academico != '' THEN 'ACADEMICA'
+          WHEN t.obs_personal IS NOT NULL AND t.obs_personal != '' THEN 'PERSONAL'
+          WHEN t.obs_profesional IS NOT NULL AND t.obs_profesional != '' THEN 'PROFESIONAL'
+          ELSE 'GENERAL'
+        END AS tipo,
+        t.obs_academico,
+        t.obs_personal,
+        t.obs_profesional,
+        t.resumen_general,
+        t.requiere_derivacion,
+        t.modalidad,
+        t.fecha_registro,
+        t.fecha_actualizacion,
+        -- Información de derivación si existe
+        d.especialidad as derivacion_especialidad,
+        d.motivo as derivacion_motivo
+      FROM tutorias t
+      INNER JOIN cronogramas c ON t.cronograma_id = c.id
+      INNER JOIN tutores tu ON c.tutor_user_id = tu.user_id
+      INNER JOIN users u ON tu.user_id = u.id
+      INNER JOIN estudiante e ON c.codigo_estudiante = e.codigo_estudiante
+      LEFT JOIN derivaciones d ON t.id = d.tutoria_id
+      WHERE ${filtros.join(' AND ')}
+      ORDER BY c.semestre DESC, c.fecha DESC
+    `;
+
+    const { rows } = await pool.query(query, values);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ 
+        message: 'No se encontraron tutorías para el estudiante especificado'
+      });
+    }
+
+    // Formatear la respuesta para el frontend
+    const tutoriasFormateadas = rows.map(t => ({
+      id: t.id,
+      estudiante: t.estudiante,
+      codigo_estudiante: t.codigo_estudiante,
+      tutor: t.tutor,
+      tutor_email: t.tutor_email,
+      semestre: t.semestre,
+      fecha: t.hora ? `${t.fecha} ${t.hora}` : t.fecha,
+      tipo: t.tipo,
+      modalidad: t.modalidad,
+      ambiente: t.ambiente,
+      observaciones: {
+        academico: t.obs_academico,
+        personal: t.obs_personal,
+        profesional: t.obs_profesional,
+        general: t.resumen_general
+      },
+      requiere_derivacion: t.requiere_derivacion,
+      derivacion: t.derivacion_especialidad ? {
+        especialidad: t.derivacion_especialidad,
+        motivo: t.derivacion_motivo
+      } : null,
+      fechas: {
+        registro: t.fecha_registro,
+        actualizacion: t.fecha_actualizacion
+      }
+    }));
+
+    res.json(tutoriasFormateadas);
+
+  } catch (err) {
+    console.error('❌ Error en getTutoriasPorEstudiante:', err);
     next(err);
   }
 }
@@ -377,7 +603,7 @@ async function getTutoriaDetalle(req, res, next) {
         e.codigo_estudiante,
         CONCAT(u.first_name, ' ', u.last_name) as tutor,
         u.email as tutor_email,
-        c.fecha,
+        TO_CHAR(c.fecha, 'YYYY-MM-DD') AS fecha,
         c.hora,
         c.ambiente,
         c.semestre,
@@ -463,5 +689,6 @@ module.exports = {
   decideRol,
   getSemestresCerrados,
   getTutoriasPorSemestre,
+  getTutoriasPorEstudiante,
   getTutoriaDetalle,
 };

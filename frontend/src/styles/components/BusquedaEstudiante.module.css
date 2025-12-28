@@ -1,10 +1,10 @@
 .container {
-  background: var(--color-surface);
-  border-radius: 12px;
+  background: var(--color-text-light);
+  border-radius: var(--radius);
   padding: 1.5rem;
   margin-bottom: 2rem;
   border: 1px solid var(--color-border);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow);
 }
 
 .header {
@@ -14,13 +14,13 @@
 .title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: var(--color-text-dark);
   margin: 0 0 0.5rem 0;
 }
 
 .subtitle {
   font-size: 0.9rem;
-  color: var(--color-text-secondary);
+  color: var(--color-gray);
   margin: 0;
   line-height: 1.4;
 }
@@ -37,24 +37,24 @@
 
 .selectorOption {
   padding: 0.5rem 1rem;
-  background: var(--color-background);
+  background: var(--color-gray-light);
   border: 1px solid var(--color-border);
-  border-radius: 6px;
+  border-radius: var(--radius);
   font-size: 0.9rem;
-  color: var(--color-text-secondary);
+  color: var(--color-gray);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: var(--transition);
 }
 
 .selectorOption:hover {
-  border-color: var(--color-primary-light);
+  border-color: var(--color-primary);
   color: var(--color-primary);
 }
 
 .selectorOption.active {
   background: var(--color-primary);
   border-color: var(--color-primary);
-  color: white;
+  color: var(--color-text-light);
   font-weight: 500;
 }
 
@@ -73,26 +73,28 @@
 .label {
   font-size: 0.9rem;
   font-weight: 500;
-  color: var(--color-text-primary);
+  color: var(--color-text-dark);
 }
 
 .input {
   padding: 0.75rem 1rem;
   border: 1px solid var(--color-border);
-  border-radius: 8px;
+  border-radius: var(--radius);
   font-size: 0.95rem;
-  color: var(--color-text-primary);
-  transition: all 0.2s ease;
+  color: var(--color-text-dark);
+  transition: var(--transition);
+  background: var(--color-text-light);
 }
 
 .input:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.1);
+  box-shadow: 0 0 0 3px rgba(0, 78, 146, 0.1);
+  background: var(--color-text-light);
 }
 
 .input::placeholder {
-  color: var(--color-text-tertiary);
+  color: var(--color-gray);
 }
 
 .nameGroup {
@@ -111,9 +113,9 @@
   flex: 1;
   padding: 0.875rem 1.5rem;
   background: var(--color-primary);
-  color: white;
+  color: var(--color-text-light);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius);
   font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
@@ -121,13 +123,13 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  transition: all 0.2s ease;
+  transition: var(--transition);
 }
 
 .searchButton:hover:not(:disabled) {
-  background: var(--color-primary-dark);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(74, 108, 247, 0.2);
+  background: var(--color-secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 78, 146, 0.2);
 }
 
 .searchButton:disabled {
@@ -137,19 +139,19 @@
 
 .clearButton {
   padding: 0.875rem 1.5rem;
-  background: var(--color-background);
-  color: var(--color-text-secondary);
+  background: var(--color-gray-light);
+  color: var(--color-gray);
   border: 1px solid var(--color-border);
-  border-radius: 8px;
+  border-radius: var(--radius);
   font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: var(--transition);
 }
 
 .clearButton:hover {
-  background: var(--color-surface);
-  border-color: var(--color-text-tertiary);
+  background: var(--color-text-light);
+  border-color: var(--color-gray);
 }
 
 .buttonIcon {
@@ -159,14 +161,14 @@
 .hint {
   margin-top: 1rem;
   padding: 0.875rem 1rem;
-  background: var(--color-info-light);
-  border-radius: 8px;
-  border-left: 4px solid var(--color-info);
+  background: rgba(0, 78, 146, 0.1);
+  border-radius: var(--radius);
+  border-left: 4px solid var(--color-primary);
 }
 
 .hintText {
   font-size: 0.85rem;
-  color: var(--color-info-dark);
+  color: var(--color-secondary);
   margin: 0;
   line-height: 1.4;
 }

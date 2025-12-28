@@ -11,12 +11,14 @@ const { createPendingUser,
     decideRol,
     getSemestresCerrados,
     getTutoriasPorSemestre,
+    getTutoriasPorEstudiante,
     getTutoriaDetalle
 } = require('../controllers/adminController');
 const requireAdmin = require('../middleware/requireAdmin');
 
 router.get('/semestres', requireAdmin, getSemestresCerrados);
 router.get('/tutorias', requireAdmin, getTutoriasPorSemestre);
+router.get('/tutorias/estudiante',requireAdmin, getTutoriasPorEstudiante);
 router.get('/tutorias/:id', requireAdmin, getTutoriaDetalle);
 //Auth
 router.post('/solicitud', createPendingUser);

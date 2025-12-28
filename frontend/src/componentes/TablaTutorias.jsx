@@ -30,7 +30,11 @@ function TablaTutorias({ tutorias, onVerDetalle, modo = "semestre" }) {
 
   // Formatear fecha para visualización
   const formatDate = (dateString) => {
+    if (!dateString) return 'Fecha no disponible';
+    
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'Fecha inválida';
+    
     return date.toLocaleDateString('es-ES', {
       day: '2-digit',
       month: 'short',
