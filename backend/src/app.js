@@ -5,12 +5,15 @@ const cookieParser = require('cookie-parser');
 
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
+const assignmentRoutes = require('./routes/assignments');
 
 const app = express();
 
 //Log
 app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  if (process.env.NODE_ENV === 'development'){
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  }
   next();
 });
 
@@ -18,14 +21,13 @@ app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:5173', cred
 app.use(express.json());
 app.use(cookieParser());
 
-// ✅ Ruta de prueba
 app.get("/api/ping", (req, res) => {
   res.json({ message: "Backend funcionando correctamente 🚀" });
 });
 
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/assignments', require('./routes/assignments'));
+app.use('/api/assignments',assignmentRoutes);
 
 // Error handler:
 app.use((err, req, res, next) => {

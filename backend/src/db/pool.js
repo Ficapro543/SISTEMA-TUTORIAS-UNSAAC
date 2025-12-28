@@ -2,13 +2,18 @@ const { Pool } = require('pg');
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
+  ssl: process.env.NODE_ENV === 'production'
+    ? {rejectUnauthorized: false}
+    : false,
+  
+  max: 10,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000
 });
 
 pool.on('connect', () => {
-  console.log('✅ Conectado a PostgreSQL con SSL');
+  if(process.env.NODE_ENV === 'development')
+    console.log('✅ Nueva conexion a PostgreSQL creada');
 });
 
 pool.on('error', (err) => {
