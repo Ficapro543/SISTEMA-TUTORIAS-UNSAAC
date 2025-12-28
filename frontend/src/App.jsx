@@ -1,22 +1,22 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import Layout from "./pages/Layout.jsx";
+import Layout from "./pages/general/Layout.jsx";
 import Login from "./pages/Login.jsx";
-import Register from "./pages/Registro.jsx";
-import RegisterConfirmation from "./pages/RegistroConfirmacion.jsx";
-import CuentaVerificada from "./pages/CuentaVerificada.jsx";
-import AprobarRegistro from "./pages/AprobarRegistro.jsx";
-import SolicitudDetalle from "./pages/SolicitudDetalle.jsx";
-import MainPage from "./pages/MainPageRoles.jsx";
-import BackendStatus from "./pages/BackendStatus.jsx";
-import RecuperarPassword from "./pages/RecuperarPassword.jsx";
-import VerificarCodigo from "./pages/VerificarCodigo.jsx";
-import NuevaContrasena from "./pages/NuevaContraseña.jsx";
+import Register from "./pages/general/Registro.jsx";
+import RegisterConfirmation from "./pages/general/RegistroConfirmacion.jsx";
+import CuentaVerificada from "./pages/general/CuentaVerificada.jsx";
+import AprobarRegistro from "./pages/admin/AprobarRegistro.jsx";
+import SolicitudDetalle from "./pages/admin/SolicitudDetalle.jsx";
+import MainPage from "./pages/general/MainPageRoles.jsx";
+import BackendStatus from "./pages/general/BackendStatus.jsx";
+import RecuperarPassword from "./pages/general/RecuperarPassword.jsx";
+import VerificarCodigo from "./pages/general/VerificarCodigo.jsx";
+import NuevaContrasena from "./pages/general/NuevaContraseña.jsx";
 
 //---- SISTEMA ----
 import TutoriasHistoricas from "./pages/TutoriasHistoricas.jsx";
 import TestJWT from "./componentes/TestJWT.jsx";
-import AsignacionTutorados from "./pages/AsignacionTutorados.jsx";
-import AdminDashboard from "./pages/AdminDashboard.jsx";
+import AsignacionTutorados from "./pages/admin/AsignacionTutorados.jsx";
+import AdminDashboard from "./pages/admin/AdminDashboard2.jsx";
 import CambioTutorados from "./pages/CambioTutorados.jsx";
 import AsignarTutorados from "./pages/AsignarTutorados.jsx";
 
