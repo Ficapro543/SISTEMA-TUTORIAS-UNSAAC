@@ -19,6 +19,8 @@ import AsignacionTutorados from "./pages/AsignacionTutorados.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
 import CambioTutorados from "./pages/CambioTutorados.jsx";
 import AsignarTutorados from "./pages/AsignarTutorados.jsx";
+// import TutorDashboard from "./pages/tutor/tutorDashboard.jsx";
+// import AdminDashboard2 from "./pages/admin/AdminDashboard.jsx";
 
 function App() {
   return (
@@ -43,6 +45,8 @@ function App() {
       <Route path="*" element={<Navigate to="/login" replace />} />
       <Route path="/tutoriasHistoricas" element={<TutoriasHistoricas roles={{ administrador: true }} />} />
       <Route path="/test-jwt" element={<TestJWT />} />
+      {/* <Route path="/webo" element={<Layout><TutorDashboard /></Layout>} />
+     <Route path="/wano" element={<Layout><AdminDashboard2 /></Layout>} />*/}
     </Routes>
   );
 }
