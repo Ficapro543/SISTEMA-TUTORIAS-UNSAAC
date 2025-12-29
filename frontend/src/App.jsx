@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Layout from "./pages/general/Layout.jsx";
-import Login from "./pages/Login.jsx";
+import Login from "./pages/general/Login.jsx";
 import Register from "./pages/general/Registro.jsx";
 import RegisterConfirmation from "./pages/general/RegistroConfirmacion.jsx";
 import CuentaVerificada from "./pages/general/CuentaVerificada.jsx";
@@ -13,14 +13,13 @@ import VerificarCodigo from "./pages/general/VerificarCodigo.jsx";
 import NuevaContrasena from "./pages/general/NuevaContraseña.jsx";
 
 //---- SISTEMA ----
-import TutoriasHistoricas from "./pages/TutoriasHistoricas.jsx";
+import TutoriasHistoricas from "./pages/admin/TutoriasHistoricas.jsx";
 import TestJWT from "./componentes/TestJWT.jsx";
 import AsignacionTutorados from "./pages/admin/AsignacionTutorados.jsx";
-import AdminDashboard from "./pages/admin/AdminDashboard2.jsx";
-import CambioTutorados from "./pages/CambioTutorados.jsx";
-import AsignarTutorados from "./pages/AsignarTutorados.jsx";
-// import TutorDashboard from "./pages/tutor/tutorDashboard.jsx";
-// import AdminDashboard2 from "./pages/admin/AdminDashboard.jsx";
+import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
+import CambioTutorados from "./pages/admin/CambioTutorados.jsx";
+import AsignarTutorados from "./pages/admin/AsignarTutorados.jsx";
+import TutorDashboard from "./pages/tutor/TutorDashboard.jsx";
 
 function App() {
   return (
@@ -41,12 +40,11 @@ function App() {
       {/* NUEVA RUTA: módulo Administrador -> Asignaciones */}
       <Route path="/administrador/asignaciones" element={<AsignarTutorados />} />
       <Route path="/admin/cambio-tutor" element={<CambioTutorados />} />
+      <Route path="/panel-tutor" element={<Layout><TutorDashboard /></Layout>} />
 
       <Route path="*" element={<Navigate to="/login" replace />} />
       <Route path="/tutoriasHistoricas" element={<TutoriasHistoricas roles={{ administrador: true }} />} />
       <Route path="/test-jwt" element={<TestJWT />} />
-      {/* <Route path="/webo" element={<Layout><TutorDashboard /></Layout>} />
-     <Route path="/wano" element={<Layout><AdminDashboard2 /></Layout>} />*/}
     </Routes>
   );
 }

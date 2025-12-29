@@ -1,6 +1,6 @@
-import React, {useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import styles from "../styles/pages/AprobarRegistro.module.css";
+import styles from "../../styles/pages/AprobarRegistro.module.css";
 
 function AprobarRegistro() {
   const navigate = useNavigate();
@@ -10,15 +10,15 @@ function AprobarRegistro() {
   // Datos de prueba
   const mockSolicitudes = [
     {
-      id:1,
+      id: 1,
       nombre: "Juan Pérez",
       email: "juan.perez@unsaac.edu.pe",
       fechaSolicitud: "2024-01-15",
-      rolesSolicitados: ["Tutor","Evaluador","Administrador"],
+      rolesSolicitados: ["Tutor", "Evaluador", "Administrador"],
       estado: "pendiente"
     },
     {
-      id:2,
+      id: 2,
       nombre: "María Garcia",
       email: "maria.garcia@unsaac.edu.pe",
       fechaSolicitud: "2024-01-14",
@@ -26,27 +26,27 @@ function AprobarRegistro() {
       estado: "pendiente"
     },
     {
-      id:3,
+      id: 3,
       nombre: "Carlos Lopez",
       email: "carlos.lopez@unsaac.edu.pe",
       fechaSolicitud: "2024-01-13",
-      rolesSolicitados: ["Evaluador","Administrador"],
+      rolesSolicitados: ["Evaluador", "Administrador"],
       estado: "pendiente"
     },
     {
-      id:4,
+      id: 4,
       nombre: "Ana Torres",
       email: "ana.torres@unsaac.edu.pe",
       fechaSolicitud: "2024-01-12",
-      rolesSolicitados: ["Tutor","Evaluador"],
+      rolesSolicitados: ["Tutor", "Evaluador"],
       estado: "pendiente"
     },
   ]
 
-  useEffect(()=>{
+  useEffect(() => {
     //Carga de datos del backend
-    const fetchSolicitudes = async () =>{
-      try{
+    const fetchSolicitudes = async () => {
+      try {
         setLoading(true);
         //// Backend
         const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/solicitudes`);
@@ -61,11 +61,11 @@ function AprobarRegistro() {
           estado: "pendiente",
         }));
         setSolicitudes(solicitudesFormateadas);
-        
-      }catch(err){
-        console.error("Error al cargar solicitudes:",err);
+
+      } catch (err) {
+        console.error("Error al cargar solicitudes:", err);
         setError("No se pudieron cargar las solicitudes. Intenta nuevamente.");
-      }finally{
+      } finally {
         setLoading(false);
       }
     };
@@ -73,9 +73,9 @@ function AprobarRegistro() {
   }, []);
 
   //Funcion para manejar la aceptacion/rechazo de un rol especifico
-  const handleRolDecision = (solicitudId, rol, decision) =>{
+  const handleRolDecision = (solicitudId, rol, decision) => {
     console.log(`Solicitud ${solicitudId}: Rol ${rol} -> ${decision}`);
-    
+
     // TODO: Backend peticiones
     // await fetch(`/api/solicitudes/${solicitudId}/rol/${rol}`, {
     //   method: 'PUT',
@@ -85,8 +85,8 @@ function AprobarRegistro() {
 
     //Actualizar UI
     setSolicitudes(prev => prev.map(solicitud => {
-      if(solicitud.id === solicitudId){
-        return{
+      if (solicitud.id === solicitudId) {
+        return {
           ...solicitud,
           //BackEnd
         };
@@ -98,20 +98,20 @@ function AprobarRegistro() {
   };
 
   // Funcion para aprobar/rechazar toda la solicitud
-  const handleSolicitudDecision = async (solicitudId, decision) =>{
+  const handleSolicitudDecision = async (solicitudId, decision) => {
     console.log(`Solicitud ${solicitudId}: ${decision}`);
-    if(decision === 'aprobada'){
-      await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/aprobar`,{
+    if (decision === 'aprobada') {
+      await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/aprobar`, {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ pendingUserId: solicitudId })
       });
-    }else{
+    } else {
       await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/rechazar`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ pendingUserId: solicitudId })
-    });
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pendingUserId: solicitudId })
+      });
     }
 
     // Remover de la lista (temporal)
@@ -128,7 +128,7 @@ function AprobarRegistro() {
     navigate("/");
   };
 
-  if(loading){
+  if (loading) {
     return (
       <div className={styles.adminPage}>
         <div className={styles.loadingContainer}>
@@ -173,18 +173,18 @@ function AprobarRegistro() {
                 <h3>{solicitud.nombre}</h3>
                 <span className={styles.badgePendiente}>PENDIENTE</span>
               </div>
-              
+
               <div className={styles.cardBody}>
                 <div className={styles.infoRow}>
                   <strong>Email:</strong>
                   <span>{solicitud.email}</span>
                 </div>
-                
+
                 <div className={styles.infoRow}>
                   <strong>Fecha:</strong>
                   <span>{new Date(solicitud.fechaSolicitud).toLocaleDateString()}</span>
                 </div>
-                
+
                 <div className={styles.infoRow}>
                   <strong>Roles Solicitados:</strong>
                   <div className={styles.rolesList}>
@@ -210,7 +210,7 @@ function AprobarRegistro() {
                   </div>
                 </div>
               </div>
-              
+
               <div className={styles.cardFooter}>
                 <button
                   onClick={() => verDetalles(solicitud)}
@@ -218,7 +218,7 @@ function AprobarRegistro() {
                 >
                   Ver Detalles
                 </button>
-                
+
                 <div className={styles.accionesGlobales}>
                   <button
                     onClick={() => handleSolicitudDecision(solicitud.id, 'aprobada')}

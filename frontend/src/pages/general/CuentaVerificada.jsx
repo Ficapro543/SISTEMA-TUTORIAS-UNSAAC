@@ -1,10 +1,10 @@
-import React, { useEffect, useState, useRef  } from "react";
-import { useNavigate, useParams} from "react-router-dom";
-import styles from "../styles/pages/CuentaVerificada.module.css";
+import React, { useEffect, useState, useRef } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import styles from "../../styles/pages/CuentaVerificada.module.css";
 
 function CuentaVerificada() {
   const navigate = useNavigate();
-  const {token} = useParams();
+  const { token } = useParams();
   const [loading, setLoading] = useState(true);
   const [rolesData, setRolesData] = useState([]);
   const [error, setError] = useState(null);
@@ -14,7 +14,7 @@ function CuentaVerificada() {
 
   const abortControllerRef = useRef(null);
 
-  useEffect(()=>{
+  useEffect(() => {
     abortControllerRef.current = new AbortController();
     const signal = abortControllerRef.current.signal;
 
@@ -31,8 +31,8 @@ function CuentaVerificada() {
         setLoading(true);
         setActivationStatus('activating');
         console.log("Activando cuenta con token:", token);
-        
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/activarCuenta/${token}`,{
+
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/activarCuenta/${token}`, {
           // Agregar headers para prevenir cache
           headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -40,9 +40,9 @@ function CuentaVerificada() {
           },
           signal  //Pasar la señal para abortar
         });
-        
+
         //Verificamos si la peticion fue abortada
-        if(signal.aborted){
+        if (signal.aborted) {
           console.log("Peticion abortada");
           return;
         }
@@ -51,16 +51,16 @@ function CuentaVerificada() {
         console.log("Respuesta del servidor (texto)", responseText);
 
         let data;
-        try{
+        try {
           data = JSON.parse(responseText);
-        }catch(parseError){
-          console.error("Error parseando JSON:",parseError);
-          throw new Error(`Respuesta inválida del servidor: ${responseText.substring(0,100)}`);
+        } catch (parseError) {
+          console.error("Error parseando JSON:", parseError);
+          throw new Error(`Respuesta inválida del servidor: ${responseText.substring(0, 100)}`);
         }
 
         if (!response.ok) {
           //Si es 409 (conflicto), reintentar despues de un delay
-          if(response.status === 409){
+          if (response.status === 409) {
             console.log("Conflicto detectado, reintentando...");
             setActivationStatus('already_processing');
             // Esperar y reintentar una sola vez
@@ -82,7 +82,7 @@ function CuentaVerificada() {
             if (!retryResponse.ok) {
               throw new Error(data.message || `Error ${retryResponse.status}: ${retryText}`);
             }
-          }else{
+          } else {
             throw new Error(data.message || `Error ${response.status}: ${responseText}`);
           }
         }
@@ -90,20 +90,20 @@ function CuentaVerificada() {
         console.log("Datos recibidos de activación:", data);
 
         // Determinar estado
-        if(data.message && data.message.includes('ya estaba activada')){
+        if (data.message && data.message.includes('ya estaba activada')) {
           setActivationStatus('already_active');
-        }else{
+        } else {
           setActivationStatus('success');
         }
 
         // Datos del usuario activado
         setUserEmail(data.user?.email || "usuario@unsaac.edu.pe");
         setUserName(data.user?.nombre || "user");
-        
+
         // Procesar roles aprobados y rechazados
         const approvedRoles = data.user?.approvedRoles || data.user?.roles || [];
         const rejectedRoles = data.user?.rejectedRoles || [];
-        
+
         if (approvedRoles.length === 0) {
           setError("No se aprobaron roles de acceso. Contacta con el administrador del Sistema.");
           setTimeout(() => {
@@ -136,10 +136,10 @@ function CuentaVerificada() {
         });
 
         setRolesData(requestedRoles);
-        
+
       } catch (err) {
         //Si fue abortado, no hacer nada
-        if(err.name === "AbortError" || signal.aborted){
+        if (err.name === "AbortError" || signal.aborted) {
           console.log("Peticion cancelada intencionalmente.");
           return;
         }
@@ -148,19 +148,19 @@ function CuentaVerificada() {
         setActivationStatus('error');
 
         //Manejamos errores especificos
-        if(err.message.includes('Token expirado')){
+        if (err.message.includes('Token expirado')) {
           setError('El enlace de activación ha expirado. Contacta al administrador para un nuevo enlace.')
 
-        } else if(err.message.includes("La cuenta ya está activada")){
+        } else if (err.message.includes("La cuenta ya está activada")) {
           setError("Esta cuenta ya está activada. Puedes iniciar sesión con tus credenciales.");
-          setTimeout(()=>{
+          setTimeout(() => {
             navigate("/login");
-          },5000);
+          }, 5000);
 
-        } else if(err.message.includes("ya estaba activada")){
+        } else if (err.message.includes("ya estaba activada")) {
           setActivationStatus('already_active');
           //Parseamos datos si estan en el mensaje
-          try{
+          try {
             const match = err.message.match(/\{[^}]+\}/);
             if (match) {
               const data = JSON.parse(match[0]);
@@ -168,28 +168,28 @@ function CuentaVerificada() {
               setUserName(data.user?.nombre || "");
               return;
             }
-          }catch(e){
+          } catch (e) {
 
           }
-        }else{
+        } else {
           setError(err.message || "Error al activar la cuenta. El enlace puede ser inválido o haber expirado.");
         }
-        
+
         // Redirigir después de mostrar error
         setTimeout(() => {
           navigate("/login");
         }, 7000);
 
       } finally {
-        if(!signal.aborted){
+        if (!signal.aborted) {
           setLoading(false);
         }
       }
     };
 
     activateAccount();
-    return() =>{
-      if(abortControllerRef.current){
+    return () => {
+      if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
     };
@@ -209,9 +209,9 @@ function CuentaVerificada() {
   // Calcular estadísticas de roles
   const rolesAprobados = rolesData.filter(rol => rol.estado === "aprobado").length;
   const rolesRechazados = rolesData.filter(rol => rol.estado === "rechazado").length;
-  
+
   //Handle para regresar a login
-  const handleBackToLogin = () =>{
+  const handleBackToLogin = () => {
     navigate("/login");
   };
 
@@ -232,7 +232,7 @@ function CuentaVerificada() {
     );
   }
 
-   // Estado de error
+  // Estado de error
   if (error) {
     return (
       <div className={styles.verificationPage}>
@@ -251,13 +251,13 @@ function CuentaVerificada() {
   }
 
   //Si la cuenta ya estaba activada
-  if(activationStatus === 'already_active'){
-    return(
+  if (activationStatus === 'already_active') {
+    return (
       <div className={styles.verificationPage}>
         <div className={styles.verificationContainer}>
           <div className={styles.infoState}>
             <div className={styles.infoIcon}>
-              <img src="/info-icon.svg" alt="Información"/>
+              <img src="/info-icon.svg" alt="Información" />
             </div>
             <h3><strong>CUENTA YA ACTIVADA</strong></h3>
             <p>Esta cuenta ya estaba activada anteriormente.</p>
@@ -277,12 +277,12 @@ function CuentaVerificada() {
 
   //Si todo es correcto => Con minimo 1 rol aprobado
   return (
-    <div className = {styles.verificationPage}>
-      <div className = {styles.verificationContainer}>
+    <div className={styles.verificationPage}>
+      <div className={styles.verificationContainer}>
         {/* Icono de confirmacion */}
-        <div className = {styles.successHeader}>
-          <div className = {styles.checkIcon}>
-            <img src = "/check-icon.svg" alt = "Check"/>
+        <div className={styles.successHeader}>
+          <div className={styles.checkIcon}>
+            <img src="/check-icon.svg" alt="Check" />
           </div>
           <h1>¡Cuenta Activada!</h1>
           {userName && <p className={styles.userName}>Bienvenido, {userName}</p>}
@@ -291,7 +291,7 @@ function CuentaVerificada() {
         {/*Informacion de bienvenida */}
         <div className={styles.infoCard}>
           <div className={styles.cardIcon}>
-            <img src="/info-icon.svg" alt="Información"/>
+            <img src="/info-icon.svg" alt="Información" />
           </div>
           <div className={styles.cardContent}>
             <h3>¡Bienvenido al sistema!</h3>
@@ -318,36 +318,36 @@ function CuentaVerificada() {
         {rolesData.length > 0 && (
           <div className={styles.rolesSection}>
             <h3 className={styles.rolesTitle}>Roles Solicitados:</h3>
-              {rolesData.map((rol, index)=>(
-                <div
-                  key={index}
-                  className={`${styles.roleCard} ${rol.estado === 'aprobado' ? styles.roleApproved : styles.roleRejected}`}
-                >
-                  <div className = {styles.roleInfo}>
-                    <div className = {styles.roleIcon}>
-                      <img src = {rol.icono} alt={rol.nombre}/>
-                    </div>
-                    <span className={styles.roleName}>{rol.nombre}</span>
+            {rolesData.map((rol, index) => (
+              <div
+                key={index}
+                className={`${styles.roleCard} ${rol.estado === 'aprobado' ? styles.roleApproved : styles.roleRejected}`}
+              >
+                <div className={styles.roleInfo}>
+                  <div className={styles.roleIcon}>
+                    <img src={rol.icono} alt={rol.nombre} />
                   </div>
-
-                  <div className={styles.roleStatus}>
-                    {rol.estado === 'aprobado' ? (
-                      <>
-                        <img src="/check-icon.svg" alt="Aprobado" className={styles.statusIcon}/>
-                        <span className={styles.statusTextApproved}>Aprobado</span>
-                      </>
-                    ):(
-                      <>
-                        <img src="/error-icon.svg" alt="No aprobado" className={styles.statusIcon}/>
-                        <span className={styles.statusTextRejected}>No aprobado</span>
-                      </>
-                    )}
-                  </div>
+                  <span className={styles.roleName}>{rol.nombre}</span>
                 </div>
-              ))}
+
+                <div className={styles.roleStatus}>
+                  {rol.estado === 'aprobado' ? (
+                    <>
+                      <img src="/check-icon.svg" alt="Aprobado" className={styles.statusIcon} />
+                      <span className={styles.statusTextApproved}>Aprobado</span>
+                    </>
+                  ) : (
+                    <>
+                      <img src="/error-icon.svg" alt="No aprobado" className={styles.statusIcon} />
+                      <span className={styles.statusTextRejected}>No aprobado</span>
+                    </>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         )}
-        
+
         {/* Boton para volver al login */}
         <button
           className={styles.backToLoginBtn}

@@ -1,6 +1,6 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import styles from "../styles/pages/RegistroConfirmacion.module.css"
+import styles from "../../styles/pages/RegistroConfirmacion.module.css"
 
 function RegistroConfirmacion() {
     const navigate = useNavigate();
@@ -8,13 +8,13 @@ function RegistroConfirmacion() {
     const [isRedirecting, setIsRedirecting] = useState(false);
 
     // Verificar si viene de Registro
-    useEffect(()=>{
-        if(!location.state?.email){
+    useEffect(() => {
+        if (!location.state?.email) {
             setIsRedirecting(true);
 
             //Esperar 3 segundos
-            const timer = setTimeout(()=>{
-                navigate("/registro",{replace: true});
+            const timer = setTimeout(() => {
+                navigate("/registro", { replace: true });
             }, 3000);
 
             //Limpiar el timer si el componente se desmonta
@@ -23,8 +23,8 @@ function RegistroConfirmacion() {
     }, [location.state, navigate]);
 
     // Si no hay estado, mostrar loading 
-    if(!location.state?.email){
-        return(
+    if (!location.state?.email) {
+        return (
             <div className={styles.confirmationPage}>
                 <div className={styles.confirmationContainer}>
                     <div className={styles.redirectingMessage}>
@@ -38,7 +38,7 @@ function RegistroConfirmacion() {
     }
 
     // Obtener datos del estado de navegacion
-    const {email, nombres} = location.state;
+    const { email, nombres } = location.state;
 
     const handleBackToLogin = () => {
         navigate('/login');
@@ -51,7 +51,7 @@ function RegistroConfirmacion() {
                 {/* Icono de confirmación */}
                 <div className={styles.successHeader}>
                     <div className={styles.checkIcon}>
-                        <img src="check-icon.svg" alt="Check"/>
+                        <img src="check-icon.svg" alt="Check" />
                     </div>
                     <h1>¡Solicitud Enviada!</h1>
                     <p className={styles.subtitle}>Tu registro fue recibido exitosamente</p>
@@ -60,7 +60,7 @@ function RegistroConfirmacion() {
                 {/* Verificación Pendiente */}
                 <div className={styles.infoCard}>
                     <div className={styles.cardIcon}>
-                        <img src="info-icon.svg" alt="Información"/>
+                        <img src="info-icon.svg" alt="Información" />
                     </div>
                     <div className={styles.cardContent}>
                         <h3>Verificación pendiente</h3>
@@ -71,7 +71,7 @@ function RegistroConfirmacion() {
                 {/* Revisa tu correo */}
                 <div className={`${styles.infoCard} ${styles.emailCard}`}>
                     <div className={styles.cardIcon}>
-                        <img src="email-icon.svg" alt="Correo"/>
+                        <img src="email-icon.svg" alt="Correo" />
                     </div>
                     <div className={styles.cardContent}>
                         <h3>Revisa tu correo</h3>
@@ -83,7 +83,7 @@ function RegistroConfirmacion() {
                 <button
                     className={styles.backToLoginBtn}
                     onClick={handleBackToLogin}>
-                        Volver a Iniciar Sesión
+                    Volver a Iniciar Sesión
                 </button>
             </div>
         </div>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import styles from "../styles/pages/SolicitudDetalle.module.css";
+import styles from "../../styles/pages/SolicitudDetalle.module.css";
 
 function SolicitudDetalle() {
     const { token } = useParams();
@@ -16,7 +16,7 @@ function SolicitudDetalle() {
             try {
                 setLoading(true);
                 const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/solicitud/${token}`);
-                
+
                 if (!res.ok) {
                     // Obtener más detalles del error
                     const errorText = await res.text();
@@ -50,11 +50,11 @@ function SolicitudDetalle() {
 
                 // Inicializar roles que no tienen decisión
                 if (data.roles && Array.isArray(data.roles)) {
-                data.roles.forEach(rol => {
-                    if (!decisionesIniciales[rol]) {
-                    decisionesIniciales[rol] = null;
-                    }
-                });
+                    data.roles.forEach(rol => {
+                        if (!decisionesIniciales[rol]) {
+                            decisionesIniciales[rol] = null;
+                        }
+                    });
                 }
 
                 setDecisionesRoles(decisionesIniciales);
@@ -99,11 +99,11 @@ function SolicitudDetalle() {
 
             const result = await res.json();
             console.log(`Rol ${rol} actualizado correctamente`, result);
-            
+
             // Verificar si todos los roles están decididos y tienen la misma decisión
             const nuevaDecisiones = { ...decisionesRoles, [rol]: decision };
             const decisionesValores = Object.values(nuevaDecisiones);
-            
+
             if (decisionesValores.every(d => d === 'aprobado')) {
                 setDecisionGlobal('aprobada');
             } else if (decisionesValores.every(d => d === 'rechazado')) {
@@ -153,9 +153,9 @@ function SolicitudDetalle() {
                     body: JSON.stringify({ decision: rolDecision })
                 })
             );
-            
+
             await Promise.all(promises);
-            
+
             // Luego ejecutar la acción global
             if (decision === 'aprobada') {
                 await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/aprobar`, {
@@ -288,7 +288,7 @@ function SolicitudDetalle() {
 
                                 return (
                                     <div key={index} className={`${styles.rolItem} ${decision === 'aprobado' ? styles.rolAprobado :
-                                            decision === 'rechazado' ? styles.rolRechazado : ''
+                                        decision === 'rechazado' ? styles.rolRechazado : ''
                                         }`}>
                                         <div className={styles.rolInfo}>
                                             <div className={styles.rolIcon}>

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import "../styles/AsignarTutorados.css";
+import "../../styles/AsignarTutorados.css";
 
 /**
  * Pantalla: Asignación de tutorados

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import styles from "../styles/pages/RecuperarPassword.module.css";
+import styles from "../../styles/pages/RecuperarPassword.module.css";
 
 function RecuperarPassword() {
   const navigate = useNavigate();
@@ -66,15 +66,15 @@ function RecuperarPassword() {
 
       if (response.ok) {
         setMessage(data.message || "Se ha enviado un código de verificación a tu correo.");
-        setTimeout(()=>{
-          navigate("/recuperar/verificar",{state: {email}});
-        },2000);
+        setTimeout(() => {
+          navigate("/recuperar/verificar", { state: { email } });
+        }, 2000);
       } else {
         setError(data.message || "No se pudo procesar la solicitud.");
       }
     } catch (err) {
       setError("Error al conectar con el servidor.");
-    } finally{
+    } finally {
       setLoading(false);
     }
   };
@@ -101,10 +101,10 @@ function RecuperarPassword() {
           />
 
           {error && <p className={styles.errorMessage}>{error}</p>}
-          {message && <p className = {styles.successMessage}>{message}</p>}
+          {message && <p className={styles.successMessage}>{message}</p>}
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className={styles.recoverBtn}
             disabled={loading}
           >

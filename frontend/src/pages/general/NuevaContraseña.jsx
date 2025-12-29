@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/pages/NuevaContrasena.css";
+import "../../styles/pages/NuevaContrasena.css";
 
 function NuevaContraseña() {
   const navigate = useNavigate();
@@ -15,12 +15,12 @@ function NuevaContraseña() {
   const [loading, setLoading] = useState(false);
   const [isValidEmail, setIsValidEmail] = useState(true);
 
-  useEffect(()=>{
-    if(!email){
+  useEffect(() => {
+    if (!email) {
       navigate("/recuperar");
     }
-  },[email,navigate]);
-  
+  }, [email, navigate]);
+
   const requisitos = {
     minLength: password.length >= 8,
     hasUpper: /[A-Z]/.test(password),
@@ -39,12 +39,12 @@ function NuevaContraseña() {
     e.preventDefault();
     setError("");
 
-    if (!contraseñaValida){
+    if (!contraseñaValida) {
       setError("Por favor, cumple con todos los requisitos de contraseña.");
       return;
     };
 
-    if(!email){
+    if (!email) {
       setError("Error: No se encontró el correo asociado.");
       return;
     }
@@ -74,7 +74,7 @@ function NuevaContraseña() {
   };
 
   //Si no hay email, redigir:
-  if(!email){
+  if (!email) {
     navigate("/recuperar");
     return null;
   }
@@ -87,7 +87,7 @@ function NuevaContraseña() {
           Crea una contraseña segura para tu cuenta
         </p>
 
-        {error && <div className = "alert error">{error}</div>}
+        {error && <div className="alert error">{error}</div>}
 
         <form onSubmit={handleSubmit} className="form-container">
 

@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import styles from "../styles/pages/TutoriasHistoricas.module.css";
-import api from "../utils/api";
+import styles from "../../styles/pages/TutoriasHistoricas.module.css";
+import api from "../../utils/api";
 
-import BusquedaSelector from "../componentes/BusquedaSelector";
-import SemestreSelector from "../componentes/SemestreSelector";
-import TablaTutorias from "../componentes/TablaTutorias";
-import DetalleTutoriaModal from "../componentes/DetalleTutoriaModal";
-import BusquedaEstudiante from "../componentes/BusquedaEstudiante";
+import BusquedaSelector from "../../componentes/BusquedaSelector";
+import SemestreSelector from "../../componentes/SemestreSelector";
+import TablaTutorias from "../../componentes/TablaTutorias";
+import DetalleTutoriaModal from "../../componentes/DetalleTutoriaModal";
+import BusquedaEstudiante from "../../componentes/BusquedaEstudiante";
 
 function TutoriasHistoricas({ roles }) {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -17,7 +17,7 @@ function TutoriasHistoricas({ roles }) {
 
   //Estados para busqueda por semestre
   const [semestreSeleccionado, setSemestreSeleccionado] = useState(null);
-  
+
   //Estados para busqueda por estudiante
   const [filtroEstudiante, setFiltroEstudiante] = useState({
     codigo: "",
@@ -77,7 +77,7 @@ function TutoriasHistoricas({ roles }) {
 
     try {
       const response = await api.get('/admin/tutorias', {
-        params: { 
+        params: {
           semestre: semestre?.nombre,
         }
       });
@@ -89,22 +89,22 @@ function TutoriasHistoricas({ roles }) {
     }
   };
 
-  const cargarTutoriasPorEstudiante = async(filtros) =>{
+  const cargarTutoriasPorEstudiante = async (filtros) => {
     setLoading(true);
     setError("");
 
-    try{
-      const response = await api.get('/admin/tutorias/estudiante',{
-        params:{
+    try {
+      const response = await api.get('/admin/tutorias/estudiante', {
+        params: {
           codigo: filtros.codigo || undefined,
           nombre: filtros.nombre || undefined,
           apellido: filtros.apellido || undefined
         }
       });
       setTutorias(response.data);
-    }catch(err){
+    } catch (err) {
       handleApiError(err, 'cargar tutorias por estudiante');
-    }finally{
+    } finally {
       setLoading(false);
     }
   };
@@ -118,19 +118,19 @@ function TutoriasHistoricas({ roles }) {
     }
   };
 
-  const handleModoBusquedaChange = (modo) =>{
+  const handleModoBusquedaChange = (modo) => {
     setModoBusqueda(modo);
     setTutorias([]);
     setSemestreSeleccionado(null);
-    setFiltroEstudiante({codigo: "", nombre: "", apellido: ""});
+    setFiltroEstudiante({ codigo: "", nombre: "", apellido: "" });
     setError("");
   }
 
   const handleSemestreChange = (semestre) => {
     setSemestreSeleccionado(semestre);
-    if(semestre){
+    if (semestre) {
       cargarTutoriasPorSemestre(semestre);
-    }else{
+    } else {
       setTutorias([]);
     }
   };
@@ -138,7 +138,7 @@ function TutoriasHistoricas({ roles }) {
   const handleBuscarPorEstudiante = (filtros) => {
     setFiltroEstudiante(filtros);
     //Validamos que minimo haya un filtro
-    if(!filtros.codigo && !filtros.nombre && !filtros.apellido){
+    if (!filtros.codigo && !filtros.nombre && !filtros.apellido) {
       setError("Debe ingresar al menos un criterio de busqueda.");
       return;
     }
@@ -149,13 +149,13 @@ function TutoriasHistoricas({ roles }) {
   const handleLimpiarBusqueda = () => {
     setTutorias([]);
     setSemestreSeleccionado(null);
-    setFiltroEstudiante({codigo: "", nombre: "", apellido: ""});
+    setFiltroEstudiante({ codigo: "", nombre: "", apellido: "" });
     setError("");
   }
 
   const handleApiError = (err, context) => {
     console.error(`Error al ${context}:`, err);
-    
+
     if (err.response?.status === 401) {
       setError('Sesión expirada. Redirigiendo al inicio de sesión...');
       setTimeout(() => window.location.href = '/login', 2000);
@@ -186,7 +186,7 @@ function TutoriasHistoricas({ roles }) {
           Esta sección requiere permisos de administrador.
         </p>
         {error && <p className={styles.errorText}>{error}</p>}
-        <button 
+        <button
           className={styles.returnButton}
           onClick={() => window.history.back()}
         >
@@ -231,9 +231,9 @@ function TutoriasHistoricas({ roles }) {
             ) : (
               <>
                 <BusquedaEstudiante
-                  onBuscar = {handleBuscarPorEstudiante}
-                  onLimpiar = {handleLimpiarBusqueda}
-                  valores = {filtroEstudiante}
+                  onBuscar={handleBuscarPorEstudiante}
+                  onLimpiar={handleLimpiarBusqueda}
+                  valores={filtroEstudiante}
                 />
                 {tutorias.length === 0 && !loading && filtroEstudiante.codigo && (
                   <div className={styles.emptyState}>
@@ -255,7 +255,7 @@ function TutoriasHistoricas({ roles }) {
           {error && !loading && (
             <div className={styles.errorAlert}>
               <p>{error}</p>
-              <button 
+              <button
                 className={styles.dismissButton}
                 onClick={() => setError("")}
               >
@@ -270,7 +270,7 @@ function TutoriasHistoricas({ roles }) {
               <div className={styles.resultsHeader}>
                 <h3>Resultados encontrados</h3>
                 <p className={styles.resultsCount}>
-                  {tutorias.length} {tutorias.length === 1 ? 'registro':'registros'} encontrados
+                  {tutorias.length} {tutorias.length === 1 ? 'registro' : 'registros'} encontrados
                 </p>
               </div>
               <TablaTutorias
