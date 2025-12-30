@@ -73,10 +73,11 @@ async function login(req, res, next) {
     }
 
     //8. Enviar respuesta
+    const rolesLower = user.roles.map(r => r.toLowerCase());
     const rolesBoolean = {
-      administrador: user.roles.includes('administrador'),
-      tutor: user.roles.includes('tutor'),
-      verificador: user.roles.includes('verificador')
+      administrador: rolesLower.includes('administrador'),
+      tutor: rolesLower.includes('tutor'),
+      verificador: rolesLower.includes('verificador')
     };
 
     console.log('🔍 Roles booleanos:', rolesBoolean);
@@ -345,10 +346,11 @@ async function logout(req, res, next) {
 // Obtener perfil del usuario actual
 async function getProfile(req, res, next) {
   try {
+    const rolesLower = req.user.roles.map(r => r.toLowerCase());
     const rolesBoolean = {
-      administrador: req.user.roles.includes('administrador'),
-      tutor: req.user.roles.includes('tutor'),
-      verificador: req.user.roles.includes('verificador')
+      administrador: rolesLower.includes('administrador'),
+      tutor: rolesLower.includes('tutor'),
+      verificador: rolesLower.includes('verificador')
     };
 
     // El usuario ya está adjunto por el middleware authenticateToken

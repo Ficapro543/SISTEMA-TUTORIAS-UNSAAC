@@ -54,11 +54,8 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    // Si es una petición al endpoint de refresh, no reintentar
-    if (originalRequest.url.includes('/auth/refresh')) {
-      // Limpiar tokens y redirigir
-      localStorage.clear();
-      window.location.href = '/login';
+    // Si es una petición al endpoint de login o refresh, no reintentar refresh automatico
+    if (originalRequest.url.includes('/auth/login') || originalRequest.url.includes('/auth/refresh')) {
       return Promise.reject(error);
     }
 

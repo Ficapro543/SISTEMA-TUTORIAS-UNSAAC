@@ -61,8 +61,8 @@ function Login() {
 
         api.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
 
-        if (data.user.roles.administrador) {
-          navigate("/admin");
+        if (data.user.roles.administrador || data.user.roles.tutor || data.user.roles.verificador) {
+          navigate("/mainpage");
         } else {
           navigate("/mainpage");
         }

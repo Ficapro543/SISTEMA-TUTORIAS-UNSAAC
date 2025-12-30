@@ -1,0 +1,545 @@
+.dashboardContainer {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    background-color: #ffffff;
+    padding: 0;
+    margin: 0;
+}
+
+/* --- Top Info Bar --- */
+.infoBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 30px;
+    background-color: #fff;
+    border-bottom: 1px solid #eee;
+    font-size: 0.9em;
+    color: #666;
+    position: relative;
+    z-index: 50;
+}
+
+.dateInfo {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.dateItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.userInfo {
+    display: flex;
+    align-items: center;
+    margin-right: 15px;
+    position: relative;
+    cursor: pointer;
+    color: inherit;
+    z-index: 50;
+    gap: 12px;
+    user-select: none;
+    /* Prevent text selection (blue highlight) */
+}
+
+.userInfo:focus {
+    outline: none;
+}
+
+.avatarCircle {
+    width: 40px;
+    height: 40px;
+    background-color: #1a237e;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-weight: bold;
+    font-size: 1.1em;
+    flex-shrink: 0;
+    /* Prevent avatar from being squashed */
+}
+
+.userDetails {
+    display: flex;
+    flex-direction: column;
+}
+
+.userName {
+    font-weight: 600;
+    color: #1a237e;
+}
+
+.userCode {
+    font-size: 0.8em;
+    color: #f59e0b;
+    /* Golden/Yellow for code in main bar too */
+    font-weight: 500;
+}
+
+/* --- User Dropdown Menu --- */
+.userMenuDropdown {
+    position: absolute;
+    top: 120%;
+    /* Push it slightly further down */
+    right: 0;
+    margin-top: 5px;
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    /* Stronger shadow */
+    width: 320px;
+    z-index: 9999;
+    padding: 0;
+    animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    /* Smoother pop animation */
+    cursor: default;
+    /* Reset cursor inside dropdown */
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdownHeader {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.dropdownAvatar {
+    width: 50px;
+    height: 50px;
+    background-color: #1a237e;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1.3em;
+    flex-shrink: 0;
+    border: 2px solid #d97706;
+    /* Golden border from image */
+}
+
+.dropdownUserInfo {
+    display: flex;
+    flex-direction: column;
+}
+
+.dropdownName {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.dropdownCode {
+    font-size: 0.85rem;
+    color: #d97706;
+    /* Golden color matching image */
+    font-weight: 600;
+}
+
+.dropdownEmail {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+.dropdownMenu {
+    padding: 10px 0;
+}
+
+.dropdownItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    color: #334155;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-decoration: none;
+}
+
+.dropdownItem:hover {
+    background-color: #f8fafc;
+}
+
+.logoutItem {
+    color: #ef4444;
+    /* Red color for logout */
+}
+
+.logoutItem:hover {
+    background-color: #fef2f2;
+}
+
+/* --- Navigation Tabs --- */
+.navTabs {
+    display: flex;
+    gap: 30px;
+    padding: 0 30px;
+    border-bottom: 2px solid #f0f0f0;
+    margin-top: 10px;
+}
+
+.tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 5px;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+}
+
+.tabActive {
+    color: #1a237e;
+    border-bottom: 2px solid #f59e0b;
+}
+
+.tab:hover:not(.tabActive) {
+    color: #1a237e;
+}
+
+/* --- Welcome Banner --- */
+.welcomeSection {
+    margin: 20px 30px;
+    background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+    /* Light blue gradient */
+    border-radius: 12px;
+    padding: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #bae6fd;
+}
+
+.welcomeText h1 {
+    font-size: 2rem;
+    color: #1e293b;
+    margin: 0 0 10px 0;
+    font-weight: 800;
+}
+
+.welcomeText h2 {
+    font-size: 1.5rem;
+    color: #1e293b;
+    margin: 0 0 10px 0;
+    font-weight: 600;
+}
+
+.subtitle {
+    color: #64748b;
+    font-size: 1rem;
+}
+
+.profileCard {
+    background-color: white;
+    border-radius: 10px;
+    padding: 15px 20px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 250px;
+}
+
+.cardRow {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.iconContainer {
+    width: 28px;
+    height: 28px;
+    background-color: #f1f5f9;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    font-size: 0.8rem;
+}
+
+.iconYellow {
+    color: #d97706;
+    background-color: #fef3c7;
+}
+
+.infoGroup {
+    display: flex;
+    flex-direction: column;
+}
+
+.label {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.value {
+    font-size: 0.9rem;
+    color: #334155;
+    font-weight: 600;
+}
+
+.highlightValue {
+    color: #d97706;
+    /* Golden text */
+}
+
+/* --- Quick Access --- */
+.quickAccessSection {
+    padding: 0 30px 40px 30px;
+}
+
+.sectionTitle {
+    font-size: 1.1rem;
+    color: #1e293b;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.cardsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.accessCard {
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.accessCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+
+.cardIcon {
+    width: 40px;
+    height: 40px;
+    background-color: #f1f5f9;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: #475569;
+    margin-bottom: 16px;
+}
+
+.blueIcon {
+    color: #2563eb;
+    background-color: #eff6ff;
+}
+
+.yellowIcon {
+    color: #d97706;
+    background-color: #fffbeb;
+}
+
+.cardTitle {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 8px;
+}
+
+.cardDesc {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-bottom: 20px;
+    line-height: 1.5;
+    flex-grow: 1;
+    /* Push button to bottom */
+}
+
+.actionBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    background-color: #f8fafc;
+    color: #334155;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.actionBtn:hover {
+    background-color: #f1f5f9;
+    color: #1e293b;
+}
+
+/* --- Secondary Navigation (Admin) --- */
+.secondaryNav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 0 30px;
+    height: 50px;
+}
+
+.subTabsContainer {
+    display: flex;
+    gap: 5px;
+    height: 100%;
+}
+
+.subTab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 15px;
+    color: #64748b;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-right: 1px solid transparent;
+    border-left: 1px solid transparent;
+    transition: all 0.2s;
+    height: 100%;
+    position: relative;
+}
+
+.subTab:hover {
+    color: #1a237e;
+    background-color: #f1f5f9;
+}
+
+.subTabActive {
+    background-color: #ffffff;
+    color: #1a237e;
+    font-weight: 600;
+    border-right: 1px solid #e2e8f0;
+    border-left: 1px solid #e2e8f0;
+    border-top: 2px solid transparent;
+    /* Just to balance alignment */
+    margin-bottom: -1px;
+    /* Overlap border bottom */
+    border-bottom: 1px solid white;
+}
+
+.subTabIcon {
+    font-size: 1rem;
+}
+
+.navControls {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    color: #94a3b8;
+    font-size: 0.6rem;
+    cursor: pointer;
+}
+
+/* --- Content Area --- */
+.contentArea {
+    padding: 0 30px 40px 30px;
+    margin-top: 20px;
+}
+
+.contentCard {
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 30px;
+    min-height: 200px;
+}
+
+.contentTitle {
+    font-size: 1.2rem;
+    color: #1e293b;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.contentPlaceholder {
+    color: #64748b;
+    font-size: 1rem;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+    .infoBar {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+
+    .navTabs {
+        overflow-x: auto;
+        padding-bottom: 5px;
+    }
+
+    .welcomeSection {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    .profileCard {
+        width: 100%;
+    }
+
+    /* Responsiveness Update */
+
+    .secondaryNav {
+        height: auto;
+        padding: 10px 15px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .subTabsContainer {
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .subTab {
+        height: 40px;
+        flex-grow: 1;
+        justify-content: center;
+    }
+}

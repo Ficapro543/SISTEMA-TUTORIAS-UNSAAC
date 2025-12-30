@@ -1,22 +1,270 @@
-/* src/styles/components/AsignacionTutorados.module.css */
-
 .pageContainer {
+    padding: 24px;
+    background-color: #f8fafc;
     min-height: 100vh;
-    background-color: white;
-    color: #1a1a1a;
-    font-family: var(--font-main, sans-serif);
 }
 
-.header {
-    padding: 12px 60px;
-    border-bottom: 1px solid #f3f3f3;
+.mainContent {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.sectionHeader {
+    margin-bottom: 32px;
+}
+
+.sectionTitle {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #1a237e;
+    margin-bottom: 8px;
+}
+
+.sectionDescription {
+    color: #64748b;
+    font-size: 0.95rem;
+}
+
+/* Cards */
+.card,
+.tableCard {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.cardTitle {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 4px;
+}
+
+.cardDescription {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin-bottom: 20px;
+}
+
+/* Form Elements */
+.inputWrapper {
+    position: relative;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
+}
+
+.inputIcon {
+    position: absolute;
+    left: 12px;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 10px 12px 10px 36px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background-color: #f8fafc;
+    font-size: 0.9rem;
+    color: #334155;
+    transition: all 0.2s;
+    outline: none;
+}
+
+.searchInput:focus {
+    border-color: #f59e0b;
     background-color: white;
-    z-index: 50;
+    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1);
+}
+
+.semesterBadge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background-color: #fef3c7;
+    color: #d97706;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+/* Tables */
+.tableContainer {
+    width: 100%;
+    margin-top: 16px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table th {
+    background-color: #f1f5f9;
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.table th:first-child {
+    border-top-left-radius: 8px;
+}
+
+.table th:last-child {
+    border-top-right-radius: 8px;
+}
+
+.table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 0.9rem;
+}
+
+.table tr:hover td {
+    background-color: #f8fafc;
+}
+
+.selectedRow td {
+    background-color: #eff6ff !important;
+}
+
+.checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    border-radius: 4px;
+    border: 1px solid #cbd5e1;
+}
+
+/* Buttons */
+.primaryButton {
+    background-color: #1a237e;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.primaryButton:hover:not(:disabled) {
+    background-color: #283593;
+    transform: translateY(-1px);
+}
+
+.primaryButton:disabled {
+    background-color: #94a3b8;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.secondaryButton {
+    background-color: white;
+    color: #475569;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.secondaryButton:hover {
+    background-color: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+/* Layout Utilities */
+.twoColumns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+@media (max-width: 900px) {
+    .twoColumns {
+        grid-template-columns: 1fr;
+    }
+}
+
+.footerActions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid #f1f5f9;
+}
+
+/* Toast/Messages */
+.toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: white;
+    border-radius: 12px;
+    padding: 16px 24px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    z-index: 10000;
+    border: 1px solid #e2e8f0;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Specific UI Elements */
+.selectedTutorPanel {
+    padding: 16px;
+    border-radius: 12px;
+    border-left: 4px solid #f59e0b;
+    background-color: #fffbeb;
+}
+
+/* Header Styles for Layout */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    background-color: white;
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 24px;
 }
 
 .headerLeft {
@@ -24,329 +272,60 @@
     flex-direction: column;
 }
 
-.headerTitle {
-    font-size: 1.25rem;
-    font-weight: 700;
-    letter-spacing: -0.025em;
-    margin: 0;
-}
-
 .headerSubtitle {
-    font-size: 10px;
-    text-transform: uppercase;
-    font-weight: 700;
     color: #94a3b8;
-    letter-spacing: 0.1em;
-    margin-top: 2px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .headerRight {
     display: flex;
     align-items: center;
-    gap: 24px;
+    gap: 16px;
 }
 
 .userInfo {
     text-align: right;
-    margin-right: 16px;
 }
 
 .userName {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #374151;
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 0.9rem;
     margin: 0;
 }
 
 .userBadge {
-    font-size: 10px;
-    background-color: #eff6ff;
-    color: #1d4ed8;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    font-size: 0.75rem;
+    color: #f59e0b;
+    font-weight: 600;
 }
 
 .navButton {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 16px;
-    font-size: 0.875rem;
+    padding: 8px 12px;
+    background: none;
+    border: none;
+    color: #64748b;
     font-weight: 600;
-    color: #374151;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    background-color: white;
-    transition: all 0.2s;
+    font-size: 0.85rem;
     cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s;
 }
 
 .navButton:hover {
-    background-color: #f9fafb;
+    background-color: #f1f5f9;
+    color: #1e293b;
 }
 
-.mainContent {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 32px 60px;
-}
-
-.sectionHeader {
-    margin-bottom: 40px;
-}
-
-.sectionTitle {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 4px;
-}
-
-.sectionDescription {
-    font-size: 0.875rem;
-    color: #6b7280;
-    margin: 0;
-}
-
-.card {
-    background-color: white;
-    border-radius: 12px;
+/* Grid Scroll */
+.scrollContainer {
+    max-height: 400px;
+    overflow-y: auto;
     border: 1px solid #f1f5f9;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    padding: 32px;
-    margin-bottom: 24px;
-}
-
-.cardTitle {
-    font-size: 0.875rem;
-    font-weight: 700;
-    color: #1f2937;
-    margin-bottom: 4px;
-}
-
-.cardDescription {
-    font-size: 0.75rem;
-    color: #6b7280;
-    font-weight: 500;
-    margin-bottom: 24px;
-}
-
-.semesterBadge {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: #16a34a;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.inputWrapper {
-    position: relative;
-    width: 100%;
-}
-
-.inputIcon {
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #cbd5e1;
-}
-
-.searchInput {
-    width: 100%;
-    padding: 12px 16px 12px 48px;
-    background-color: rgba(248, 250, 252, 0.5);
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    transition: all 0.2s;
-}
-
-.searchInput:focus {
-    outline: none;
-    background-color: white;
-    box-shadow: 0 0 0 4px rgba(219, 234, 254, 0.5);
-    border-color: #60a5fa;
-}
-
-.dropdownResults {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    background-color: white;
-    border: 1px solid #f1f5f9;
-    margin-top: 8px;
-    border-radius: 12px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    z-index: 20;
-    overflow: hidden;
-}
-
-.tutorResult {
-    padding: 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #f8fafc;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.tutorResult:hover {
-    background-color: rgba(239, 246, 255, 0.5);
-}
-
-.tutorResult:last-child {
-    border-bottom: none;
-}
-
-.selectedTutorPanel {
-    background-color: rgba(239, 246, 255, 0.5);
-    border: 1px solid #dbeafe;
-    border-radius: 12px;
-    padding: 24px;
-    margin-bottom: 24px;
-}
-
-.infoAlert {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 16px;
-    background-color: rgba(248, 250, 252, 0.5);
-    border: 1px solid #f1f5f9;
-    border-radius: 12px;
-    margin-bottom: 24px;
-}
-
-.tableCard {
-    background-color: white;
-    border-radius: 12px;
-    border: 1px solid #f1f5f9;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    overflow: hidden;
-}
-
-.tableHeader {
-    padding: 32px;
-    border-bottom: 1px solid #f8fafc;
-}
-
-.tableContainer {
-    overflow-x: auto;
-}
-
-.table {
-    width: 100%;
-    text-align: left;
-    border-collapse: collapse;
-}
-
-.table thead tr {
-    background-color: rgba(248, 250, 252, 0.5);
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #94a3b8;
-    border-bottom: 1px solid #f8fafc;
-}
-
-.table th {
-    padding: 24px;
-}
-
-.table td {
-    padding: 24px;
-    font-size: 0.875rem;
-    font-weight: 700;
-}
-
-.table rowHover:hover {
-    background-color: #f9fafb;
-}
-
-.selectedRow {
-    background-color: rgba(239, 246, 255, 0.3);
-}
-
-.footerActions {
-    padding: 24px;
-    border-top: 1px solid #f8fafc;
-    background-color: rgba(248, 250, 252, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.primaryButton {
-    padding: 10px 20px;
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: white;
-    background-color: #1f2937;
     border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
-.primaryButton:hover:not(:disabled) {
-    background-color: black;
-}
-
-.primaryButton:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.secondaryButton {
-    padding: 10px 20px;
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #6b7280;
-    background-color: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.secondaryButton:hover:not(:disabled) {
-    background-color: #f9fafb;
-}
-
-.checkbox {
-    width: 16px;
-    height: 16px;
-    border-radius: 4px;
-    border: 1px solid #d1d5db;
-    cursor: pointer;
-}
-
-.toast {
-    position: fixed;
-    bottom: 48px;
-    right: 48px;
-    padding: 24px;
-    background-color: white;
-    border-radius: 16px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    border: 1px solid #f1f5f9;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    z-index: 50;
 }
