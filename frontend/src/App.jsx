@@ -32,14 +32,13 @@ function App() {
       <Route path="/confirmacion" element={<Layout><RegisterConfirmation /></Layout>} />
       <Route path="/verificado" element={<Layout><CuentaVerificada /></Layout>} />
       <Route path="/solicitudes_registro" element={<Layout><AprobarRegistro /></Layout>} />
-      <Route path="/mainpage" element={<Layout><MainPage /></Layout>} />
+      <Route path="/mainpage" element={<Layout><TutorDashboard /></Layout>} />
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/asignaciones" element={<AsignacionTutorados />} />
       <Route path="/recuperar" element={<Layout><RecuperarPassword /></Layout>} />
       <Route path="/recuperar/verificar" element={<Layout><VerificarCodigo /></Layout>} />
       <Route path="/recuperar/nueva" element={<Layout><NuevaContrasena /></Layout>} />
       <Route path="/ping" element={<Layout><BackendStatus /></Layout>} />
-      <Route path="/tutordashboard" element={<Layout><TutorDashboard /></Layout>} />
 
       {/* Admin routes */}
       <Route path="/solicitudes_registro" element={<Layout><AprobarRegistro /></Layout>} />
