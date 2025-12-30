@@ -11,7 +11,7 @@ const app = express();
 
 //Log
 app.use((req, res, next) => {
-  if (process.env.NODE_ENV === 'development'){
+  if (process.env.NODE_ENV === 'development') {
     console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
   }
   next();
@@ -27,22 +27,22 @@ app.get("/api/ping", (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/assignments',assignmentRoutes);
+app.use('/api/assignments', assignmentRoutes);
 
 // Error handler:
 app.use((err, req, res, next) => {
   console.error('Error:', err);
-  
+
   // Si es un error de JWT
   if (err.name === 'JsonWebTokenError') {
     return res.status(401).json({ message: 'Token inválido' });
   }
-  
+
   if (err.name === 'TokenExpiredError') {
     return res.status(401).json({ message: 'Token expirado' });
   }
 
-  res.status(err.status || 500).json({ 
+  res.status(err.status || 500).json({
     message: err.message || 'Error interno del servidor',
     // Solo mostrar stack en desarrollo
     ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
