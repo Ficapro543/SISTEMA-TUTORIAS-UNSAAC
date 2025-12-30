@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import styles from "../styles/pages/RegistroConfirmacion.module.css"
+import styles from "../../styles/pages/RegistroConfirmacion.module.css"
 
 function RegistroConfirmacion() {
     const navigate = useNavigate();

@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import styles from "../styles/pages/TutoriasHistoricas.module.css";
-import api from "../utils/api";
+import styles from "../../styles/pages/TutoriasHistoricas.module.css";
+import api from "../../utils/api";
 
-import BusquedaSelector from "../componentes/BusquedaSelector";
-import SemestreSelector from "../componentes/SemestreSelector";
-import TablaTutorias from "../componentes/TablaTutorias";
-import DetalleTutoriaModal from "../componentes/DetalleTutoriaModal";
-import BusquedaEstudiante from "../componentes/BusquedaEstudiante";
+import BusquedaSelector from "../../componentes/BusquedaSelector.jsx";
+import SemestreSelector from "../../componentes/SemestreSelector";
+import TablaTutorias from "../../componentes/TablaTutorias";
+import DetalleTutoriaModal from "../../componentes/DetalleTutoriaModal";
+import BusquedaEstudiante from "../../componentes/BusquedaEstudiante";
 
 function TutoriasHistoricas({ roles }) {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -29,6 +29,7 @@ function TutoriasHistoricas({ roles }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [tutoriaSeleccionada, setTutoriaSeleccionada] = useState(null);
+  const [estudiantesCount, setEstudiantesCount] = useState(null);
 
   // Verificar permisos de administrador
   useEffect(() => {
@@ -102,6 +103,12 @@ function TutoriasHistoricas({ roles }) {
         }
       });
       setTutorias(response.data);
+      if (response.data.length > 0) {
+        const uniqueStudents = new Set(response.data.map(t => t.codigo_estudiante));
+        setEstudiantesCount(uniqueStudents.size);
+      } else {
+        setEstudiantesCount(null);
+      }
     }catch(err){
       handleApiError(err, 'cargar tutorias por estudiante');
     }finally{
@@ -124,6 +131,7 @@ function TutoriasHistoricas({ roles }) {
     setSemestreSeleccionado(null);
     setFiltroEstudiante({codigo: "", nombre: "", apellido: ""});
     setError("");
+    setEstudiantesCount(null);
   }
 
   const handleSemestreChange = (semestre) => {
@@ -151,6 +159,7 @@ function TutoriasHistoricas({ roles }) {
     setSemestreSeleccionado(null);
     setFiltroEstudiante({codigo: "", nombre: "", apellido: ""});
     setError("");
+    setEstudiantesCount(null);
   }
 
   const handleApiError = (err, context) => {
@@ -267,16 +276,11 @@ function TutoriasHistoricas({ roles }) {
           {/* Mostrar resultados si hay tutorias */}
           {tutorias.length > 0 && !loading && !error && (
             <div className={styles.resultsSection}>
-              <div className={styles.resultsHeader}>
-                <h3>Resultados encontrados</h3>
-                <p className={styles.resultsCount}>
-                  {tutorias.length} {tutorias.length === 1 ? 'registro':'registros'} encontrados
-                </p>
-              </div>
               <TablaTutorias
                 tutorias={tutorias}
                 onVerDetalle={(tutoria) => cargarDetalleTutoria(tutoria.id)}
                 modo={modoBusqueda}
+                estudiantesCount={estudiantesCount}
               />
             </div>
           )}
