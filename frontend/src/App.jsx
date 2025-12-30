@@ -1,16 +1,4 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import Layout from "./pages/Layout.jsx";
-import Login from "./pages/Login.jsx";
-import Register from "./pages/Registro.jsx";
-import RegisterConfirmation from "./pages/RegistroConfirmacion.jsx";
-import CuentaVerificada from "./pages/CuentaVerificada.jsx";
-import AprobarRegistro from "./pages/AprobarRegistro.jsx";
-import SolicitudDetalle from "./pages/SolicitudDetalle.jsx";
-import Dashboard from "./pages/Dashboard.jsx";
-import BackendStatus from "./pages/BackendStatus.jsx";
-import RecuperarPassword from "./pages/RecuperarPassword.jsx";
-import VerificarCodigo from "./pages/VerificarCodigo.jsx";
-import NuevaContrasena from "./pages/NuevaContraseña.jsx";
 
 // General pages
 import Layout from "./pages/general/Layout.jsx";
@@ -42,7 +30,7 @@ function App() {
       <Route path="/confirmacion" element={<Layout><RegisterConfirmation /></Layout>} />
       <Route path="/verificado" element={<Layout><CuentaVerificada /></Layout>} />
       <Route path="/solicitudes_registro" element={<Layout><AprobarRegistro /></Layout>} />
-      <Route path="/mainpage" element={<Layout><Dashboard /></Layout>} />
+      <Route path="/mainpage" element={<Layout><MainPage /></Layout>} />
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/asignaciones" element={<AsignacionTutorados />} />
       <Route path="/recuperar" element={<Layout><RecuperarPassword /></Layout>} />
@@ -61,7 +49,7 @@ function App() {
 
       {/* Catch-all */}
       <Route path="*" element={<Navigate to="/login" replace />} />
-    </Routes>
+    </Routes >
   );
 }
 
