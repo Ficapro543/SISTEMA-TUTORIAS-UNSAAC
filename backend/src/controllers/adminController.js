@@ -373,12 +373,6 @@ async function getTutoriasPorSemestre(req, res, next) {
         TO_CHAR(c.fecha, 'YYYY-MM-DD') AS fecha,
         c.hora,
         c.ambiente,
-        CASE
-          WHEN t.obs_academico IS NOT NULL AND t.obs_academico != '' THEN 'ACADEMICA'
-          WHEN t.obs_personal IS NOT NULL AND t.obs_personal != '' THEN 'PERSONAL'
-          WHEN t.obs_profesional IS NOT NULL AND t.obs_profesional != '' THEN 'PROFESIONAL'
-          ELSE 'GENERAL'
-        END AS tipo,
         t.obs_academico,
         t.obs_personal,
         t.obs_profesional,
@@ -410,7 +404,6 @@ async function getTutoriasPorSemestre(req, res, next) {
       tutor_email: t.tutor_email,
       semestre: t.semestre,
       fecha: `${t.fecha} ${t.hora || ''}`,
-      tipo: t.tipo,
       modalidad: t.modalidad,
       ambiente: t.ambiente,
       observaciones: {
@@ -521,13 +514,6 @@ async function getTutoriasPorEstudiante(req, res, next) {
         TO_CHAR(c.fecha, 'YYYY-MM-DD') AS fecha,
         c.hora,
         c.ambiente,
-        -- Determinar el tipo de tutoría basado en observaciones
-        CASE
-          WHEN t.obs_academico IS NOT NULL AND t.obs_academico != '' THEN 'ACADEMICA'
-          WHEN t.obs_personal IS NOT NULL AND t.obs_personal != '' THEN 'PERSONAL'
-          WHEN t.obs_profesional IS NOT NULL AND t.obs_profesional != '' THEN 'PROFESIONAL'
-          ELSE 'GENERAL'
-        END AS tipo,
         t.obs_academico,
         t.obs_personal,
         t.obs_profesional,
@@ -566,7 +552,6 @@ async function getTutoriasPorEstudiante(req, res, next) {
       tutor_email: t.tutor_email,
       semestre: t.semestre,
       fecha: t.hora ? `${t.fecha} ${t.hora}` : t.fecha,
-      tipo: t.tipo,
       modalidad: t.modalidad,
       ambiente: t.ambiente,
       observaciones: {
@@ -607,13 +592,6 @@ async function getTutoriaDetalle(req, res, next) {
         c.hora,
         c.ambiente,
         c.semestre,
-        -- Determinar el tipo de tutoría
-        CASE 
-          WHEN t.obs_academico IS NOT NULL AND t.obs_academico != '' THEN 'ACADEMICA'
-          WHEN t.obs_personal IS NOT NULL AND t.obs_personal != '' THEN 'PERSONAL'
-          WHEN t.obs_profesional IS NOT NULL AND t.obs_profesional != '' THEN 'PROFESIONAL'
-          ELSE 'GENERAL'
-        END as tipo,
         t.obs_academico,
         t.obs_personal,
         t.obs_profesional,
@@ -650,7 +628,6 @@ async function getTutoriaDetalle(req, res, next) {
       tutor_email: tutoria.tutor_email,
       fecha: `${tutoria.fecha} ${tutoria.hora}`,
       semestre: tutoria.semestre,
-      tipo: tutoria.tipo,
       modalidad: tutoria.modalidad,
       ambiente: tutoria.ambiente,
       observaciones: {

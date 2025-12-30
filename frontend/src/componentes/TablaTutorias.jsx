@@ -42,26 +42,6 @@ function TablaTutorias({ tutorias, onVerDetalle, modo = "semestre" }) {
     }).replace(/ de /g, '/');
   };
 
-  // Obtener clase para el tipo de tutoría
-  const getTipoClass = (tipo) => {
-    switch(tipo?.toUpperCase()) {
-      case 'ACADEMICA': return styles.tipoAcademica;
-      case 'PERSONAL': return styles.tipoPersonal;
-      case 'PROFESIONAL': return styles.tipoProfesional;
-      default: return styles.tipoGeneral;
-    }
-  };
-
-  // Obtener texto abreviado para tipo
-  const getTipoAbreviado = (tipo) => {
-    switch(tipo?.toUpperCase()) {
-      case 'ACADEMICA': return 'Académica';
-      case 'PERSONAL': return 'Personal';
-      case 'PROFESIONAL': return 'Profesional';
-      default: return 'General';
-    }
-  };
-
   const sortedTutorias = getSortedData();
 
   if (tutorias.length === 0) {
@@ -132,7 +112,7 @@ function TablaTutorias({ tutorias, onVerDetalle, modo = "semestre" }) {
                     </span>
                   )}
               </th>
-              <th>Tipo</th>
+
               <th 
                 className={`${styles.sortable} ${sortConfig.key === 'fecha' ? styles.sorted : ''}`}
                 onClick={() => requestSort('fecha')}
@@ -164,11 +144,6 @@ function TablaTutorias({ tutorias, onVerDetalle, modo = "semestre" }) {
                   </td>
                 )}
                 <td className={styles.tutorCell}>{tutoria.tutor}</td>
-                <td>
-                  <span className={`${styles.tipoBadge} ${getTipoClass(tutoria.tipo)}`}>
-                    {getTipoAbreviado(tutoria.tipo)}
-                  </span>
-                </td>
                 <td className={styles.dateCell}>
                   {formatDate(tutoria.fecha)}
                 </td>

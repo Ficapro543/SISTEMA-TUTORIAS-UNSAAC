@@ -34,16 +34,6 @@ function DetalleTutoriaModal({ tutoria, onClose }) {
     return semestre;
   };
 
-  // Obtener clase para el tipo de tutoría
-  const getTipoClass = (tipo) => {
-    switch(tipo?.toUpperCase()) {
-      case 'ACADEMICA': return styles.tipoAcademica;
-      case 'PERSONAL': return styles.tipoPersonal;
-      case 'PROFESIONAL': return styles.tipoProfesional;
-      default: return styles.tipoGeneral;
-    }
-  };
-
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
@@ -94,13 +84,6 @@ function DetalleTutoriaModal({ tutoria, onClose }) {
                 <strong>Fecha y Hora:</strong>
                 <span className={styles.dateTime}>
                   {formatDate(tutoria.fecha)}
-                </span>
-              </div>
-              
-              <div className={styles.infoItem}>
-                <strong>Tipo de Tutoría:</strong>
-                <span className={`${styles.tipoBadge} ${getTipoClass(tutoria.tipo)}`}>
-                  {tutoria.tipo || 'GENERAL'}
                 </span>
               </div>
               

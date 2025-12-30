@@ -144,41 +144,6 @@
   font-weight: 500;
 }
 
-.tipoBadge {
-  display: inline-block;
-  padding: 6px 14px;
-  border-radius: 16px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-  text-align: center;
-  min-width: 100px;
-}
-
-.tipoAcademica {
-  background: linear-gradient(135deg, rgba(0, 123, 255, 0.1), rgba(0, 86, 179, 0.08));
-  color: #0066cc;
-  border: 1px solid rgba(0, 123, 255, 0.2);
-}
-
-.tipoPersonal {
-  background: linear-gradient(135deg, rgba(40, 167, 69, 0.1), rgba(33, 136, 56, 0.08));
-  color: #28a745;
-  border: 1px solid rgba(40, 167, 69, 0.2);
-}
-
-.tipoProfesional {
-  background: linear-gradient(135deg, rgba(220, 53, 69, 0.1), rgba(200, 35, 51, 0.08));
-  color: #dc3545;
-  border: 1px solid rgba(220, 53, 69, 0.2);
-}
-
-.tipoGeneral {
-  background: linear-gradient(135deg, rgba(108, 117, 125, 0.1), rgba(73, 80, 87, 0.08));
-  color: #495057;
-  border: 1px solid rgba(108, 117, 125, 0.2);
-}
-
 .actionsCell {
   width: 140px;
   text-align: center;
