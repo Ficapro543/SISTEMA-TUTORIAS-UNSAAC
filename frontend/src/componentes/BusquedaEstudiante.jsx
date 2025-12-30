@@ -5,7 +5,7 @@ function BusquedaEstudiante({ onBuscar, onLimpiar, valores = {} }) {
   const [codigo, setCodigo] = useState(valores.codigo || "");
   const [nombre, setNombre] = useState(valores.nombre || "");
   const [apellido, setApellido] = useState(valores.apellido || "");
-  const [buscarPor, setBuscarPor] = useState("codigo"); //"codigo", "nombre", "ambos"
+  const [buscarPor, setBuscarPor] = useState("codigo"); //"codigo", "nombre"
 
   //Sincronizar con valores externos
   useEffect(()=>{
@@ -21,10 +21,7 @@ function BusquedaEstudiante({ onBuscar, onLimpiar, valores = {} }) {
     if(buscarPor === "codigo" && !codigo.trim()){
       return;
     }
-    if(buscarPor === "nombre" && (!nombre.trim() || !apellido.trim())){
-      return;
-    }
-    if(buscarPor === "ambos" && !codigo.trim() && (!nombre.trim() || !apellido.trim())){
+    if(buscarPor === "nombre" && (!nombre.trim() && !apellido.trim())){
       return;
     }
 
@@ -54,7 +51,7 @@ function BusquedaEstudiante({ onBuscar, onLimpiar, valores = {} }) {
       <div className={styles.header}>
         <h3 className={styles.title}>Consulta por Estudiante</h3>
         <p className={styles.subtitle}>
-          Busque el historial de tutorías por codigo, nombre o ambos
+          Busque el historial de tutorías por código o nombre del estudiante
         </p>
       </div>
 
@@ -71,12 +68,6 @@ function BusquedaEstudiante({ onBuscar, onLimpiar, valores = {} }) {
             onClick={() => handleBuscarPorChange("nombre")}
           >
             Por Nombre
-          </button>
-          <button
-            className={`${styles.selectorOption} ${buscarPor === "ambos" ? styles.active : ""}`}
-            onClick={() => handleBuscarPorChange("ambos")}
-          >
-            Ambos
           </button>
         </div>
       </div>
@@ -138,8 +129,7 @@ function BusquedaEstudiante({ onBuscar, onLimpiar, valores = {} }) {
             onClick={handleBuscar}
             disabled={
               (buscarPor === "codigo" && !codigo.trim()) ||
-              (buscarPor === "nombre" && (!nombre.trim() || !apellido.trim())) ||
-              (buscarPor === "ambos" && !codigo.trim() && (!nombre.trim() || !apellido.trim()))
+              (buscarPor === "nombre" && (!nombre.trim() && !apellido.trim()))
             }
           >
             <span className={styles.buttonIcon}>🔍</span>

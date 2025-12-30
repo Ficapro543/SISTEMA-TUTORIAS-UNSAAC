@@ -45,64 +45,70 @@ function DetalleTutoriaModal({ tutoria, onClose }) {
         </div>
 
         <div className={styles.modalContent}>
-          {/* Columna 1: Información General */}
-          <div className={styles.section}>
-            <h4>📊 Información General</h4>
-            <div className={styles.grid}>
-              <div className={styles.infoItem}>
-                <strong>Estudiante:</strong>
-                <div className={styles.studentInfo}>
-                  <span className={styles.studentName}>{tutoria.estudiante}</span>
-                  {tutoria.codigo_estudiante && (
-                    <span className={styles.studentCode}>
-                      Código: {tutoria.codigo_estudiante}
-                    </span>
-                  )}
-                </div>
-              </div>
-              
-              <div className={styles.infoItem}>
-                <strong>Tutor:</strong>
-                <div className={styles.tutorInfo}>
-                  <span className={styles.tutorName}>{tutoria.tutor}</span>
-                  {tutoria.tutor_email && (
-                    <span className={styles.tutorEmail}>
-                      {tutoria.tutor_email}
-                    </span>
-                  )}
-                </div>
-              </div>
-              
-              <div className={styles.infoItem}>
-                <strong>Semestre:</strong>
-                <span className={styles.semesterBadge}>
-                  {formatSemesterName(tutoria.semestre)}
-                </span>
-              </div>
-              
-              <div className={styles.infoItem}>
-                <strong>Fecha y Hora:</strong>
-                <span className={styles.dateTime}>
-                  {formatDate(tutoria.fecha)}
-                </span>
-              </div>
-              
-              <div className={styles.infoItem}>
-                <strong>Modalidad:</strong>
-                <span className={styles.modalidadText}>{tutoria.modalidad || 'No especificada'}</span>
-              </div>
-              
-              {tutoria.ambiente && (
+          {/* Columna 1 */}
+          <div className={styles.column}>
+            <div className={styles.section}>
+              <h4>📊 Información General</h4>
+              <div className={styles.grid}>
                 <div className={styles.infoItem}>
-                  <strong>Ambiente/Lugar:</strong>
-                  <span className={styles.ambienteText}>{tutoria.ambiente}</span>
+                  <strong>Estudiante:</strong>
+                  <div className={styles.studentInfo}>
+                    <span className={styles.studentName}>{tutoria.estudiante}</span>
+                    {tutoria.codigo_estudiante && (
+                      <span className={styles.studentCode}>
+                        Código: {tutoria.codigo_estudiante}
+                      </span>
+                    )}
+                  </div>
                 </div>
-              )}
+                
+                <div className={styles.infoItem}>
+                  <strong>Tutor:</strong>
+                  <div className={styles.tutorInfo}>
+                    <span className={styles.tutorName}>{tutoria.tutor}</span>
+                    {tutoria.tutor_email && (
+                      <span className={styles.tutorEmail}>
+                        {tutoria.tutor_email}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                
+                <div className={styles.infoItem}>
+                  <strong>Semestre:</strong>
+                  <span className={styles.semesterBadge}>
+                    {formatSemesterName(tutoria.semestre)}
+                  </span>
+                </div>
+                
+                <div className={styles.infoItem}>
+                  <strong>Fecha y Hora:</strong>
+                  <span className={styles.dateTime}>
+                    {formatDate(tutoria.fecha)}
+                  </span>
+                </div>
+                
+                <div className={styles.infoItem}>
+                  <strong>Modalidad:</strong>
+                  <span className={styles.modalidadText}>{tutoria.modalidad || 'No especificada'}</span>
+                </div>
+                
+                {tutoria.ambiente && (
+                  <div className={styles.infoItem}>
+                    <strong>Ambiente/Lugar:</strong>
+                    <span className={styles.ambienteText}>{tutoria.ambiente}</span>
+                  </div>
+                )}
+                
+                <div className={styles.infoItem}>
+                  <strong>Derivación Psicológica:</strong>
+                  <span className={tutoria.requiere_derivacion ? styles.derivadoBadge : styles.noDerivadoBadge}>
+                    {tutoria.requiere_derivacion ? '🔄 Derivado' : '✅ No requiere derivación'}
+                  </span>
+                </div>
+              </div>
             </div>
-          </div>
 
-          {/* Columna 2: Observaciones por categoría */}
-          <div>
             {/* Observaciones organizadas */}
             <div className={styles.section}>
               <h4>📋 Observaciones por Área</h4>
@@ -168,38 +174,24 @@ function DetalleTutoriaModal({ tutoria, onClose }) {
                 )}
               </div>
             </div>
+          </div>
 
-            {/* Derivación (si existe) */}
+          {/* Columna 2 */}
+          <div className={styles.column}>
+            {/* Derivación si aplica */}
             {tutoria.requiere_derivacion && tutoria.derivacion && (
               <div className={styles.section}>
-                <h4>🔄 Derivación</h4>
-                <div className={styles.derivacionInfo}>
-                  <div className={styles.derivacionItem}>
-                    <strong>Estado:</strong>
-                    <span className={styles.derivacionStatus}>Derivado</span>
-                  </div>
-                  <div className={styles.derivacionItem}>
+                <h4>🔄 Información de Derivación</h4>
+                <div className={styles.grid}>
+                  <div className={styles.infoItem}>
                     <strong>Especialidad:</strong>
-                    <span className={styles.derivacionValue}>
-                      {tutoria.derivacion.especialidad}
-                    </span>
+                    <span className={styles.especialidadText}>{tutoria.derivacion.especialidad}</span>
                   </div>
-                  {tutoria.derivacion.motivo && (
-                    <div className={styles.derivacionItem}>
-                      <strong>Motivo:</strong>
-                      <span className={styles.derivacionValue}>
-                        {tutoria.derivacion.motivo}
-                      </span>
-                    </div>
-                  )}
-                  {tutoria.derivacion.observaciones && (
-                    <div className={styles.derivacionItem}>
-                      <strong>Observaciones:</strong>
-                      <span className={styles.derivacionValue}>
-                        {tutoria.derivacion.observaciones}
-                      </span>
-                    </div>
-                  )}
+                  
+                  <div className={styles.infoItem}>
+                    <strong>Motivo:</strong>
+                    <span className={styles.motivoText}>{tutoria.derivacion.motivo}</span>
+                  </div>
                 </div>
               </div>
             )}

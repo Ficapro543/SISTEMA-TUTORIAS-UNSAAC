@@ -92,6 +92,12 @@
   overflow-y: auto;
 }
 
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
 /* Secciones */
 .section {
   margin-bottom: 2rem;
@@ -554,4 +560,53 @@
 .ambienteText {
   color: var(--color-text-dark);
   font-weight: 500;
+}
+
+.derivacionBadge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
+}
+
+.especialidadText {
+  color: var(--color-text-dark);
+  font-weight: 500;
+}
+
+.motivoText {
+  color: var(--color-text-dark);
+  font-weight: 500;
+}
+
+/* Badges de derivación */
+.derivadoBadge {
+  display: inline-block;
+  padding: 0.375rem 0.875rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #dc3545, #fd7e14);
+  color: white;
+  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
+  border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+.noDerivadoBadge {
+  display: inline-block;
+  padding: 0.375rem 0.875rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
+  border: 1px solid rgba(40, 167, 69, 0.3);
 }
