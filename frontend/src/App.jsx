@@ -21,6 +21,8 @@ import AdminDashboard from "./pages/admin/AdminDashboard2.jsx";
 import CambioTutorados from "./pages/admin/CambioTutorados.jsx";
 import AsignarTutorados from "./pages/admin/AsignarTutorados.jsx";
 
+import TutorDashboard from "./pages/Dashboard.jsx"
+
 function App() {
   return (
     <Routes>
@@ -37,7 +39,7 @@ function App() {
       <Route path="/recuperar/verificar" element={<Layout><VerificarCodigo /></Layout>} />
       <Route path="/recuperar/nueva" element={<Layout><NuevaContrasena /></Layout>} />
       <Route path="/ping" element={<Layout><BackendStatus /></Layout>} />
-      <Route path="/mainpage" element={<Layout><MainPage /></Layout>} />
+      <Route path="/tutordashboard" element={<Layout><TutorDashboard /></Layout>} />
 
       {/* Admin routes */}
       <Route path="/solicitudes_registro" element={<Layout><AprobarRegistro /></Layout>} />
