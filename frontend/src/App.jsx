@@ -50,7 +50,7 @@ function App() {
       <Route path="/asignaciones" element={<AsignacionTutorados />} />
       <Route path="/administrador/asignaciones" element={<AsignarTutorados />} />
       <Route path="/admin/cambio-tutor" element={<CambioTutorados />} />
-      <Route path="/tutoriasHistoricas" elemenutoriasHistoricas roles={{ administrador: true }} />} />
+      <Route path="/tutoriasHistoricas" element = {<TutoriasHistoricas roles={{ administrador: true }} />} />
 
       {/* Catch-all */}
       <Route path="*" element={<Navigate to="/login" replace />} />
