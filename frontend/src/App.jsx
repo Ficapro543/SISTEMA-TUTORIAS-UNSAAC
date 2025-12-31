@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 
 // General pages
 import Layout from "./pages/general/Layout.jsx";
+import LandingPage from "./pages/general/LandingPage.jsx";
 import Login from "./pages/general/Login.jsx";
 import Register from "./pages/general/Registro.jsx";
 import RegisterConfirmation from "./pages/general/RegistroConfirmacion.jsx";
@@ -21,18 +22,21 @@ import AdminDashboard from "./pages/admin/AdminDashboard2.jsx";
 import CambioTutorados from "./pages/admin/CambioTutorados.jsx";
 import AsignarTutorados from "./pages/admin/AsignarTutorados.jsx";
 
-import TutorDashboard from "./pages/Dashboard.jsx"
+import Dashboard from "./pages/Dashboard.jsx"
 
 function App() {
   return (
     <Routes>
+      {/* Landing Page */}
+      <Route path="/" element={<LandingPage />} />
+      
       {/* General routes */}
       <Route path="/login" element={<Layout><Login /></Layout>} />
       <Route path="/registro" element={<Layout><Register /></Layout>} />
       <Route path="/confirmacion" element={<Layout><RegisterConfirmation /></Layout>} />
       <Route path="/verificado" element={<Layout><CuentaVerificada /></Layout>} />
       <Route path="/solicitudes_registro" element={<Layout><AprobarRegistro /></Layout>} />
-      <Route path="/mainpage" element={<Layout><TutorDashboard /></Layout>} />
+      <Route path="/mainpage" element={<Dashboard />} />
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/asignaciones" element={<AsignacionTutorados />} />
       <Route path="/recuperar" element={<Layout><RecuperarPassword /></Layout>} />
@@ -46,7 +50,7 @@ function App() {
       <Route path="/asignaciones" element={<AsignacionTutorados />} />
       <Route path="/administrador/asignaciones" element={<AsignarTutorados />} />
       <Route path="/admin/cambio-tutor" element={<CambioTutorados />} />
-      <Route path="/tutoriasHistoricas" element={<TutoriasHistoricas roles={{ administrador: true }} />} />
+      <Route path="/tutoriasHistoricas" elemenutoriasHistoricas roles={{ administrador: true }} />} />
 
       {/* Catch-all */}
       <Route path="*" element={<Navigate to="/login" replace />} />

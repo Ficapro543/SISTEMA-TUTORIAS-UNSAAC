@@ -1,0 +1,231 @@
+.landingPage {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-image: url('/informatica.webp');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    position: relative;
+}
+
+.landingPage::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, 
+        rgba(0, 33, 71, 0.92)100%, 
+        rgba(33, 35, 150, 0.88) 100%, 
+        rgba(26, 35, 126, 0.90) 100%);
+    z-index: 1;
+}
+
+.header {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 60px;
+    padding: 30px 40px;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.logo {
+    height: 100px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+.mainContent {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.contentWrapper {
+    max-width: 1100px;
+    width: 100%;
+    text-align: center;
+}
+
+.mainTitle {
+    font-size: 4rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    letter-spacing: 1px;
+}
+
+.universityName {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #fbbf24;
+    margin: 10px 0 15px;
+    text-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+}
+
+.subtitle {
+    font-size: 1.4rem;
+    color: rgba(255, 255, 255, 0.95);
+    margin: 0 0 30px;
+    font-weight: 400;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.description {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.9);
+    max-width: 800px;
+    margin: 0 auto 50px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.featureCards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    margin: 50px auto 60px;
+    max-width: 950px;
+}
+
+.featureCard {
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    padding: 35px 25px;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.featureCard:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+    border-color: rgba(255, 255, 255, 0.35);
+}
+
+.iconWrapper {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 20px;
+    background: rgba(251, 191, 36, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon {
+    width: 36px;
+    height: 36px;
+    color: #fbbf24;
+}
+
+.featureTitle {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0 0 12px;
+}
+
+.featureDesc {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.loginButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    color: #1a237e;
+    font-size: 1.3rem;
+    font-weight: 600;
+    padding: 16px 50px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(251, 191, 36, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.loginButton:hover {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(251, 191, 36, 0.5);
+}
+
+.loginButton:active {
+    transform: translateY(-1px);
+}
+
+.buttonIcon {
+    width: 24px;
+    height: 24px;
+}
+
+.footer {
+    position: relative;
+    z-index: 2;
+    padding: 25px 20px;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.35);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.95rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .mainTitle {
+        font-size: 2.5rem;
+    }
+
+    .universityName {
+        font-size: 1.8rem;
+    }
+
+    .subtitle {
+        font-size: 1.1rem;
+    }
+
+    .description {
+        font-size: 1rem;
+        padding: 0 15px;
+    }
+
+    .featureCards {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 0 15px;
+    }
+
+    .logo {
+        height: 70px;
+    }
+
+    .header {
+        gap: 30px;
+    }
+
+    .loginButton {
+        font-size: 1.1rem;
+        padding: 14px 40px;
+    }
+}

@@ -3,12 +3,13 @@ import { useNavigate } from "react-router-dom";
 import {
     FaCog, FaBook, FaFolderOpen, FaArrowRight,
     FaCalendarAlt, FaClock, FaUserCircle, FaHashtag, FaEnvelope, FaCheckCircle,
-    FaUserCheck, FaProjectDiagram, FaFileAlt, FaCaretDown, FaCaretUp, FaSignOutAlt
+    FaUserCheck, FaProjectDiagram, FaFileAlt, FaCaretDown, FaCaretUp, FaSignOutAlt, FaExchangeAlt
 } from "react-icons/fa";
 import styles from "../styles/pages/Dashboard.module.css";
 // Admin Views
 import AprobarRegistro from "../pages/admin/AprobarRegistro";
 import AsignacionTutorados from "../pages/admin/AsignacionTutorados";
+import CambioTutorados from "../pages/admin/CambioTutorados";
 
 // Tutor Views
 import TutoradosList from "../pages/TutoradosList";
@@ -28,7 +29,7 @@ export default function Dashboard() {
 
     // Navigation States
     const [activeTab, setActiveTab] = useState('inicio'); // 'inicio', 'admin', 'tutor', 'verificador'
-    const [activeAdminTab, setActiveAdminTab] = useState('reportes'); // 'validar', 'asignaciones', 'cronogramas', 'reportes'
+    const [activeAdminTab, setActiveAdminTab] = useState('reportes'); // 'validar', 'asignaciones', 'cambio', 'cronogramas', 'reportes'
     const [activeTutorTab, setActiveTutorTab] = useState('tutorados'); // 'tutorados', 'sesiones', 'actividades'
     const [activeVerifierTab, setActiveVerifierTab] = useState('revision'); // 'revision', 'reportes', 'ficha'
 
@@ -126,6 +127,13 @@ export default function Dashboard() {
 
     return (
         <div className={styles.dashboardContainer}>
+            {/* Header with Logos and Title */}
+            <header className={styles.mainHeader}>
+                <img src="/logo_izquierdo.png" alt="Logo UNSAAC" className={styles.logoLeft} />
+                <h1 className={styles.mainTitle}>SISTEMA DE TUTORÍAS UNSAAC</h1>
+                <img src="/logo_derecho.png" alt="Logo Derecho" className={styles.logoRight} />
+            </header>
+
             {/* Top Info Bar: Date/Time + User Profile */}
             <div className={styles.infoBar}>
                 <div className={styles.dateInfo}>
@@ -235,6 +243,13 @@ export default function Dashboard() {
                         >
                             <FaProjectDiagram className={styles.subTabIcon} />
                             <span>Asignaciones</span>
+                        </div>
+                        <div
+                            className={`${styles.subTab} ${activeAdminTab === 'cambio' ? styles.subTabActive : ''}`}
+                            onClick={() => handleAdminSubTabClick('cambio')}
+                        >
+                            <FaExchangeAlt className={styles.subTabIcon} />
+                            <span>Cambio de Tutor</span>
                         </div>
                         <div
                             className={`${styles.subTab} ${activeAdminTab === 'cronogramas' ? styles.subTabActive : ''}`}
@@ -402,7 +417,7 @@ export default function Dashboard() {
                                 <p className={styles.cardDesc}>
                                     Verifica y evalúa las sesiones de tutoría realizadas por los tutores asignados.
                                 </p>
-                                <button className={styles.actionBtn} onClick={() => navigate('/verificador-dash')}>
+                                <button className={styles.actionBtn} onClick={() => setActiveTab('verificador')}>
                                     Ir a Evaluación <FaArrowRight size={12} />
                                 </button>
                             </div>
@@ -422,6 +437,10 @@ export default function Dashboard() {
 
                         {activeAdminTab === 'asignaciones' && (
                             <AsignacionTutorados embedded={true} />
+                        )}
+
+                        {activeAdminTab === 'cambio' && (
+                            <CambioTutorados />
                         )}
 
                         {activeAdminTab === 'cronogramas' && (

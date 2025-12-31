@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-    FaSearch, FaCheckCircle, FaHome, FaSignOutAlt, FaInfoCircle,
-    FaChevronDown, FaUsers, FaArrowRight, FaExchangeAlt, FaHistory
+    FaSearch, FaCheckCircle, FaInfoCircle,
+    FaUsers, FaArrowRight, FaExchangeAlt
 } from "react-icons/fa";
 import {
     getActiveSemester, getSemesters, getTutors,
@@ -12,23 +12,16 @@ import styles from "../../styles/components/AsignacionTutorados.module.css";
 
 export default function CambioTutorados() {
     const navigate = useNavigate();
-    const [isAdmin, setIsAdmin] = useState(false);
     const [loading, setLoading] = useState(true);
-
     const [allSemesters, setAllSemesters] = useState([]);
     const [selectedSemesterId, setSelectedSemesterId] = useState("");
-    const [semester, setSemester] = useState(null);
-
     const [tutores, setTutores] = useState([]);
     const [tutorOrigen, setTutorOrigen] = useState(null);
     const [tutorDestino, setTutorDestino] = useState(null);
-
     const [searchOrigen, setSearchOrigen] = useState("");
     const [searchDestino, setSearchDestino] = useState("");
-
     const [estudiantes, setEstudiantes] = useState([]);
     const [selectedStudentIds, setSelectedStudentIds] = useState([]);
-
     const [message, setMessage] = useState(null);
     const [isProcessing, setIsProcessing] = useState(false);
 
@@ -37,7 +30,6 @@ export default function CambioTutorados() {
         if (rolesStr) {
             const roles = JSON.parse(rolesStr);
             if (roles.administrador) {
-                setIsAdmin(true);
                 loadInitialData();
             }
         } else {
@@ -56,10 +48,8 @@ export default function CambioTutorados() {
             setTutores(tutorsList);
 
             if (activeSem) {
-                setSemester(activeSem);
                 setSelectedSemesterId(activeSem.id);
             } else if (sems.length > 0) {
-                setSemester(sems[0]);
                 setSelectedSemesterId(sems[0].id);
             }
         } catch (err) {
@@ -70,7 +60,6 @@ export default function CambioTutorados() {
         }
     }
 
-    // Al cambiar tutor origen, cargar sus estudiantes
     useEffect(() => {
         if (tutorOrigen && selectedSemesterId) {
             loadOriginStudents();
@@ -121,7 +110,7 @@ export default function CambioTutorados() {
             return;
         }
 
-        if (!confirm(`¿Confirmar transferencia de ${selectedStudentIds.length} estudiantes de ${tutorOrigen.first_name} a ${tutorDestino.first_name}?`)) {
+        if (!window.confirm(`¿Confirmar transferencia de ${selectedStudentIds.length} estudiantes de ${tutorOrigen.first_name} a ${tutorDestino.first_name}?`)) {
             return;
         }
 
@@ -135,13 +124,9 @@ export default function CambioTutorados() {
             });
 
             setMessage({ type: "success", text: "Transferencia completada correctamente." });
-
-            // Recargar datos
             loadOriginStudents();
             const updatedTutors = await getTutors("");
             setTutores(updatedTutors);
-
-            // Actualizar referencias de tutores seleccionados para ver contadores actualizados
             setTutorOrigen(updatedTutors.find(t => t.id === tutorOrigen.id));
             setTutorDestino(updatedTutors.find(t => t.id === tutorDestino.id));
 
@@ -152,175 +137,281 @@ export default function CambioTutorados() {
         }
     };
 
-    if (loading) return <div>Cargando...</div>;
+    if (loading) return <div style={{ padding: '20px', textAlign: 'center' }}>Cargando...</div>;
 
     return (
-        <div className={styles.pageContainer}>
-            <header className={styles.header}>
-                <div className={styles.headerLeft}>
-                    <span className={styles.headerSubtitle} style={{ fontSize: '14px', margin: 0 }}>Módulo Administrador</span>
-                </div>
-                <div className={styles.headerRight}>
-                    <button onClick={() => navigate("/admin")} className={styles.navButton}><FaHome /> Inicio</button>
-                    <button onClick={() => { localStorage.removeItem("userRoles"); navigate("/login"); }} className={styles.navButton}><FaSignOutAlt /> Salir</button>
-                </div>
-            </header>
+        <div style={{ padding: '24px', maxWidth: '1400px', margin: '0 auto' }}>
+            <div className={styles.sectionHeader}>
+                <h2 className={styles.sectionTitle} style={{ fontSize: '1.8rem', fontWeight: '700', color: '#1e293b', marginBottom: '8px' }}>
+                    <FaExchangeAlt style={{ marginRight: '12px', color: '#3b82f6' }} />
+                    Transferencia de Tutorados
+                </h2>
+                <p className={styles.sectionDescription} style={{ color: '#64748b', fontSize: '0.95rem' }}>
+                    Reasigne estudiantes entre tutores para el semestre seleccionado.
+                </p>
+            </div>
 
-            <main className={styles.mainContent}>
-                <div className={styles.sectionHeader}>
-                    <h2 className={styles.sectionTitle}>Transferencia de Tutorados</h2>
-                    <p className={styles.sectionDescription}>Reasigne estudiantes entre tutores para el semestre seleccionado.</p>
-                </div>
-
-                {/* Semestre */}
-                <div className={styles.card}>
-                    <h3 className={styles.cardTitle}>Semestre</h3>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                        <select
-                            value={selectedSemesterId}
-                            onChange={(e) => setSelectedSemesterId(e.target.value)}
-                            className={styles.searchInput}
-                            style={{ width: '320px' }}
-                        >
-                            {allSemesters.map(s => (
-                                <option key={s.id} value={s.id}>{s.name} {s.is_active ? "(Actual)" : ""}</option>
-                            ))}
-                        </select>
+            <div className={styles.card} style={{ marginBottom: '24px', backgroundColor: '#f8fafc' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div>
+                        <h3 className={styles.cardTitle} style={{ marginBottom: '4px' }}>Semestre Académico</h3>
+                        <p style={{ fontSize: '0.875rem', color: '#64748b', margin: 0 }}>Seleccione el semestre</p>
                     </div>
+                    <select
+                        value={selectedSemesterId}
+                        onChange={(e) => setSelectedSemesterId(e.target.value)}
+                        className={styles.searchInput}
+                        style={{ 
+                            width: '320px', 
+                            padding: '12px 16px',
+                            fontSize: '1rem',
+                            fontWeight: '500',
+                            border: '2px solid #3b82f6',
+                            borderRadius: '8px'
+                        }}
+                    >
+                        {allSemesters.map(s => (
+                            <option key={s.id} value={s.id}>{s.name} {s.is_active ? "✓ Actual" : ""}</option>
+                        ))}
+                    </select>
                 </div>
+            </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-                    {/* Tutor Origen */}
-                    <div className={styles.card}>
-                        <h3 className={styles.cardTitle}>1. Tutor Origen</h3>
-                        <div className={styles.inputWrapper}>
-                            <FaSearch className={styles.inputIcon} />
-                            <input
-                                type="text"
-                                placeholder="Buscar tutor origen..."
-                                value={searchOrigen}
-                                onChange={(e) => setSearchOrigen(e.target.value)}
-                                className={styles.searchInput}
-                                style={{ width: '100%' }}
-                            />
-                        </div>
-                        <div style={{ maxHeight: '200px', overflowY: 'auto', marginTop: '10px', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: '24px', alignItems: 'start' }}>
+                <div className={styles.card} style={{ border: tutorOrigen ? '2px solid #3b82f6' : '1px solid #e2e8f0' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                        <div style={{ 
+                            width: '32px', 
+                            height: '32px', 
+                            borderRadius: '50%', 
+                            backgroundColor: '#dbeafe', 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'center',
+                            fontWeight: 'bold',
+                            color: '#1e40af'
+                        }}>1</div>
+                        <h3 className={styles.cardTitle} style={{ margin: 0 }}>Tutor Origen</h3>
+                    </div>
+                    <div style={{ position: 'relative' }}>
+                        <FaSearch style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                        <input
+                            type="text"
+                            placeholder="Buscar tutor..."
+                            value={searchOrigen}
+                            onChange={(e) => setSearchOrigen(e.target.value)}
+                            className={styles.searchInput}
+                            style={{ width: '100%', paddingLeft: '40px' }}
+                        />
+                    </div>
+                    <div style={{ maxHeight: '280px', overflowY: 'auto', marginTop: '12px', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+                        {filteredTutoresOrigen.length === 0 ? (
+                            <div style={{ padding: '24px', textAlign: 'center', color: '#64748b' }}>
+                                <FaUsers size={32} style={{ opacity: 0.3 }} />
+                                <p>No hay tutores</p>
+                            </div>
+                        ) : (
                             <table className={styles.table}>
                                 <tbody>
                                     {filteredTutoresOrigen.map(t => (
                                         <tr
                                             key={t.id}
                                             onClick={() => setTutorOrigen(t)}
-                                            style={{ cursor: 'pointer', backgroundColor: tutorOrigen?.id === t.id ? '#eff6ff' : 'transparent' }}
+                                            style={{ 
+                                                cursor: 'pointer', 
+                                                backgroundColor: tutorOrigen?.id === t.id ? '#dbeafe' : 'transparent'
+                                            }}
                                         >
-                                            <td style={{ padding: '8px' }}>{t.first_name} {t.last_name} ({t.code})</td>
-                                            <td style={{ textAlign: 'right', padding: '8px', color: '#64748b' }}>{t.student_count} tut.</td>
+                                            <td style={{ padding: '12px' }}>
+                                                {t.first_name} {t.last_name}
+                                                <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{t.code}</div>
+                                            </td>
+                                            <td style={{ textAlign: 'right', padding: '12px' }}>
+                                                <span style={{ backgroundColor: '#f1f5f9', padding: '4px 8px', borderRadius: '6px', fontSize: '0.875rem' }}>
+                                                    {t.student_count} est.
+                                                </span>
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
-                        </div>
+                        )}
                     </div>
+                </div>
 
-                    {/* Tutor Destino */}
-                    <div className={styles.card}>
-                        <h3 className={styles.cardTitle}>2. Tutor Destino</h3>
-                        <div className={styles.inputWrapper}>
-                            <FaSearch className={styles.inputIcon} />
-                            <input
-                                type="text"
-                                placeholder="Buscar tutor destino..."
-                                value={searchDestino}
-                                onChange={(e) => setSearchDestino(e.target.value)}
-                                className={styles.searchInput}
-                                style={{ width: '100%' }}
-                            />
-                        </div>
-                        <div style={{ maxHeight: '200px', overflowY: 'auto', marginTop: '10px', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', paddingTop: '80px' }}>
+                    <FaArrowRight size={32} color={tutorOrigen && tutorDestino ? '#3b82f6' : '#cbd5e1'} />
+                </div>
+
+                <div className={styles.card} style={{ border: tutorDestino ? '2px solid #10b981' : '1px solid #e2e8f0' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                        <div style={{ 
+                            width: '32px', 
+                            height: '32px', 
+                            borderRadius: '50%', 
+                            backgroundColor: '#d1fae5', 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'center',
+                            fontWeight: 'bold',
+                            color: '#065f46'
+                        }}>2</div>
+                        <h3 className={styles.cardTitle} style={{ margin: 0 }}>Tutor Destino</h3>
+                    </div>
+                    <div style={{ position: 'relative' }}>
+                        <FaSearch style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                        <input
+                            type="text"
+                            placeholder="Buscar tutor..."
+                            value={searchDestino}
+                            onChange={(e) => setSearchDestino(e.target.value)}
+                            className={styles.searchInput}
+                            style={{ width: '100%', paddingLeft: '40px' }}
+                        />
+                    </div>
+                    <div style={{ maxHeight: '280px', overflowY: 'auto', marginTop: '12px', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+                        {filteredTutoresDestino.length === 0 ? (
+                            <div style={{ padding: '24px', textAlign: 'center', color: '#64748b' }}>
+                                <FaUsers size={32} style={{ opacity: 0.3 }} />
+                                <p>No hay tutores</p>
+                            </div>
+                        ) : (
                             <table className={styles.table}>
                                 <tbody>
                                     {filteredTutoresDestino.map(t => (
                                         <tr
                                             key={t.id}
                                             onClick={() => setTutorDestino(t)}
-                                            style={{ cursor: 'pointer', backgroundColor: tutorDestino?.id === t.id ? '#eff6ff' : 'transparent' }}
+                                            style={{ 
+                                                cursor: 'pointer', 
+                                                backgroundColor: tutorDestino?.id === t.id ? '#d1fae5' : 'transparent'
+                                            }}
                                         >
-                                            <td style={{ padding: '8px' }}>{t.first_name} {t.last_name} ({t.code})</td>
-                                            <td style={{ textAlign: 'right', padding: '8px', color: '#64748b' }}>{t.student_count} tut.</td>
+                                            <td style={{ padding: '12px' }}>
+                                                {t.first_name} {t.last_name}
+                                                <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{t.code}</div>
+                                            </td>
+                                            <td style={{ textAlign: 'right', padding: '12px' }}>
+                                                <span style={{ backgroundColor: '#f1f5f9', padding: '4px 8px', borderRadius: '6px', fontSize: '0.875rem' }}>
+                                                    {t.student_count} est.
+                                                </span>
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
-                        </div>
+                        )}
                     </div>
                 </div>
+            </div>
 
-                {/* Estudiantes del Tutor Origen */}
-                {tutorOrigen && (
-                    <div className={styles.tableCard} style={{ marginTop: '24px' }}>
-                        <div className={styles.tableHeader}>
-                            <h3 className={styles.cardTitle}>Estudiantes de {tutorOrigen.first_name}</h3>
-                            <p className={styles.cardDescription}>Seleccione los estudiantes a transferir</p>
-                        </div>
-                        <div className={styles.tableContainer}>
-                            <table className={styles.table}>
-                                <thead>
-                                    <tr>
-                                        <th style={{ width: '50px' }}>
-                                            <input type="checkbox" checked={estudiantes.length > 0 && selectedStudentIds.length === estudiantes.length} onChange={handleSelectAll} />
-                                        </th>
-                                        <th>Código</th>
-                                        <th>Nombre</th>
-                                        <th>Ciclo</th>
-                                        <th>Tutorías</th>
+            {tutorOrigen && (
+                <div className={styles.tableCard} style={{ marginTop: '24px' }}>
+                    <div className={styles.tableHeader}>
+                        <h3 className={styles.cardTitle}>Estudiantes de {tutorOrigen.first_name}</h3>
+                        <p className={styles.cardDescription}>Seleccione los estudiantes a transferir</p>
+                    </div>
+                    <div className={styles.tableContainer}>
+                        <table className={styles.table}>
+                            <thead>
+                                <tr>
+                                    <th style={{ width: '50px' }}>
+                                        <input type="checkbox" checked={estudiantes.length > 0 && selectedStudentIds.length === estudiantes.length} onChange={handleSelectAll} />
+                                    </th>
+                                    <th>Código</th>
+                                    <th>Nombre</th>
+                                    <th>Ciclo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {estudiantes.map(s => (
+                                    <tr key={s.id} onClick={() => toggleStudent(s.id)} style={{ cursor: 'pointer', backgroundColor: selectedStudentIds.includes(s.id) ? '#f0f9ff' : 'transparent' }}>
+                                        <td><input type="checkbox" checked={selectedStudentIds.includes(s.id)} readOnly /></td>
+                                        <td>{s.code}</td>
+                                        <td>{s.first_name} {s.last_name}</td>
+                                        <td>{s.cycle || "N/A"}</td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    {estudiantes.map(s => (
-                                        <tr key={s.id} onClick={() => toggleStudent(s.id)} style={{ cursor: 'pointer', backgroundColor: selectedStudentIds.includes(s.id) ? '#f0f9ff' : 'transparent' }}>
-                                            <td><input type="checkbox" checked={selectedStudentIds.includes(s.id)} readOnly /></td>
-                                            <td>{s.code}</td>
-                                            <td>{s.first_name} {s.last_name}</td>
-                                            <td>{s.cycle || "N/A"}</td>
-                                            <td>{s.tutorias_count}</td>
-                                        </tr>
-                                    ))}
-                                    {estudiantes.length === 0 && <tr><td colSpan="5" style={{ textAlign: 'center', padding: '20px' }}>No hay estudiantes asignados.</td></tr>}
-                                </tbody>
-                            </table>
-                        </div>
+                                ))}
+                                {estudiantes.length === 0 && <tr><td colSpan="4" style={{ textAlign: 'center', padding: '20px' }}>No hay estudiantes</td></tr>}
+                            </tbody>
+                        </table>
                     </div>
-                )}
+                </div>
+            )}
 
-                {/* Resumen y Acción */}
-                {(tutorOrigen && tutorDestino) && (
-                    <div className={styles.card} style={{ marginTop: '24px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div>
-                                <h4 style={{ margin: 0, color: '#1e293b' }}>Resumen de Transferencia</h4>
-                                <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: '#64748b' }}>
-                                    Transferir <strong>{selectedStudentIds.length}</strong> estudiantes de <strong>{tutorOrigen.first_name}</strong> a <strong>{tutorDestino.first_name}</strong>.
-                                </p>
-                            </div>
-                            <button
-                                onClick={handleTransfer}
-                                disabled={selectedStudentIds.length === 0 || isProcessing}
-                                className={styles.primaryButton}
-                                style={{ padding: '12px 24px', display: 'flex', alignItems: 'center', gap: '8px' }}
-                            >
-                                <FaExchangeAlt /> {isProcessing ? "Procesando..." : "Confirmar Transferencia"}
-                            </button>
+            {(tutorOrigen && tutorDestino) && (
+                <div style={{ 
+                    marginTop: '24px', 
+                    backgroundColor: '#eff6ff', 
+                    border: '2px solid #3b82f6',
+                    borderRadius: '12px',
+                    padding: '20px'
+                }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                            <h4 style={{ margin: 0, color: '#1e40af', fontSize: '1.1rem', fontWeight: '700' }}>
+                                <FaCheckCircle style={{ marginRight: '8px' }} />
+                                Resumen
+                            </h4>
+                            <p style={{ margin: '8px 0 0 0', fontSize: '0.95rem', color: '#475569' }}>
+                                Transferir <strong>{selectedStudentIds.length}</strong> estudiantes de{' '}
+                                <strong>{tutorOrigen.first_name} {tutorOrigen.last_name}</strong> a{' '}
+                                <strong>{tutorDestino.first_name} {tutorDestino.last_name}</strong>
+                            </p>
                         </div>
+                        <button
+                            onClick={handleTransfer}
+                            disabled={selectedStudentIds.length === 0 || isProcessing}
+                            style={{
+                                padding: '14px 28px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '10px',
+                                backgroundColor: selectedStudentIds.length === 0 || isProcessing ? '#cbd5e1' : '#3b82f6',
+                                color: '#ffffff',
+                                border: 'none',
+                                borderRadius: '8px',
+                                fontSize: '1rem',
+                                fontWeight: '600',
+                                cursor: selectedStudentIds.length === 0 || isProcessing ? 'not-allowed' : 'pointer'
+                            }}
+                        >
+                            <FaExchangeAlt /> {isProcessing ? "Procesando..." : "Confirmar"}
+                        </button>
                     </div>
-                )}
+                </div>
+            )}
 
-                {message && (
-                    <div className={styles.toast} style={{ position: 'fixed', bottom: '20px', right: '20px', backgroundColor: message.type === 'success' ? '#dcfce7' : '#fee2e2', color: message.type === 'success' ? '#166534' : '#991b1b', border: '1px solid currentColor' }}>
-                        <span>{message.text}</span>
-                        <button onClick={() => setMessage(null)} style={{ background: 'none', border: 'none', color: 'currentColor', marginLeft: '10px', cursor: 'pointer' }}>×</button>
-                    </div>
-                )}
-            </main>
+            {message && (
+                <div style={{ 
+                    position: 'fixed', 
+                    bottom: '20px', 
+                    right: '20px', 
+                    backgroundColor: message.type === 'success' ? '#dcfce7' : '#fee2e2', 
+                    color: message.type === 'success' ? '#166534' : '#991b1b', 
+                    border: `2px solid ${message.type === 'success' ? '#22c55e' : '#ef4444'}`,
+                    padding: '16px 20px',
+                    borderRadius: '12px',
+                    boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    zIndex: 1000
+                }}>
+                    {message.type === 'success' ? <FaCheckCircle size={20} /> : <FaInfoCircle size={20} />}
+                    <span style={{ fontWeight: '500' }}>{message.text}</span>
+                    <button 
+                        onClick={() => setMessage(null)} 
+                        style={{ 
+                            background: 'none', 
+                            border: 'none', 
+                            color: 'currentColor', 
+                            fontSize: '24px',
+                            cursor: 'pointer'
+                        }}
+                    >×</button>
+                </div>
+            )}
         </div>
     );
 }
