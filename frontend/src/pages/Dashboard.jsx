@@ -10,6 +10,7 @@ import styles from "../styles/pages/Dashboard.module.css";
 import AprobarRegistro from "../pages/admin/AprobarRegistro";
 import AsignacionTutorados from "../pages/admin/AsignacionTutorados";
 import CambioTutorados from "../pages/admin/CambioTutorados";
+import TutoriasHistoricas from "../pages/admin/TutoriasHistoricas";
 
 // Tutor Views
 import TutoradosList from "../pages/TutoradosList";
@@ -453,12 +454,7 @@ export default function Dashboard() {
                         )}
 
                         {activeAdminTab === 'reportes' && (
-                            <>
-                                <h3 className={styles.contentTitle}>Reportes</h3>
-                                <div className={styles.contentPlaceholder}>
-                                    <p>Generación de reportes de asistencia y desempeño (Próximamente).</p>
-                                </div>
-                            </>
+                            <TutoriasHistoricas embedded={true}/>
                         )}
                     </div>
                 </div>
