@@ -8,7 +8,7 @@ import TablaTutorias from "../../componentes/TablaTutorias";
 import DetalleTutoriaModal from "../../componentes/DetalleTutoriaModal";
 import BusquedaEstudiante from "../../componentes/BusquedaEstudiante";
 
-function TutoriasHistoricas({ roles }) {
+function TutoriasHistoricas({ embedded = false }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loadingAuth, setLoadingAuth] = useState(true);
 
@@ -202,6 +202,108 @@ function TutoriasHistoricas({ roles }) {
           Volver
         </button>
       </div>
+    );
+  }
+
+  // Si esta embebido, quitamos contenedor externo
+  if(embedded){
+    return(
+      <>
+        <header className={styles.header}>
+          <h1 className={styles.title}>Tutorías Históricas</h1>
+          <p className={styles.subtitle}>
+            Consulte registros de acompañamiento académico por semestre o por estudiante
+          </p>
+        </header>
+
+        <main className={styles.mainContent}>
+          {/* Selector de modo de busqueda */}
+          <BusquedaSelector
+            modo={modoBusqueda}
+            onChange={handleModoBusquedaChange}
+          />
+
+          {/* Contenido según el modo seleccionado */}
+          <div className={styles.searchContent}>
+            {modoBusqueda === "semestre" ? (
+              <>
+                <SemestreSelector
+                  semestres={semestres}
+                  onChange={handleSemestreChange}
+                  value={semestreSeleccionado}
+                />
+                {semestreSeleccionado && tutorias.length === 0 && !loading && (
+                  <div className={styles.emptyState}>
+                    <p>No se encontraron tutorías para el semestre seleccionado.</p>
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                <BusquedaEstudiante
+                  onBuscar = {handleBuscarPorEstudiante}
+                  onLimpiar = {handleLimpiarBusqueda}
+                  valores = {filtroEstudiante}
+                />
+                {tutorias.length === 0 && !loading && filtroEstudiante.codigo && (
+                  <div className={styles.emptyState}>
+                    <p>No se encontraron tutorías para el estudiante especificado.</p>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+
+          {/* Estados de carga y error */}
+          {loading && (
+            <div className={styles.loadingState}>
+              <div className={styles.loadingSpinner}></div>
+              <p>Cargando registros...</p>
+            </div>
+          )}
+
+          {error && !loading && (
+            <div className={styles.errorAlert}>
+              <p>{error}</p>
+              <button 
+                className={styles.dismissButton}
+                onClick={() => setError("")}
+              >
+                Cerrar
+              </button>
+            </div>
+          )}
+
+          {/* Mostrar resultados si hay tutorias */}
+          {tutorias.length > 0 && !loading && !error && (
+            <div className={styles.resultsSection}>
+              <TablaTutorias
+                tutorias={tutorias}
+                onVerDetalle={(tutoria) => cargarDetalleTutoria(tutoria.id)}
+                modo={modoBusqueda}
+                estudiantesCount={estudiantesCount}
+              />
+            </div>
+          )}
+
+          {/* Instrucciones iniciales */}
+          {tutorias.length === 0 && !loading && !error && (
+            <div className={styles.instructions}>
+              <p>
+                {modoBusqueda === "semestre"
+                  ? "Selecciona un semestre para consultar las tutorias realizadas."
+                  : "Ingrese los datos del estudiante para consultar su historial de tutorías."
+                }
+              </p>
+            </div>
+          )}
+        </main>
+
+        <DetalleTutoriaModal
+          tutoria={tutoriaSeleccionada}
+          onClose={() => setTutoriaSeleccionada(null)}
+        />
+      </>
     );
   }
 
