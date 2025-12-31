@@ -62,9 +62,9 @@ function Login() {
         api.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
 
         if (data.user.roles.administrador || data.user.roles.tutor || data.user.roles.verificador) {
-          navigate("/mainpage");
+          navigate("/dashboard");
         } else {
-          navigate("/mainpage");
+          navigate("/dashboard");
         }
       } else {
         setError(data.message || "Correo o contraseña incorrectos.");
