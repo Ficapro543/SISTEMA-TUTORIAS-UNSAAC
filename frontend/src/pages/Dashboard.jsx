@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import {
     FaCog, FaBook, FaFolderOpen, FaArrowRight,
     FaCalendarAlt, FaClock, FaUserCircle, FaHashtag, FaEnvelope, FaCheckCircle,
-    FaUserCheck, FaProjectDiagram, FaFileAlt, FaCaretDown, FaCaretUp, FaSignOutAlt, FaExchangeAlt
+    FaUserCheck, FaProjectDiagram, FaFileAlt, FaCaretDown, FaCaretUp, FaSignOutAlt,
+    FaExchangeAlt, FaShieldAlt
 } from "react-icons/fa";
 import styles from "../styles/pages/Dashboard.module.css";
 // Admin Views
@@ -30,7 +31,7 @@ export default function Dashboard() {
 
     // Navigation States
     const [activeTab, setActiveTab] = useState('inicio'); // 'inicio', 'admin', 'tutor', 'verificador'
-    const [activeAdminTab, setActiveAdminTab] = useState('reportes'); // 'validar', 'asignaciones', 'cambio', 'cronogramas', 'reportes'
+    const [activeAdminTab, setActiveAdminTab] = useState('reportes'); // 'validar', 'asignaciones', 'cambio', 'cronogramas', 'reportes','seguridad'
     const [activeTutorTab, setActiveTutorTab] = useState('tutorados'); // 'tutorados', 'sesiones', 'actividades'
     const [activeVerifierTab, setActiveVerifierTab] = useState('revision'); // 'revision', 'reportes', 'ficha'
 
@@ -266,6 +267,13 @@ export default function Dashboard() {
                             <FaFileAlt className={styles.subTabIcon} />
                             <span>Reportes</span>
                         </div>
+                        <div
+                            className={`${styles.subTab} ${activeAdminTab === 'seguridad' ? styles.subTabActive : ''}`}
+                            onClick={() => handleAdminSubTabClick('seguridad')}
+                        >
+                            <FaShieldAlt className={styles.subTabIcon} />
+                            <span>Seguridad</span>
+                        </div>
                     </div>
                 </div>
             )}
@@ -455,6 +463,15 @@ export default function Dashboard() {
 
                         {activeAdminTab === 'reportes' && (
                             <TutoriasHistoricas embedded={true}/>
+                        )}
+
+                        {activeAdminTab === 'seguridad' && (
+                            <>
+                                <h3 className={styles.contentTitle}>Seguridad</h3>
+                                <div className={styles.contentPlaceholder}>
+                                    <p>Sistema de Recuperación y Backup (Próximamente).</p>
+                                </div>
+                            </>                            
                         )}
                     </div>
                 </div>
