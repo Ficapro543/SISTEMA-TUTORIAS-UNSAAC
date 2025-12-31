@@ -194,6 +194,23 @@ ON cronogramas (tutor_user_id);
 -- FUNCIONES
 -- =========================
 
+CREATE OR REPLACE FUNCTION insertar_tutor_si_corresponde()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Verificar si el usuario tiene el rol 'tutor'
+    IF 'tutor' = ANY (NEW.roles) THEN
+
+        -- Insertar solo si no existe ya en tutores
+        INSERT INTO tutores (user_id, cubiculo)
+        VALUES (NEW.id, NULL)
+        ON CONFLICT (user_id) DO NOTHING;
+
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE OR REPLACE FUNCTION set_fecha_actualizacion()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -259,6 +276,11 @@ $$ LANGUAGE plpgsql;
 -- =========================
 -- TRIGGERS
 -- =========================
+
+CREATE TRIGGER trg_insertar_tutor
+AFTER INSERT ON users
+FOR EACH ROW
+EXECUTE FUNCTION insertar_tutor_si_corresponde();
 
 CREATE TRIGGER trg_update_fecha_tutoria
 BEFORE UPDATE ON tutorias
