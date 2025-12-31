@@ -1,9 +1,163 @@
 @import "tailwindcss";
-@import "./base/variables.css";
-@import "./base/globals.css";
-@import "./App.css";
 
-/* estilos extra adicionales */
-html, body, #root {
-  height: 100%;
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+/* Variables CSS - fuera de @theme */
+:root {
+  /* Paleta extraída del logo UNSAAC */
+  --background: 210 20% 98%;
+  --foreground: 230 70% 20%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 230 70% 20%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 230 70% 20%;
+
+  /* Azul primario del logo */
+  --primary: 230 70% 20%;
+  --primary-foreground: 0 0% 100%;
+
+  /* Azul secundario más claro */
+  --secondary: 220 60% 30%;
+  --secondary-foreground: 0 0% 100%;
+
+  --muted: 210 30% 96%;
+  --muted-foreground: 220 15% 45%;
+
+  /* Dorado/Amarillo del logo */
+  --accent: 45 70% 47%;
+  --accent-foreground: 230 70% 15%;
+
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 214 32% 91%;
+  --input: 214 32% 91%;
+  --ring: 230 70% 20%;
+
+  --radius: 0.5rem;
+
+  /* Panel de bienvenida - azul claro */
+  --info-panel: 205 80% 95%;
+  --info-panel-foreground: 230 70% 20%;
+
+  /* Header gradient */
+  --header-start: 230 70% 18%;
+  --header-end: 220 60% 25%;
+
+  --sidebar-background: 0 0% 98%;
+  --sidebar-foreground: 240 5% 26%;
+  --sidebar-primary: 230 70% 20%;
+  --sidebar-primary-foreground: 0 0% 98%;
+  --sidebar-accent: 210 30% 96%;
+  --sidebar-accent-foreground: 230 70% 20%;
+  --sidebar-border: 220 13% 91%;
+  --sidebar-ring: 230 70% 40%;
+}
+
+/* Tema oscuro */
+.dark {
+  --background: 230 50% 8%;
+  --foreground: 210 40% 98%;
+
+  --card: 230 50% 12%;
+  --card-foreground: 210 40% 98%;
+
+  --popover: 230 50% 12%;
+  --popover-foreground: 210 40% 98%;
+
+  --primary: 210 40% 98%;
+  --primary-foreground: 230 70% 20%;
+
+  --secondary: 220 40% 25%;
+  --secondary-foreground: 210 40% 98%;
+
+  --muted: 220 40% 20%;
+  --muted-foreground: 215 20% 65%;
+
+  --accent: 45 70% 50%;
+  --accent-foreground: 230 70% 10%;
+
+  --destructive: 0 63% 31%;
+  --destructive-foreground: 210 40% 98%;
+
+  --border: 220 40% 20%;
+  --input: 220 40% 20%;
+  --ring: 213 27% 84%;
+
+  --info-panel: 220 50% 15%;
+  --info-panel-foreground: 210 40% 98%;
+
+  --header-start: 230 70% 12%;
+  --header-end: 220 60% 18%;
+
+  --sidebar-background: 230 50% 10%;
+  --sidebar-foreground: 210 40% 96%;
+  --sidebar-primary: 220 76% 48%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 220 40% 16%;
+  --sidebar-accent-foreground: 210 40% 96%;
+  --sidebar-border: 220 40% 16%;
+  --sidebar-ring: 230 70% 60%;
+}
+
+/* EXTENDER el tema de Tailwind con nuestras variables */
+@theme {
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
+
+/* Estilos base */
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: ui-sans-serif, system-ui, sans-serif, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+}
+
+/* Utilidades personalizadas */
+@layer utilities {
+  .bg-header-gradient {
+    background: linear-gradient(135deg, hsl(var(--header-start)), hsl(var(--header-end)));
+  }
+  
+  .bg-info-gradient {
+    background: linear-gradient(135deg, hsl(var(--info-panel)), hsl(var(--info-panel) / 0.7));
+  }
 }

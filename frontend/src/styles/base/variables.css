@@ -1,19 +1,14 @@
+/* src/styles/base/variables.css */
 :root {
-  /* 🎨 Colores principales */
-  --color-primary: #004e92;
-  --color-secondary: #002147;
-  --color-text-dark: #222;
-  --color-text-light: #fff;
-  --color-border: #ccc;
+  /* 🎨 Solo colores que NO están en el Lovable */
   --color-gray: #444;
   --color-gray-light: #f3f3f3;
-
-  /* 🖋️ Tipografía */
+  
+  /* 🖋️ Tipografía - Mantener */
   --font-main: "Poppins", sans-serif;
-
-  /* 📏 Dimensiones y bordes */
-  --radius: 10px;
+  
+  /* 📏 Dimensiones y bordes - Mantener si los usas */
+  --radius: 10px; /* Nota: El Lovable usa 0.5rem (~8px) */
   --shadow: 0 10px 35px rgba(0, 0, 0, 0.35);
   --transition: 0.3s ease;
-
 }

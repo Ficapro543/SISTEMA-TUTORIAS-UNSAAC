@@ -31,8 +31,7 @@ function App() {
       <Route path="/registro" element={<Layout><Register /></Layout>} />
       <Route path="/confirmacion" element={<Layout><RegisterConfirmation /></Layout>} />
       <Route path="/verificado" element={<Layout><CuentaVerificada /></Layout>} />
-      <Route path="/solicitudes_registro" element={<Layout><AprobarRegistro /></Layout>} />
-      <Route path="/mainpage" element={<Layout><TutorDashboard /></Layout>} />
+      <Route path="/mainpage" element={<Layout><MainPage /></Layout>} />
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/asignaciones" element={<AsignacionTutorados />} />
       <Route path="/recuperar" element={<Layout><RecuperarPassword /></Layout>} />

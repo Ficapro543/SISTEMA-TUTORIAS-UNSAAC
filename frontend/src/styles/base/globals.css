@@ -1,5 +1,5 @@
-/*SOLO estilos globales universales*/
-@import "./variables.css";
+/* src/styles/base/globals.css */
+/* SOLO estilos que NO interfieran con Tailwind */
 
 /* 🔁 Reset básico */
 * {
@@ -8,48 +8,41 @@
   box-sizing: border-box;
 }
 
-/* 🌐 Estructura general */
+/* 🌐 Estructura general - SIN estilos que Tailwind maneja */
 html, body, #root {
   height: 100%;
-  font-family: var(--font-main);
-  background-color: var(--color-secondary);
-  color: var(--color-text-light);
+  /* NO poner background-color ni color aquí */
+  /* Tailwind se encarga en index.css */
 }
 
-/* Elementos comunes */
+/* Elementos comunes que Tailwind no cubre */
 a {
   text-decoration: none;
   color: inherit;
 }
 
-button, input{
-  font-family: inherit;
-  outline: none;
-  border: none;
-}
-
-/* 🧭 Scroll minimalista */
+/* 🧭 Scroll minimalista personalizado */
 ::-webkit-scrollbar {
   width: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--color-primary);
-  border-radius: var(--radius);
+  background-color: hsl(var(--primary)); /* Usar variable del Lovable */
+  border-radius: 0.5rem; /* Usar --radius del Lovable */
 }
 
-/*Utilidades globales*/
+/* Utilidades globales QUE NO EXISTEN EN TAILWIND */
 .text-center { text-align: center; }
 .flex { display: flex; }
 .hidden { display: none; }
 
-/*Botones base Globales*/
+/* Botones base Globales - solo si no usas los de Tailwind */
 .btn {
   padding: 12px 20px;
-  border-radius: var(--radius);
+  border-radius: 0.5rem;
   font-weight: 600;
   cursor: pointer;
-  transition: var(--transition);
+  transition: 0.3s ease;
 }
 
 .btn:hover{
@@ -57,19 +50,19 @@ button, input{
   transform: translateY(-2px);
 }
 
-/*Inputs base globales*/
+/* Inputs base globales - solo si no usas los de Tailwind */
 .input{
   width: 100%;
   padding: 12px 15px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.5rem;
   background: rgba(255, 255, 255, 0.9);
   font-size: 1rem;
-  transition: var(--transition);
+  transition: 0.3s ease;
 }
 
 .input:focus{
-  border-color: var(--color-primary);
-  box-shadow: 0 0 5px var(--color-primary);
-  background: var(--color-text-light);
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 5px hsl(var(--primary));
+  background: white;
 }

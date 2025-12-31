@@ -1,0 +1,5 @@
+.tailwind-component {
+  /* Asegurar que los estilos de Tailwind tengan prioridad */
+  all: unset;
+  /* Tailwind se encargará del resto */
+}
