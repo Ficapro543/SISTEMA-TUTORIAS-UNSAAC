@@ -323,52 +323,20 @@ async function getSemestresCerrados(req, res, next) {
 }
 
 async function getTutoriasPorSemestre(req, res, next) {
-  const { semestre, codigo_estudiante, nombre } = req.query;
+  const { semestre } = req.query;
 
   if (!semestre) {
     return res.status(400).json({ message: 'Semestre requerido' });
   }
 
   try {
-    let filtros = [];
-    let values = [];
-    let idx = 1;
-
-    // Semestre (obligatorio)
-    filtros.push(`c.semestre = $${idx}`);
-    values.push(semestre);
-    idx++;
-
-    // Solo tutorías realizadas
-    filtros.push(`c.estado = 'realizada'`);
-
-    // Solo fechas válidas
-    filtros.push(`c.fecha IS NOT NULL`);
-
-    // Filtro por código de estudiante
-    if (codigo_estudiante) {
-      filtros.push(`e.codigo_estudiante = $${idx}`);
-      values.push(codigo_estudiante);
-      idx++;
-    }
-
-    // Filtro por nombre o apellido
-    if (nombre) {
-      filtros.push(`(
-        LOWER(e.nombre_estudiante) LIKE LOWER($${idx})
-        OR LOWER(e.apellido_estudiante) LIKE LOWER($${idx})
-        )`);
-      values.push(`%${nombre}%`);
-      idx++;
-    }
-
     const query = `
       SELECT 
         t.id,
         CONCAT(e.nombre_estudiante, ' ', e.apellido_estudiante) AS estudiante,
         e.codigo_estudiante,
         CONCAT(u.first_name, ' ', u.last_name) AS tutor,
-        u.email as tutor_email,
+        u.email AS tutor_email,
         c.semestre,
         TO_CHAR(c.fecha, 'YYYY-MM-DD') AS fecha,
         c.hora,
@@ -381,21 +349,22 @@ async function getTutoriasPorSemestre(req, res, next) {
         t.modalidad,
         t.fecha_registro,
         t.fecha_actualizacion,
-        d.especialidad as derivacion_especialidad,
-        d.motivo as derivacion_motivo
+        d.especialidad AS derivacion_especialidad,
+        d.motivo AS derivacion_motivo
       FROM tutorias t
       INNER JOIN cronogramas c ON t.cronograma_id = c.id
       INNER JOIN tutores tu ON c.tutor_user_id = tu.user_id
       INNER JOIN users u ON tu.user_id = u.id
       INNER JOIN estudiante e ON c.codigo_estudiante = e.codigo_estudiante
       LEFT JOIN derivaciones d ON t.id = d.tutoria_id
-      WHERE ${filtros.join(' AND ')}
+      WHERE c.semestre = $1
+        AND c.estado = 'realizada'
+        AND c.fecha IS NOT NULL
       ORDER BY c.fecha DESC, t.fecha_registro DESC
     `;
 
-    const { rows } = await pool.query(query, values);
+    const { rows } = await pool.query(query, [semestre]);
 
-    // Formatear la respuesta de manera consistente
     const tutoriasFormateadas = rows.map(t => ({
       id: t.id,
       estudiante: t.estudiante,
