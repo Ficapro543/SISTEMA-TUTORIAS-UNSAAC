@@ -12,6 +12,7 @@ DELETE FROM refresh_tokens;
 DELETE FROM pending_users;
 DELETE FROM users;
 
+
 -- 2. INSERTAR USUARIOS (USERS)
 -- ===============================================================================================
 -- Se insertan 80 usuarios distribuidos en roles.
@@ -25,7 +26,20 @@ VALUES (
     'Castro Pari',
     '231865@unsaac.edu.pe',
     '$2b$10$IBJekPk8BR4mk4zgiZZz8.pMKo.Na92dk3s3KEcXAcir17wTnRAo2',
-    ARRAY['administador', 'evaluador', 'tutor'],
+    ARRAY['administrador', 'verificador', 'tutor'],
+    BOOLEAN 'true',
+    NOW()
+);
+
+-- Admin General con todos los roles
+INSERT INTO users (id, first_name, last_name, email, password_hash, roles, is_active, created_at)
+VALUES (
+    gen_random_uuid(),
+    'Admin',
+    'Sistema',
+    'admin@unsaac.edu.pe',
+    '$2b$10$IBJekPk8BR4mk4zgiZZz8.pMKo.Na92dk3s3KEcXAcir17wTnRAo2',
+    ARRAY['administrador', 'verificador', 'tutor'],
     BOOLEAN 'true',
     NOW()
 );
@@ -146,7 +160,7 @@ VALUES (
     'Trump Paredes',
     'rodrigo.trump@unsaac.edu.pe',
     '$2b$10$IBJekPk8BR4mk4zgiZZz8.pMKo.Na92dk3s3KEcXAcir17wTnRAo2',
-    ARRAY['evaluador', 'tutor'],
+    ARRAY['verificador', 'tutor'],
     BOOLEAN 'true',
     NOW()
 );

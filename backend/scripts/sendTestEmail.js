@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { sendMail, sendAdminApprovalEmail, sendUserActivationEmail } = require('../services/mailService');
+const { sendMail, sendAdminApprovalEmail, sendUserActivationEmail } = require('/src/services/mailService');
 
 (async () => {
   try {
