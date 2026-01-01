@@ -228,6 +228,50 @@ export default function Dashboard() {
                 )}
             </nav>
 
+            {/* Welcome Banner */}
+            <div className={styles.welcomeSection}>
+                <div className={styles.welcomeText}>
+                    <h1>¡Bienvenido!</h1>
+                    <h2>{user.first_name} {user.last_name}</h2>
+                    <p className={styles.subtitle}>Accede a las herramientas del sistema de tutorías</p>
+                </div>
+
+                {/* Profile Card (Right side of banner) */}
+                <div className={styles.profileCard}>
+                    <div className={styles.cardRow}>
+                        <div className={styles.iconContainer}>
+                            <FaHashtag />
+                        </div>
+                        <div className={styles.infoGroup}>
+                            <span className={styles.label}>Código</span>
+                            <span className={styles.value}>{user.code || "No asignado"}</span>
+                        </div>
+                    </div>
+
+                    <div className={styles.cardRow}>
+                        <div className={styles.iconContainer}>
+                            <FaEnvelope />
+                        </div>
+                        <div className={styles.infoGroup}>
+                            <span className={styles.label}>Correo</span>
+                            <span className={styles.value}>{user.email}</span>
+                        </div>
+                    </div>
+
+                    <div className={styles.cardRow}>
+                        <div className={`${styles.iconContainer} ${styles.iconYellow}`}>
+                            <FaCheckCircle />
+                        </div>
+                        <div className={styles.infoGroup}>
+                            <span className={styles.label}>Rol Actual</span>
+                            <span className={`${styles.value} ${styles.highlightValue}`}>
+                                {getRoleDisplay()}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             {/* Admin Secondary Navigation */}
             {activeTab === 'admin' && (
                 <div className={styles.secondaryNav}>
@@ -335,50 +379,6 @@ export default function Dashboard() {
                     </div>
                 </div>
             )}
-
-            {/* Welcome Banner */}
-            <div className={styles.welcomeSection}>
-                <div className={styles.welcomeText}>
-                    <h1>¡Bienvenido!</h1>
-                    <h2>{user.first_name} {user.last_name}</h2>
-                    <p className={styles.subtitle}>Accede a las herramientas del sistema de tutorías</p>
-                </div>
-
-                {/* Profile Card (Right side of banner) */}
-                <div className={styles.profileCard}>
-                    <div className={styles.cardRow}>
-                        <div className={styles.iconContainer}>
-                            <FaHashtag />
-                        </div>
-                        <div className={styles.infoGroup}>
-                            <span className={styles.label}>Código</span>
-                            <span className={styles.value}>{user.code || "No asignado"}</span>
-                        </div>
-                    </div>
-
-                    <div className={styles.cardRow}>
-                        <div className={styles.iconContainer}>
-                            <FaEnvelope />
-                        </div>
-                        <div className={styles.infoGroup}>
-                            <span className={styles.label}>Correo</span>
-                            <span className={styles.value}>{user.email}</span>
-                        </div>
-                    </div>
-
-                    <div className={styles.cardRow}>
-                        <div className={`${styles.iconContainer} ${styles.iconYellow}`}>
-                            <FaCheckCircle />
-                        </div>
-                        <div className={styles.infoGroup}>
-                            <span className={styles.label}>Rol Actual</span>
-                            <span className={`${styles.value} ${styles.highlightValue}`}>
-                                {getRoleDisplay()}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             {/* Content Area */}
 
