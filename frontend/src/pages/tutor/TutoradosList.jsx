@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { getMisTutorados } from '../services/tutorService';
-import { getActiveSemester } from '../services/assignmentService';
-import styles from '../styles/pages/TutorInterface.module.css';
+import { getMisTutorados } from '../../services/tutorService';
+import { getActiveSemester } from '../../services/assignmentService';
+import styles from '../../styles/pages/TutorInterface.module.css';
 
 const TutoradosList = () => {
     const [tutorados, setTutorados] = useState([]);
