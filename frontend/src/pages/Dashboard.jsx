@@ -8,20 +8,20 @@ import {
 } from "react-icons/fa";
 import styles from "../styles/pages/Dashboard.module.css";
 // Admin Views
-import AprobarRegistro from "../pages/admin/AprobarRegistro";
-import AsignacionTutorados from "../pages/admin/AsignacionTutorados";
-import CambioTutorados from "../pages/admin/CambioTutorados";
-import TutoriasHistoricas from "../pages/admin/TutoriasHistoricas";
+import AprobarRegistro from "./admin/AprobarRegistro";
+import AsignacionTutorados from "./admin/AsignacionTutorados";
+import CambioTutorados from "./admin/CambioTutorados";
+import TutoriasHistoricas from "./admin/TutoriasHistoricas";
 
 // Tutor Views
-import TutoradosList from "../pages/TutoradosList";
-import RegistrarSesion from "../pages/RegistrarSesion";
-import ActividadesList from "../pages/ActividadesList";
+import TutoradosList from "./tutor/TutoradosList";
+import RegistrarSesion from "./tutor/RegistrarSesion";
+import ActividadesList from "./tutor/ActividadesList";
 
 // Verifier Views
-import RevisionSesiones from "../pages/RevisionSesiones";
-import ReportesVerificador from "../pages/ReportesVerificador";
-import FichaTutoria from "../pages/FichaTutoria";
+import RevisionSesiones from "./verificador/RevisionSesiones";
+import ReportesVerificador from "./verificador/ReportesVerificador";
+import FichaTutoria from "./verificador/FichaTutoria";
 
 export default function Dashboard() {
     const navigate = useNavigate();

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { registrarSesion, getMisTutorados } from '../services/tutorService';
-import { getActiveSemester } from '../services/assignmentService';
-import styles from '../styles/pages/TutorInterface.module.css';
+import { registrarSesion, getMisTutorados } from '../../services/tutorService';
+import { getActiveSemester } from '../../services/assignmentService';
+import styles from '../../styles/pages/TutorInterface.module.css';
 import { FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
 
 const RegistrarSesion = () => {
