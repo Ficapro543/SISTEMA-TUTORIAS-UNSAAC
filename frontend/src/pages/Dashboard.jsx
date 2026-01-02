@@ -31,7 +31,7 @@ export default function Dashboard() {
 
     // Navigation States
     const [activeTab, setActiveTab] = useState('inicio'); // 'inicio', 'admin', 'tutor', 'verificador'
-    const [activeAdminTab, setActiveAdminTab] = useState('reportes'); // 'validar', 'asignaciones', 'cambio', 'cronogramas', 'reportes','seguridad'
+    const [activeAdminTab, setActiveAdminTab] = useState('validar'); // 'validar', 'asignaciones', 'cambio', 'cronogramas', 'reportes','seguridad'
     const [activeTutorTab, setActiveTutorTab] = useState('tutorados'); // 'tutorados', 'sesiones', 'actividades'
     const [activeVerifierTab, setActiveVerifierTab] = useState('estudiantes'); // 'estudiantes', 'consulta', 'seguimiento_est', 'seguimiento_tut'
 
