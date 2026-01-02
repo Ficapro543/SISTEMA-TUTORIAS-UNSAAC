@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 const assignmentRoutes = require('./routes/assignments');
+const tutoriasRoutes = require('./routes/tutorias');
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.get("/api/ping", (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/assignments', assignmentRoutes);
+app.use('/api/tutorias', tutoriasRoutes);
 app.use('/api/verificador', require('./routes/verificador'));
 
 app.use('/api/cronogramas', require('./routes/cronogramas'));

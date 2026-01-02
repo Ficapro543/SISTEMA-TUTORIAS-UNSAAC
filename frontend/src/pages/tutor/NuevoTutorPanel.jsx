@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Table,
     TableBody,
@@ -19,116 +19,17 @@ import Textarea from '../../componentes/ui/Textarea';
 import Label from '../../componentes/ui/Label';
 import { RadioGroup, RadioGroupItem } from '../../componentes/ui/RadioGroup';
 import { Plus, Pencil, Printer, Check, CornerDownLeft, Loader2 } from '../../componentes/ui/icons';
-import styles from '../../styles/pages/NuevoTutorPanel.module.css';
-
-// Mock data basado en las tablas de la BDD
-const mockCronogramas = [
-    {
-        id: '1',
-        fecha: '12/02/25',
-        horaInicio: '10:00',
-        horaFin: '10:15',
-        aula: '201',
-        estudiante: { codigo: '184521', nombre: 'Carlo Rodriguez Mamani' },
-        tutoria: {
-            id: 't1',
-            obsAcademico: 'El estudiante presenta buen rendimiento en cálculo pero dificultades en programación.',
-            obsPersonal: 'Se muestra motivado pero con algo de estrés por la carga académica.',
-            obsProfesional: 'Interesado en desarrollo web, busca orientación para prácticas.',
-            requiereDerivacion: false,
-            fechaRegistro: '10:03 a.m. - 12/02/2025',
-        },
-    },
-    {
-        id: '2',
-        fecha: '12/02/25',
-        horaInicio: '10:15',
-        horaFin: '10:30',
-        aula: '201',
-        estudiante: { codigo: '184522', nombre: 'Ana Quispe Torres' },
-        tutoria: {
-            id: 't2',
-            obsAcademico: 'Excelente rendimiento general, destaca en bases de datos.',
-            obsPersonal: 'Buena adaptación universitaria.',
-            obsProfesional: 'Orientada hacia análisis de datos.',
-            requiereDerivacion: false,
-            fechaRegistro: '10:18 a.m. - 12/02/2025',
-        },
-    },
-    {
-        id: '3',
-        fecha: '12/02/25',
-        horaInicio: '10:30',
-        horaFin: '10:45',
-        aula: '201',
-        estudiante: { codigo: '184523', nombre: 'José Huamán Ccopa' },
-        tutoria: {
-            id: 't3',
-            obsAcademico: 'Presenta dificultades en matemáticas, requiere apoyo adicional.',
-            obsPersonal: 'Muestra signos de ansiedad ante los exámenes.',
-            obsProfesional: 'Aún no tiene definida su orientación profesional.',
-            requiereDerivacion: true,
-            especialidad: 'Departamento de Psicología',
-            motivo: 'Ansiedad académica que afecta su rendimiento en evaluaciones.',
-            fechaRegistro: '10:35 a.m. - 12/02/2025',
-        },
-    },
-    {
-        id: '4',
-        fecha: '12/02/25',
-        horaInicio: '10:45',
-        horaFin: '11:00',
-        aula: '201',
-        estudiante: { codigo: '184524', nombre: 'Lucía Ramos Quispe' },
-        tutoria: {
-            id: 't4',
-            obsAcademico: 'Buen desempeño en programación orientada a objetos.',
-            obsPersonal: 'Equilibrio entre vida académica y personal.',
-            obsProfesional: 'Interés en inteligencia artificial.',
-            requiereDerivacion: false,
-            fechaRegistro: '10:48 a.m. - 12/02/2025',
-        },
-    },
-    {
-        id: '5',
-        fecha: '12/02/25',
-        horaInicio: '11:00',
-        horaFin: '11:15',
-        aula: '201',
-        estudiante: { codigo: '200932', nombre: 'Miguel Condori Apaza' },
-    },
-    {
-        id: '6',
-        fecha: '12/02/25',
-        horaInicio: '11:15',
-        horaFin: '11:30',
-        aula: '201',
-        estudiante: { codigo: '184526', nombre: 'Elena Torres Mendoza' },
-    },
-    {
-        id: '7',
-        fecha: '12/02/25',
-        horaInicio: '11:45',
-        horaFin: '12:00',
-        aula: '201',
-        estudiante: { codigo: '184527', nombre: 'Bruno Cáceres Vilca' },
-    },
-    {
-        id: '8',
-        fecha: '12/02/25',
-        horaInicio: '12:00',
-        horaFin: '12:15',
-        aula: '201',
-        estudiante: { codigo: '184528', nombre: 'Sofía Mendoza Chávez' },
-    },
-];
+import styles from './NuevoTutorPanel.module.css';
+import { getTutorias, registrarTutoria, actualizarTutoria } from '../../services/tutorService';
 
 const NuevoTutorPanel = () => {
-    const [cronogramas, setCronogramas] = useState(mockCronogramas);
+    const [cronogramas, setCronogramas] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [selectedCronograma, setSelectedCronograma] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [downloadingId, setDownloadingId] = useState(null);
+    const [submitting, setSubmitting] = useState(false);
 
     // Form state
     const [obsAcademico, setObsAcademico] = useState('');
@@ -138,9 +39,51 @@ const NuevoTutorPanel = () => {
     const [especialidad, setEspecialidad] = useState('Departamento de Psicología');
     const [motivo, setMotivo] = useState('');
 
-    // Get user from localStorage (assuming it's stored from login)
+    // Get user from localStorage
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const userName = user.nombres || user.first_name || 'Usuario';
+    const tutorId = user.id || user.user_id; // Ajustar según lo que guarde el login
+
+    // Cargar datos reales
+    const fetchTutorias = async () => {
+        if (!tutorId) return;
+        setLoading(true);
+        try {
+            const data = await getTutorias(tutorId);
+            // Mapeo de datos del backend a la estructura usada en el frontend
+            const formattedData = data.map(item => ({
+                id: item.cronograma_id,
+                fecha: new Date(item.fecha).toLocaleDateString('es-PE'),
+                horaInicio: item.hora.substring(0, 5), // '10:00:00' -> '10:00'
+                horaFin: item.hora.substring(0, 5),
+                aula: item.aula,
+                estudiante: {
+                    codigo: item.codigo_estudiante,
+                    nombre: `${item.nombre_estudiante} ${item.apellido_estudiante}`
+                },
+                tutoria: item.tutoria_id ? {
+                    id: item.tutoria_id,
+                    obsAcademico: item.obs_academico,
+                    obsPersonal: item.obs_personal,
+                    obsProfesional: item.obs_profesional,
+                    requiereDerivacion: item.requiere_derivacion,
+                    especialidad: item.derivacion_especialidad,
+                    motivo: item.derivacion_motivo,
+                    fechaRegistro: 'Registrado' // Fecha real podría venir del backend
+                } : null
+            }));
+            setCronogramas(formattedData);
+        } catch (error) {
+            console.error("Error cargando tutorías:", error);
+            // alert("Error al cargar las tutorías."); // Opcional: mostrar error visual
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchTutorias();
+    }, [tutorId]);
 
     const openRegisterDialog = (cronograma) => {
         setSelectedCronograma(cronograma);
@@ -158,69 +101,84 @@ const NuevoTutorPanel = () => {
         setSelectedCronograma(cronograma);
         setIsEditing(true);
         if (cronograma.tutoria) {
-            setObsAcademico(cronograma.tutoria.obsAcademico);
-            setObsPersonal(cronograma.tutoria.obsPersonal);
-            setObsProfesional(cronograma.tutoria.obsProfesional);
-            setRequiereDerivacion(cronograma.tutoria.requiereDerivacion);
+            setObsAcademico(cronograma.tutoria.obsAcademico || '');
+            setObsPersonal(cronograma.tutoria.obsPersonal || '');
+            setObsProfesional(cronograma.tutoria.obsProfesional || '');
+            setRequiereDerivacion(cronograma.tutoria.requiereDerivacion || false);
             setEspecialidad(cronograma.tutoria.especialidad || 'Departamento de Psicología');
             setMotivo(cronograma.tutoria.motivo || '');
         }
         setIsDialogOpen(true);
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!selectedCronograma) return;
+        setSubmitting(true);
 
-        const now = new Date();
-        const fechaRegistro = `${now.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })} - ${now.toLocaleDateString('es-PE')}`;
-
-        const newTutoria = {
-            id: `t${Date.now()}`,
-            obsAcademico,
-            obsPersonal,
-            obsProfesional,
-            requiereDerivacion,
-            especialidad: requiereDerivacion ? especialidad : undefined,
-            motivo: requiereDerivacion ? motivo : undefined,
-            fechaRegistro: isEditing && selectedCronograma.tutoria
-                ? selectedCronograma.tutoria.fechaRegistro
-                : fechaRegistro,
+        const payload = {
+            cronograma_id: selectedCronograma.id,
+            obs_academico: obsAcademico,
+            obs_personal: obsPersonal,
+            obs_profesional: obsProfesional,
+            requiere_derivacion: requiereDerivacion,
+            derivacion: requiereDerivacion ? {
+                especialidad,
+                motivo
+            } : null
         };
 
-        setCronogramas((prev) =>
-            prev.map((c) =>
-                c.id === selectedCronograma.id ? { ...c, tutoria: newTutoria } : c
-            )
-        );
-
-        setIsDialogOpen(false);
-        alert(
-            `${isEditing ? 'Tutoría actualizada' : 'Tutoría registrada'}\nLa tutoría de ${selectedCronograma.estudiante.nombre} ha sido ${isEditing ? 'actualizada' : 'registrada'} correctamente.`
-        );
+        try {
+            if (isEditing && selectedCronograma.tutoria) {
+                // Actualizar
+                await actualizarTutoria(selectedCronograma.tutoria.id, payload);
+                alert('Tutoría actualizada correctamente');
+            } else {
+                // Registrar nueva
+                await registrarTutoria(payload);
+                alert('Tutoría registrada correctamente');
+            }
+            setIsDialogOpen(false);
+            fetchTutorias(); // Refrescar tabla
+        } catch (error) {
+            console.error("Error guardando tutoría:", error);
+            alert("Error al guardar la operación.");
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     const handleDownload = async (cronograma) => {
+        // En un futuro, esto llamaría a un endpoint de generación de PDF real
         setDownloadingId(cronograma.id);
+        console.log("Generando constancia para:", cronograma.id);
 
-        // Simular descarga
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-
-        alert(`Constancia generada\nLa constancia de ${cronograma.estudiante.nombre} está lista para descargar.`);
-
+        await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulación de espera de red
+        alert(`Constancia generada para ${cronograma.estudiante.nombre}`);
         setDownloadingId(null);
     };
 
-    const formatHora = (horaInicio, horaFin) => {
-        return `${horaInicio} - ${horaFin} a.m.`;
+    const formatHora = (hora) => {
+        return `${hora} a.m.`;
     };
 
     const handleRadioChange = (value) => {
         setRequiereDerivacion(value === 'si');
     };
 
+    if (loading) {
+        return (
+            <div className={styles.container}>
+                <div className={styles.welcomeCard}>
+                    <h2 className={styles.welcomeTitle}>Cargando...</h2>
+                    <Loader2 className={`${styles.icon} animate-spin`} />
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className={styles.container}>
-            
+
             {/* Table */}
             <div className={styles.tableCard}>
                 <Table>
@@ -234,65 +192,73 @@ const NuevoTutorPanel = () => {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {cronogramas.map((cronograma, index) => (
-                            <TableRow
-                                key={cronograma.id}
-                                className={index % 2 === 0 ? styles.evenRow : styles.oddRow}
-                            >
-                                <TableCell className={styles.fontMedium}>{cronograma.fecha}</TableCell>
-                                <TableCell>{formatHora(cronograma.horaInicio, cronograma.horaFin)}</TableCell>
-                                <TableCell>Aula {cronograma.aula}</TableCell>
-                                <TableCell>
-                                    <div>
-                                        <p className={styles.fontMedium}>{cronograma.estudiante.nombre}</p>
-                                        <p className={styles.codigoText}>Código: {cronograma.estudiante.codigo}</p>
-                                    </div>
+                        {cronogramas.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={5} className="text-center py-8">
+                                    No hay tutorías programadas.
                                 </TableCell>
-                                <TableCell>
-                                    <div className={styles.actionsCell}>
-                                        {cronograma.tutoria ? (
-                                            <>
-                                                <Button
-                                                    size="sm"
-                                                    variant="accent"
-                                                    onClick={() => openEditDialog(cronograma)}
-                                                >
-                                                    <Pencil className={styles.icon} />
-                                                    Editar Tutoría
-                                                </Button>
+                            </TableRow>
+                        ) : (
+                            cronogramas.map((cronograma, index) => (
+                                <TableRow
+                                    key={cronograma.id}
+                                    className={index % 2 === 0 ? styles.evenRow : styles.oddRow}
+                                >
+                                    <TableCell className={styles.fontMedium}>{cronograma.fecha}</TableCell>
+                                    <TableCell>{formatHora(cronograma.horaInicio)}</TableCell>
+                                    <TableCell>Aula {cronograma.aula}</TableCell>
+                                    <TableCell>
+                                        <div>
+                                            <p className={styles.fontMedium}>{cronograma.estudiante.nombre}</p>
+                                            <p className={styles.codigoText}>Código: {cronograma.estudiante.codigo}</p>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className={styles.actionsCell}>
+                                            {cronograma.tutoria ? (
+                                                <>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="accent"
+                                                        onClick={() => openEditDialog(cronograma)}
+                                                    >
+                                                        <Pencil className={styles.icon} />
+                                                        Editar Tutoría
+                                                    </Button>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="primary"
+                                                        onClick={() => handleDownload(cronograma)}
+                                                        disabled={downloadingId === cronograma.id}
+                                                    >
+                                                        {downloadingId === cronograma.id ? (
+                                                            <>
+                                                                <Loader2 className={styles.icon} />
+                                                                ...
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <Printer className={styles.icon} />
+                                                                Imprimir
+                                                            </>
+                                                        )}
+                                                    </Button>
+                                                </>
+                                            ) : (
                                                 <Button
                                                     size="sm"
                                                     variant="primary"
-                                                    onClick={() => handleDownload(cronograma)}
-                                                    disabled={downloadingId === cronograma.id}
+                                                    onClick={() => openRegisterDialog(cronograma)}
                                                 >
-                                                    {downloadingId === cronograma.id ? (
-                                                        <>
-                                                            <Loader2 className={styles.icon} />
-                                                            Descargando...
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <Printer className={styles.icon} />
-                                                            Imprimir Constancia
-                                                        </>
-                                                    )}
+                                                    <Plus className={styles.icon} />
+                                                    Registrar Tutoría
                                                 </Button>
-                                            </>
-                                        ) : (
-                                            <Button
-                                                size="sm"
-                                                variant="primary"
-                                                onClick={() => openRegisterDialog(cronograma)}
-                                            >
-                                                <Plus className={styles.icon} />
-                                                Registrar Tutoría
-                                            </Button>
-                                        )}
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                        ))}
+                                            )}
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        )}
                     </TableBody>
                 </Table>
             </div>
@@ -340,19 +306,15 @@ const NuevoTutorPanel = () => {
                                 <div>
                                     <Label className={styles.labelMuted}>Hora:</Label>
                                     <Input
-                                        value={formatHora(selectedCronograma.horaInicio, selectedCronograma.horaFin)}
+                                        value={formatHora(selectedCronograma.horaInicio)}
                                         disabled
                                         className={styles.inputDisabled}
                                     />
                                 </div>
                                 <div>
-                                    <Label className={styles.labelMuted}>Fecha Registro:</Label>
+                                    <Label className={styles.labelMuted}>Estado:</Label>
                                     <Input
-                                        value={
-                                            isEditing && selectedCronograma.tutoria
-                                                ? selectedCronograma.tutoria.fechaRegistro
-                                                : new Date().toLocaleString('es-PE')
-                                        }
+                                        value={isEditing ? "Registrada" : "Pendiente"}
                                         disabled
                                         className={styles.inputDisabled}
                                     />
@@ -449,17 +411,19 @@ const NuevoTutorPanel = () => {
                                     variant="primary"
                                     onClick={handleSubmit}
                                     className={styles.flexOne}
+                                    disabled={submitting}
                                 >
-                                    <Check className={styles.icon} />
-                                    Confirmar
+                                    {submitting ? <Loader2 className="animate-spin" /> : <Check className={styles.icon} />}
+                                    {isEditing ? 'Guardar Cambios' : 'Confirmar Registro'}
                                 </Button>
                                 <Button
                                     variant="outline"
                                     onClick={() => setIsDialogOpen(false)}
                                     className={styles.flexOne}
+                                    disabled={submitting}
                                 >
                                     <CornerDownLeft className={styles.icon} />
-                                    Volver atrás
+                                    Cancelar
                                 </Button>
                             </div>
                         </div>
