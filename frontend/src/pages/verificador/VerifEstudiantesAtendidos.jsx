@@ -43,10 +43,15 @@ const VerifEstudiantesAtendidos = () => {
         // No limpiamos data aquí para evitar parpadeo feo, o si prefieres limpiar: setData([]); 
 
         try {
+            // FIX HU-VER-01: Backend espera opcional para todos
             const params = {
-                semestre: filters.semestre,
-                estado: filters.estado
+                semestre: filters.semestre
             };
+
+            // Solo agregar estado si NO es "Todos"
+            if (filters.estado && filters.estado !== 'Todos') {
+                params.estado = filters.estado;
+            }
 
             const url = '/verificador/estudiantes';
             console.log("GET verificador/estudiantes URL:", url, "Params:", params);

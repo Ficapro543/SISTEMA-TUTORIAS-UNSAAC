@@ -1,36 +1,8 @@
 const pool = require('../db/pool');
 
-// TEMPORAL: Descubrir esquema de BD
-async function getSchema(req, res) {
-    try {
-        const tablesQuery = `
-            SELECT table_name 
-            FROM information_schema.tables 
-            WHERE table_schema = 'public' 
-            ORDER BY table_name;
-        `;
-        const columnsQuery = `
-            SELECT table_name, column_name, data_type 
-            FROM information_schema.columns 
-            WHERE table_schema = 'public' 
-            ORDER BY table_name, ordinal_position;
-        `;
-
-        const tables = await pool.query(tablesQuery);
-        const columns = await pool.query(columnsQuery);
-
-        res.json({
-            tables: tables.rows,
-            columns: columns.rows
-        });
-    } catch (error) {
-        console.error('Error getSchema:', error);
-        res.status(500).json({ error: error.message });
-    }
-}
 
 // HU-VER-01: Control de estudiantes atendidos y pendientes
-// GET /api/verificador/estudiantes?semestre=2025-2&estado=Atendido|Pendiente
+// Query Params: semestre (req), estado (opt, 'Atendido'|'Pendiente'|'Todos'|'')
 async function getEstudiantesPorSemestreEstado(req, res) {
     try {
         const { semestre, estado } = req.query;
@@ -43,34 +15,35 @@ async function getEstudiantesPorSemestreEstado(req, res) {
         let whereClause = 'c.semestre = $1';
         let paramIndex = 2;
 
-        // Si estado es "Todos" o vacío, no filtramos por estado.
-        // Si viene Atendido/Pendiente, mapeamos a realizada/programada
+        // Si estado viene y NO es vacío ni 'Todos', filtramos.
         if (estado && estado !== 'Todos') {
             const est = estado.toLowerCase();
             let estadoDB = null;
-            if (est === 'atendido') estadoDB = 'realizada';
-            else if (est === 'pendiente') estadoDB = 'programada';
+
+            // Mapeo: 'Atendido' -> 'realizada', 'Pendiente' -> 'programada'
+            if (est === 'atendido' || est === 'realizada') estadoDB = 'realizada';
+            else if (est === 'pendiente' || est === 'programada') estadoDB = 'programada';
 
             if (estadoDB) {
-                whereClause += ` AND c.estado = $${paramIndex}`;
+                whereClause += ` AND c.estado = $${paramIndex} `;
                 params.push(estadoDB);
                 paramIndex++;
             }
         }
 
         const query = `
-      SELECT DISTINCT ON (c.codigo_estudiante)
-        c.codigo_estudiante AS codigo,
-        CONCAT(e.nombre_estudiante, ' ', e.apellido_estudiante) AS nombre,
-        (c.fecha + c.hora) AS fecha_atencion,
-        CONCAT(u.first_name, ' ', u.last_name) AS tutor,
-        c.estado
+      SELECT DISTINCT ON(c.codigo_estudiante)
+c.codigo_estudiante AS codigo,
+    CONCAT(e.nombre_estudiante, ' ', e.apellido_estudiante) AS nombre,
+        TO_CHAR((c.fecha + c.hora), 'YYYY-MM-DD HH24:MI') AS fecha_atencion,
+            CONCAT(u.first_name, ' ', u.last_name) AS tutor,
+                c.estado
       FROM cronogramas c
       JOIN estudiante e ON e.codigo_estudiante = c.codigo_estudiante
       JOIN users u ON u.id = c.tutor_user_id
       WHERE ${whereClause}
       ORDER BY c.codigo_estudiante, (c.fecha + c.hora) DESC;
-    `;
+`;
 
         const { rows } = await pool.query(query, params);
         return res.json(rows);
@@ -80,11 +53,11 @@ async function getEstudiantesPorSemestreEstado(req, res) {
     }
 }
 
-// HU-VER-02: Consulta de tutorías por semestre, tipo y tutor
-// GET /api/verificador/tutorias?semestre=...&tipo=...&tutor=...
+// HU-VER-02: Consulta de tutorías por semestre y tipo
+// Query Params: semestre (req), tipo (opt), tutor_id (opt)
 async function getTutoriasPorSemestre(req, res) {
     try {
-        const { semestre, tipo, tutor } = req.query;
+        const { semestre, tipo, tutor_id } = req.query;
 
         if (!semestre) {
             return res.status(400).json({ message: 'El parámetro "semestre" es obligatorio.' });
@@ -94,73 +67,96 @@ async function getTutoriasPorSemestre(req, res) {
         let whereClause = 'c.semestre = $1';
         let paramIndex = 2;
 
-        if (tipo && tipo !== 'Todos') {
-            whereClause += ` AND c.tipo_tutoria = $${paramIndex}`;
-            params.push(tipo);
+        // Filtro por ID de Tutor si viene
+        if (tutor_id && tutor_id !== 'Todos') {
+            whereClause += ` AND c.tutor_user_id = $${paramIndex} `;
+            params.push(tutor_id);
             paramIndex++;
         }
 
-        // tutor viene como nombre "Dr. Juan", pero necesitamos ID o búsqueda.
-        // Asumo que el frontend enviará el NOMBRE exacto o filtraremos por string match si no hay ID.
-        // Dado el mock anterior, el frontend enviaba nombres. Lo ideal es ID.
-        // Voy a intentar coincidencia parcial con nombre si no es ID, o exacto.
-        if (tutor && tutor !== 'Todos') {
-            whereClause += ` AND CONCAT(u.first_name, ' ', u.last_name) = $${paramIndex}`;
-            params.push(tutor);
-            paramIndex++;
+        // Tipo: Logica JS vs SQL. Como 'tipo' es inferido, es mejor filtrar en SQL si es posible o en JS.
+        // Dado el CASE, en SQL sería: AND (CASE ... END) = $param.
+        // Pero para simplificar y asegurar compatibilidad, filtraremos en memoria si no resulta muy pesado,
+        // O implementamos el CASE en el WHERE. Implementaré CASE en WHERE para eficiencia.
+
+        let tipoWhere = "";
+        let tipoParamVal = null;
+
+        if (tipo && tipo !== 'Todos') {
+            // 'Académica', 'Personal', 'Profesional'
+            if (tipo === 'Académica') {
+                tipoWhere = ` AND(t.obs_academico IS NOT NULL AND t.obs_academico <> '')`;
+            } else if (tipo === 'Personal') {
+                tipoWhere = ` AND(t.obs_personal IS NOT NULL AND t.obs_personal <> '')`;
+            } else if (tipo === 'Profesional') {
+                tipoWhere = ` AND(t.obs_profesional IS NOT NULL AND t.obs_profesional <> '')`;
+            }
         }
 
         const query = `
-            SELECT 
-                CONCAT(e.nombre_estudiante, ' ', e.apellido_estudiante) AS estudiante,
-                CONCAT(u.first_name, ' ', u.last_name) AS tutor,
-                c.tipo_tutoria AS tipo,
-                c.fecha,
-                c.estado
+SELECT
+c.codigo_estudiante,
+    CONCAT(e.nombre_estudiante, ' ', e.apellido_estudiante) AS estudiante_nombre_completo,
+        CONCAT(u.first_name, ' ', u.last_name) AS tutor_nombre_completo,
+            c.semestre,
+            TO_CHAR(c.fecha, 'YYYY-MM-DD') as fecha,
+            TO_CHAR(c.hora, 'HH24:MI') as hora,
+            c.estado,
+            CASE 
+                    WHEN t.obs_academico IS NOT NULL AND t.obs_academico <> '' THEN 'Académica'
+                    WHEN t.obs_personal IS NOT NULL AND t.obs_personal <> '' THEN 'Personal'
+                    WHEN t.obs_profesional IS NOT NULL AND t.obs_profesional <> '' THEN 'Profesional'
+                    ELSE 'Sin registro'
+END as tipo
             FROM cronogramas c
             JOIN estudiante e ON e.codigo_estudiante = c.codigo_estudiante
             JOIN users u ON u.id = c.tutor_user_id
-            WHERE ${whereClause}
+            LEFT JOIN tutorias t ON t.cronograma_id = c.id
+            WHERE ${whereClause} ${tipoWhere}
             ORDER BY c.fecha DESC, c.hora DESC
         `;
 
         const { rows } = await pool.query(query, params);
-        return res.json(rows);
+
+        // Mapeo final para frontend (normalización de nombres de keys si se requiere, pero usaré los del query)
+        // Frontend espera: estudiante, tutor, tipo, fecha, estado.
+        const result = rows.map(r => ({
+            estudiante: r.estudiante_nombre_completo,
+            tutor: r.tutor_nombre_completo,
+            tipo: r.tipo,
+            fecha: `${r.fecha} ${r.hora} `,
+            estado: r.estado
+        }));
+
+        return res.json(result);
     } catch (error) {
         console.error('Error getTutoriasPorSemestre:', error);
         return res.status(500).json({ message: 'Error interno del servidor' });
     }
 }
 
-// HU-VER-03: Seguimiento individual - BUSCAR
-// GET /api/verificador/estudiantes/buscar?q=...
+// HU-VER-03: Buscar estudiante
 async function buscarEstudiante(req, res) {
     try {
         const { q } = req.query;
-        if (!q) return res.json([]);
+        if (!q) {
+            return res.status(400).json({ message: 'Término de búsqueda requerido' });
+        }
 
-        // Búsqueda por código o nombre
+        // Buscar por código exacto o parcial, o por nombre/apellido
         const query = `
             SELECT 
-                e.codigo_estudiante AS codigo,
-                CONCAT(e.nombre_estudiante, ' ', e.apellido_estudiante) AS nombre,
-                e.escuela_profesional AS escuela,
-                e.email_institucional AS email,
-                -- Intentar obtener el tutor actual (último asignado o de la última sesión)
-                (
-                    SELECT CONCAT(u.first_name, ' ', u.last_name)
-                    FROM cronogramas c2
-                    JOIN users u ON u.id = c2.tutor_user_id
-                    WHERE c2.codigo_estudiante = e.codigo_estudiante
-                    ORDER BY c2.fecha DESC LIMIT 1
-                ) as tutor_actual
+                codigo_estudiante, 
+                nombre_estudiante, 
+                apellido_estudiante
             FROM estudiante e
-            WHERE e.codigo_estudiante ILIKE $1 OR 
-                  CONCAT(e.nombre_estudiante, ' ', e.apellido_estudiante) ILIKE $1
-            LIMIT 10
+            WHERE 
+                e.codigo_estudiante ILIKE '%' || $1 || '%' 
+                OR (e.nombre_estudiante || ' ' || e.apellido_estudiante) ILIKE '%' || $1 || '%'
+            LIMIT 20
         `;
 
-        const { rows } = await pool.query(query, [`%${q}%`]);
+        const { rows } = await pool.query(query, [q]);
         return res.json(rows);
 
     } catch (error) {
@@ -169,51 +165,76 @@ async function buscarEstudiante(req, res) {
     }
 }
 
-// HU-VER-03: Seguimiento individual - HISTORIAL
-// GET /api/verificador/estudiantes/:codigo/historial
+// HU-VER-03: Historial estudiante
 async function getHistorialEstudiante(req, res) {
     try {
         const { codigo } = req.params;
+        const { semestre } = req.query; // Opcional
 
-        const query = `
+        let query = `
             SELECT 
-                c.fecha,
-                c.tipo_tutoria AS tipo,
-                CONCAT(u.first_name, ' ', u.last_name) AS tutor,
+                c.fecha AS fecha_raw,
+                TO_CHAR(c.fecha, 'YYYY-MM-DD') as fecha,
+                TO_CHAR(c.hora, 'HH24:MI') as hora,
+                c.semestre,
+                c.ambiente,
                 c.estado,
-                c.observacion AS observaciones
+                CONCAT(u.first_name, ' ', u.last_name) AS tutor,
+                t.modalidad,
+                t.resumen_general,
+                t.requiere_derivacion,
+                CASE 
+                    WHEN t.obs_academico IS NOT NULL AND t.obs_academico <> '' THEN 'Académica'
+                    WHEN t.obs_personal IS NOT NULL AND t.obs_personal <> '' THEN 'Personal'
+                    WHEN t.obs_profesional IS NOT NULL AND t.obs_profesional <> '' THEN 'Profesional'
+                    ELSE 'Individual'
+                END as tipo
             FROM cronogramas c
             JOIN users u ON u.id = c.tutor_user_id
+            LEFT JOIN tutorias t ON t.cronograma_id = c.id
             WHERE c.codigo_estudiante = $1
-            ORDER BY c.fecha DESC
         `;
 
-        const { rows } = await pool.query(query, [codigo]);
-        return res.json(rows);
+        // Mantener codigo como texto explícitamente si es necesario en drivers viejos,
+        // pero pg con string funciona.
+        const params = [codigo];
+
+        if (semestre) {
+            query += ` AND c.semestre = $2`;
+            params.push(semestre);
+        }
+
+        query += ` ORDER BY c.fecha DESC, c.hora DESC`;
+
+        const { rows } = await pool.query(query, params);
+
+        // Formateo final
+        const result = rows.map(r => ({
+            fecha: `${r.fecha} ${r.hora}`,
+            tipo: r.tipo,
+            tutor: r.tutor,
+            estado: r.estado,
+            modalidad: r.modalidad,
+            observaciones: r.resumen_general || '-'
+        }));
+
+        return res.json(result);
     } catch (error) {
         console.error('Error getHistorialEstudiante:', error);
         return res.status(500).json({ message: 'Error interno del servidor' });
     }
 }
 
-// HU-VER-04: Seguimiento tutor - LISTA TUTORES
-// GET /api/verificador/tutores
+// HU-VER-04: Lista Tutores
 async function getTutores(req, res) {
     try {
-        // Obtener usuarios con rol 'tutor'. 
-        // Asumiendo que hay una columna o tabla de roles, o un filtro en users.
-        // Dado el esquema usual, quizá roles está en users.roles o tabla separada.
-        // Voy a asumir que puedo filtrar por roles->>'tutor' si es JSONB, o join con roles.
-        // Como no tengo el esquema exacto de roles, voy a buscar usuarios que estén en la tabla de cronogramas como tutores, para asegurar que existan.
-        // O mejor: SELECT * FROM users WHERE roles->>'tutor' = 'true' (si es el patrón comun)
-        // Usaré DISTINCT de cronogramas para ir a la segura si no conozco la estructura de roles.
-
+        // Solo usuarios que estén en la tabla 'tutores'
         const query = `
-            SELECT DISTINCT u.id, CONCAT(u.first_name, ' ', u.last_name) as nombre
+            SELECT u.id, CONCAT(u.first_name, ' ', u.last_name) as nombre
             FROM users u
-            JOIN cronogramas c ON c.tutor_user_id = u.id
-            ORDER BY nombre
-        `;
+            JOIN tutores t ON t.user_id = u.id
+            ORDER BY u.first_name, u.last_name
+    `;
 
         const { rows } = await pool.query(query);
         return res.json(rows);
@@ -223,11 +244,10 @@ async function getTutores(req, res) {
     }
 }
 
-// HU-VER-04: Seguimiento tutor - DETALLE Y KPIS
-// GET /api/verificador/tutores/:id/seguimiento?semestre=...
+// HU-VER-04: Seguimiento Tutor
 async function getSeguimientoTutor(req, res) {
     try {
-        const { id } = req.params; // tutor_user_id
+        const { id } = req.params;
         const { semestre } = req.query;
 
         if (!semestre) {
@@ -236,33 +256,57 @@ async function getSeguimientoTutor(req, res) {
 
         // KPIs
         const kpiQuery = `
-            SELECT 
-                COUNT(*) as total,
-                COUNT(CASE WHEN estado = 'realizada' THEN 1 END) as realizadas,
-                COUNT(CASE WHEN estado = 'programada' THEN 1 END) as pendientes
+SELECT
+COUNT(*) as total,
+    COUNT(CASE WHEN estado = 'realizada' THEN 1 END) as realizadas,
+    COUNT(CASE WHEN estado = 'programada' THEN 1 END) as pendientes,
+    COUNT(CASE WHEN estado = 'cancelada' THEN 1 END) as canceladas
             FROM cronogramas
             WHERE tutor_user_id = $1 AND semestre = $2
-        `;
+    `;
         const kpiRes = await pool.query(kpiQuery, [id, semestre]);
         const kpis = kpiRes.rows[0];
 
         // Detalle
         const detalleQuery = `
-            SELECT 
-                CONCAT(e.nombre_estudiante, ' ', e.apellido_estudiante) AS estudiante,
-                c.fecha,
-                c.tipo_tutoria AS tipo,
-                c.estado
+SELECT
+c.codigo_estudiante,
+    CONCAT(e.nombre_estudiante, ' ', e.apellido_estudiante) AS estudiante_nombre,
+        TO_CHAR(c.fecha, 'YYYY-MM-DD') as fecha,
+        TO_CHAR(c.hora, 'HH24:MI') as hora,
+        c.semestre,
+        c.estado,
+        c.ambiente,
+        CASE 
+                    WHEN t.obs_academico IS NOT NULL AND t.obs_academico <> '' THEN 'Académica'
+                    WHEN t.obs_personal IS NOT NULL AND t.obs_personal <> '' THEN 'Personal'
+                    WHEN t.obs_profesional IS NOT NULL AND t.obs_profesional <> '' THEN 'Profesional'
+                    ELSE 'Individual'
+END as tipo
             FROM cronogramas c
             JOIN estudiante e ON e.codigo_estudiante = c.codigo_estudiante
+            LEFT JOIN tutorias t ON t.cronograma_id = c.id
             WHERE c.tutor_user_id = $1 AND c.semestre = $2
-            ORDER BY c.fecha DESC
+            ORDER BY c.fecha DESC, c.hora DESC
         `;
         const detalleRes = await pool.query(detalleQuery, [id, semestre]);
 
+        // Formato para frontend
+        const detalle = detalleRes.rows.map(r => ({
+            estudiante: r.estudiante_nombre,
+            fecha: `${r.fecha} ${r.hora} `,
+            tipo: r.tipo,
+            estado: r.estado
+        }));
+
         return res.json({
-            kpi: kpis,
-            detalle: detalleRes.rows
+            kpi: {
+                total: kpis.total,
+                realizadas: kpis.realizadas,
+                pendientes: kpis.pendientes,
+                canceladas: kpis.canceladas
+            },
+            detalle: detalle
         });
 
     } catch (error) {
@@ -277,6 +321,5 @@ module.exports = {
     buscarEstudiante,
     getHistorialEstudiante,
     getTutores,
-    getSeguimientoTutor,
-    getSchema
+    getSeguimientoTutor
 };
