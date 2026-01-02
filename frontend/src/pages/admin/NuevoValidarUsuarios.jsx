@@ -1,4 +1,5 @@
-import { useState } from 'react';
+// NuevoValidarUsuarios.jsx
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader } from '../../componentes/ui/Card';
 import Button from '../../componentes/ui/Button';
 import {
@@ -21,44 +22,16 @@ import {
     XCircle,
     Send,
 } from '../../componentes/ui/icons';
+import { 
+    getPendingRequests, 
+    approveUser, 
+    rejectUser,
+    getRequestDetail 
+} from '../../services/adminService';
 import styles from './NuevoValidarUsuarios.module.css';
 
-// Mock data para simular solicitudes pendientes
-const mockPendingUsers = [
-    {
-        id: '1',
-        first_name: 'María Elena',
-        last_name: 'Quispe Mamani',
-        email: 'maria.quispe@unsaac.edu.pe',
-        roles: ['administrador', 'tutor'],
-        roles_decisiones: [
-            { role: 'administrador', approved: null },
-            { role: 'tutor', approved: null },
-        ],
-        created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    },
-    {
-        id: '2',
-        first_name: 'Carlos Alberto',
-        last_name: 'Huanca Condori',
-        email: 'carlos.huanca@unsaac.edu.pe',
-        roles: ['verificador'],
-        roles_decisiones: [{ role: 'verificador', approved: null }],
-        created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-    },
-    {
-        id: '3',
-        first_name: 'Ana Lucía',
-        last_name: 'Flores Gutierrez',
-        email: 'ana.flores@unsaac.edu.pe',
-        roles: ['tutor', 'verificador'],
-        roles_decisiones: [
-            { role: 'tutor', approved: null },
-            { role: 'verificador', approved: null },
-        ],
-        created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    },
-];
+// Definir jerarquía de roles
+const roleHierarchy = ['administrador', 'tutor', 'verificador'];
 
 const roleLabels = {
     administrador: 'Administrador',
@@ -72,20 +45,98 @@ const roleVariants = {
     verificador: 'default',
 };
 
+// Función para ordenar roles según jerarquía
+const sortRolesByHierarchy = (roles) => {
+    return [...roles].sort((a, b) => {
+        const indexA = roleHierarchy.indexOf(a);
+        const indexB = roleHierarchy.indexOf(b);
+        
+        // Si ambos están en la jerarquía, ordenar según su posición
+        if (indexA !== -1 && indexB !== -1) {
+            return indexA - indexB;
+        }
+        
+        // Si solo uno está en la jerarquía, ese va primero
+        if (indexA !== -1) return -1;
+        if (indexB !== -1) return 1;
+        
+        // Si ninguno está en la jerarquía, orden alfabético
+        return a.localeCompare(b);
+    });
+};
+
 const NuevoValidarUsuarios = () => {
-    const [pendingUsers, setPendingUsers] = useState(mockPendingUsers);
+    const [pendingUsers, setPendingUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
     const [roleDecisions, setRoleDecisions] = useState({});
     const [submitting, setSubmitting] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    const openDetails = (user) => {
-        setSelectedUser(user);
-        const decisions = {};
-        user.roles.forEach((role) => {
-            const existingDecision = user.roles_decisiones?.find((d) => d.role === role);
-            decisions[role] = existingDecision?.approved ?? null;
-        });
-        setRoleDecisions(decisions);
+    // Cargar solicitudes pendientes al montar el componente
+    useEffect(() => {
+        fetchPendingUsers();
+    }, []);
+
+    const fetchPendingUsers = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const data = await getPendingRequests();
+            
+            // Transformar datos del backend al formato del frontend
+            const transformedData = data.map(user => ({
+                id: user.id,
+                first_name: user.first_name,
+                last_name: user.last_name,
+                email: user.email,
+                roles: Array.isArray(user.roles) ? sortRolesByHierarchy(user.roles) : [],
+                roles_decisiones: user.roles_decisiones || [],
+                created_at: user.created_at
+            }));
+            
+            setPendingUsers(transformedData);
+        } catch (err) {
+            console.error('Error fetching pending users:', err);
+            setError('Error al cargar las solicitudes pendientes');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const openDetails = async (user) => {
+        try {
+            // Obtener detalles actualizados del usuario
+            const userDetail = await getRequestDetail(user.id);
+            
+            // Ordenar roles según jerarquía
+            const sortedRoles = sortRolesByHierarchy(
+                Array.isArray(userDetail.roles) ? userDetail.roles : []
+            );
+            
+            setSelectedUser({
+                ...userDetail,
+                roles: sortedRoles
+            });
+            
+            // Inicializar decisiones basadas en roles_decisiones existentes
+            const decisions = {};
+            
+            sortedRoles.forEach((role) => {
+                const existingDecision = userDetail.roles_decisiones?.find(d => d.rol === role);
+                if (existingDecision) {
+                    decisions[role] = existingDecision.decision === 'aprobado' ? true : 
+                                    existingDecision.decision === 'rechazado' ? false : null;
+                } else {
+                    decisions[role] = null;
+                }
+            });
+            
+            setRoleDecisions(decisions);
+        } catch (err) {
+            console.error('Error fetching user details:', err);
+            alert('Error al cargar los detalles del usuario');
+        }
     };
 
     const closeDetails = () => {
@@ -100,7 +151,7 @@ const NuevoValidarUsuarios = () => {
         }));
     };
 
-    const handleSubmitDecisions = () => {
+    const handleSubmitDecisions = async () => {
         if (!selectedUser) return;
 
         const allDecided = selectedUser.roles.every(
@@ -112,31 +163,34 @@ const NuevoValidarUsuarios = () => {
             return;
         }
 
+        // Verificar si todos los roles fueron rechazados
+        const allRejected = selectedUser.roles.every(
+            (role) => roleDecisions[role] === false
+        );
+
         setSubmitting(true);
 
-        // Simular procesamiento
-        setTimeout(() => {
-            const updatedUsers = pendingUsers.map((user) => {
-                if (user.id === selectedUser.id) {
-                    return {
-                        ...user,
-                        roles_decisiones: user.roles.map((role) => ({
-                            role,
-                            approved: roleDecisions[role],
-                        })),
-                    };
-                }
-                return user;
-            });
+        try {
+            if (allRejected) {
+                // Si todos los roles fueron rechazados, rechazar completamente al usuario
+                await rejectUser(selectedUser.id);
+                alert('Usuario rechazado\nSe ha rechazado completamente la solicitud del usuario.');
+            } else {
+                // Si hay al menos un rol aprobado, aprobar al usuario con las decisiones
+                await approveUser(selectedUser.id, roleDecisions);
+                alert('Decisiones enviadas\nLas decisiones de roles han sido registradas correctamente.');
+            }
 
-            // Remover usuario de la lista (simulando que ya fue procesado)
-            setPendingUsers(updatedUsers.filter((u) => u.id !== selectedUser.id));
-
-            alert('Decisiones enviadas\nLas decisiones de roles han sido registradas correctamente.');
-
-            closeDetails();
+            // Actualizar la lista de usuarios pendientes
+            await fetchPendingUsers();
+            
+        } catch (err) {
+            console.error('Error submitting decisions:', err);
+            alert('Error al enviar las decisiones. Por favor, intenta nuevamente.');
+        } finally {
             setSubmitting(false);
-        }, 800);
+            closeDetails();
+        }
     };
 
     const formatDate = (dateString) => {
@@ -155,6 +209,42 @@ const NuevoValidarUsuarios = () => {
             minute: '2-digit',
         });
     };
+
+    if (loading) {
+        return (
+            <Card className={styles.emptyCard}>
+                <CardContent className={styles.emptyContent}>
+                    <div className={styles.loadingSpinner}></div>
+                    <h3 className={styles.emptyTitle}>
+                        Cargando solicitudes...
+                    </h3>
+                </CardContent>
+            </Card>
+        );
+    }
+
+    if (error) {
+        return (
+            <Card className={styles.emptyCard}>
+                <CardContent className={styles.emptyContent}>
+                    <XCircle className={styles.emptyIcon} style={{ color: '#ef4444' }} />
+                    <h3 className={styles.emptyTitle}>
+                        Error al cargar las solicitudes
+                    </h3>
+                    <p className={styles.emptyText}>
+                        {error}
+                    </p>
+                    <Button 
+                        variant="outline" 
+                        onClick={fetchPendingUsers}
+                        style={{ marginTop: '1rem' }}
+                    >
+                        Reintentar
+                    </Button>
+                </CardContent>
+            </Card>
+        );
+    }
 
     if (pendingUsers.length === 0) {
         return (
@@ -183,6 +273,14 @@ const NuevoValidarUsuarios = () => {
                         {pendingUsers.length} solicitud{pendingUsers.length !== 1 ? 'es' : ''} pendiente{pendingUsers.length !== 1 ? 's' : ''}
                     </p>
                 </div>
+                <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={fetchPendingUsers}
+                    disabled={loading}
+                >
+                    Actualizar
+                </Button>
             </div>
 
             {/* Grid de tarjetas */}
@@ -229,7 +327,7 @@ const NuevoValidarUsuarios = () => {
                                 </div>
                             </div>
 
-                            {/* Roles solicitados */}
+                            {/* Roles solicitados - ordenados por jerarquía */}
                             <div className={styles.rolesSection}>
                                 <span className={styles.rolesLabel}>
                                     Roles Solicitados
@@ -246,6 +344,30 @@ const NuevoValidarUsuarios = () => {
                                     ))}
                                 </div>
                             </div>
+
+                            {/* Estado de decisiones */}
+                            {user.roles_decisiones && user.roles_decisiones.length > 0 && (
+                                <div className={styles.decisionsStatus}>
+                                    <span className={styles.decisionsLabel}>
+                                        Decisiones previas:
+                                    </span>
+                                    <div className={styles.decisionsBadges}>
+                                        {/* Ordenar decisiones por jerarquía también */}
+                                        {sortRolesByHierarchy(user.roles_decisiones.map(d => d.rol)).map((role) => {
+                                            const decision = user.roles_decisiones.find(d => d.rol === role);
+                                            return decision ? (
+                                                <Badge
+                                                    key={role}
+                                                    variant={decision.decision === 'aprobado' ? 'success' : 'destructive'}
+                                                    size="sm"
+                                                >
+                                                    {roleLabels[role] || role}: {decision.decision}
+                                                </Badge>
+                                            ) : null;
+                                        })}
+                                    </div>
+                                </div>
+                            )}
 
                             {/* Botón ver detalle */}
                             <Button
@@ -271,7 +393,7 @@ const NuevoValidarUsuarios = () => {
                             Revisar Solicitud
                         </DialogTitle>
                         <DialogDescription>
-                            Revisa los detalles y decide sobre cada rol solicitado.
+                            Revisa los detalles y decide sobre cada rol solicitado (ordenados por jerarquía).
                         </DialogDescription>
                     </DialogHeader>
 
@@ -311,7 +433,7 @@ const NuevoValidarUsuarios = () => {
                                     </div>
                                 </div>
 
-                                {/* Decisión de roles */}
+                                {/* Decisión de roles - ORDENADOS POR JERARQUÍA */}
                                 <div className={styles.decisionsSection}>
                                     <h4 className={styles.sectionTitle}>
                                         Decisión por Rol

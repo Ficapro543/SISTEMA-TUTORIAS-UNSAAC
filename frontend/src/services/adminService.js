@@ -1,42 +1,76 @@
+// services/adminService.js
+import api from '../utils/api';
+
 const API_URL = `${import.meta.env.VITE_API_BASE_URL}/admin` || "http://localhost:3001/api/admin";
 
+// Obtener solicitudes pendientes
 export async function getPendingRequests() {
-    const res = await fetch(`${API_URL}/solicitudes`);
-    if (!res.ok) {
-        const error = await res.json().catch(() => ({ message: "Unknown error" }));
-        throw new Error(error.message || "Error fetching pending requests");
+    try {
+        const response = await api.get(`${API_URL}/solicitudes`);
+        console.log('Pending requests fetched:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching pending requests:', error);
+        throw error;
     }
-    return res.json();
 }
 
+// Obtener detalles de una solicitud específica
 export async function getRequestDetail(id) {
-    const res = await fetch(`${API_URL}/solicitudes/${id}`);
-    if (!res.ok) throw new Error("Error fetching request detail");
-    return res.json();
+    try {
+        const response = await api.get(`${API_URL}/solicitud/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching request detail:', error);
+        throw error;
+    }
 }
 
-export async function approveRequest(pendingUserId, roles) {
-    const res = await fetch(`${API_URL}/aprobar`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pendingUserId, roles }),
-    });
-    if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || "Error approving request");
+// Aprobar/rechazar roles específicos
+export async function updateRoleDecision(pendingUserId, role, decision) {
+    try {
+        const response = await api.put(
+            `${API_URL}/solicitud/${pendingUserId}/rol/${role}`,
+            { decision: decision ? 'aprobado' : 'rechazado' }
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Error updating role decision:', error);
+        throw error;
     }
-    return res.json();
 }
 
-export async function rejectRequest(pendingUserId) {
-    const res = await fetch(`${API_URL}/rechazar`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pendingUserId }),
-    });
-    if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || "Error rejecting request");
+// Aprobar usuario completamente
+export async function approveUser(pendingUserId, rolesDecisions) {
+    try {
+        // Primero actualizamos cada rol individualmente
+        const updatePromises = Object.entries(rolesDecisions).map(
+            ([role, approved]) => 
+                updateRoleDecision(pendingUserId, role, approved)
+        );
+        
+        await Promise.all(updatePromises);
+        
+        // Luego aprobamos al usuario
+        const response = await api.post(`${API_URL}/aprobar`, {
+            pendingUserId,
+            roles: Object.keys(rolesDecisions).filter(role => rolesDecisions[role] === true)
+        });
+        
+        return response.data;
+    } catch (error) {
+        console.error('Error approving user:', error);
+        throw error;
     }
-    return res.json();
+}
+
+// Rechazar usuario completamente
+export async function rejectUser(pendingUserId) {
+    try {
+        const response = await api.post(`${API_URL}/rechazar`, { pendingUserId });
+        return response.data;
+    } catch (error) {
+        console.error('Error rejecting user:', error);
+        throw error;
+    }
 }
