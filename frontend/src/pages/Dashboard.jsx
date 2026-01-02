@@ -8,10 +8,13 @@ import {
 } from "react-icons/fa";
 import styles from "../styles/pages/Dashboard.module.css";
 // Admin Views
-import AprobarRegistro from "./admin/AprobarRegistro";
+import AprobarRegistro from "./admin/NuevoValidarUsuarios";
 import AsignacionTutorados from "./admin/AsignacionTutorados";
 import CambioTutorados from "./admin/CambioTutorados";
 import TutoriasHistoricas from "./admin/TutoriasHistoricas";
+
+// Tutor Views
+import NuevoTutorPanel from "./tutor/NuevoTutorPanel";
 
 // Verifier Views
 import VerifEstudiantesAtendidos from "../pages/verificador/VerifEstudiantesAtendidos";
@@ -455,6 +458,7 @@ export default function Dashboard() {
             {activeTab === 'tutor' && (
                 <div className={styles.contentArea}>
                     <div className={styles.contentCard}>
+                        <NuevoTutorPanel />
                     </div>
                 </div>
             )}
