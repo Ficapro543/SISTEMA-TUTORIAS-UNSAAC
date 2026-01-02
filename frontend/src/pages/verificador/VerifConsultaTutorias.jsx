@@ -1,53 +1,79 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from '../../styles/pages/VerifConsultaTutorias.module.css';
+import api from '../../utils/api';
 
 const VerifConsultaTutorias = () => {
-    // Mock Data
-    const mockData = [
-        {
-            estudiante: 'Juan Pérez Muñoz',
-            tutor: 'Dr. Roberto Carlos',
-            tipo: 'Académica',
-            fecha: '2023-11-15',
-            estado: 'Realizada'
-        },
-        {
-            estudiante: 'Maria Rodriguez',
-            tutor: 'Dra. Ana Lopez',
-            tipo: 'Personal',
-            fecha: '2023-11-20',
-            estado: 'Programada'
-        },
-        {
-            estudiante: 'Carlos Sanchez',
-            tutor: 'Ing. Pedro Castillo',
-            tipo: 'Profesional',
-            fecha: '2023-11-10',
-            estado: 'Realizada'
-        },
-        {
-            estudiante: 'Elena Quispe',
-            tutor: 'Dr. Roberto Carlos',
-            tipo: 'Académica',
-            fecha: '2023-11-05',
-            estado: 'Cancelada'
-        },
-        {
-            estudiante: 'Jorge Mamani',
-            tutor: 'Dra. Ana Lopez',
-            tipo: 'Personal',
-            fecha: '2023-11-25',
-            estado: 'Programada'
-        }
-    ];
-
     const [filters, setFilters] = useState({
         semestre: '2023-II',
         tipo: 'Todos',
-        tutor: 'Todos'
+        tutor_id: 'Todos' // Usamos ID para el filtro
     });
 
-    const [filteredData, setFilteredData] = useState(mockData);
+    const [tutorsList, setTutorsList] = useState([]);
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    // Cargar lista de tutores al inicio
+    useEffect(() => {
+        const fetchTutors = async () => {
+            try {
+                const res = await api.get('/verificador/tutores');
+                setTutorsList(res.data || []);
+            } catch (err) {
+                console.error("Error al cargar tutores:", err);
+            }
+        };
+        fetchTutors();
+    }, []);
+
+    // Normalizar estado
+    const normalizeEstado = (estadoRaw) => {
+        if (!estadoRaw) return '-';
+        const lower = String(estadoRaw).toLowerCase();
+        if (lower === 'realizada') return 'Realizada';
+        if (lower === 'programada') return 'Programada';
+        if (lower === 'cancelada') return 'Cancelada';
+        return estadoRaw; // "Asistió", "Faltó", etc.
+    };
+
+    const fetchData = async () => {
+        setLoading(true);
+        setError(null);
+        setData([]);
+
+        try {
+            const params = {
+                semestre: filters.semestre
+            };
+
+            if (filters.tipo !== 'Todos') {
+                params.tipo = filters.tipo;
+            }
+            if (filters.tutor_id !== 'Todos') {
+                params.tutor_id = filters.tutor_id;
+            }
+
+            console.log("GET /verificador/tutorias Params:", params);
+            const response = await api.get('/verificador/tutorias', { params });
+            console.log("Respuesta backend:", response.data);
+
+            if (Array.isArray(response.data)) {
+                setData(response.data.map(item => ({
+                    ...item,
+                    estado: normalizeEstado(item.estado)
+                })));
+            } else {
+                setData([]);
+            }
+
+        } catch (err) {
+            console.error("Error fetching tutorias:", err);
+            setError("Error al consultar las tutorías.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
@@ -58,24 +84,11 @@ const VerifConsultaTutorias = () => {
     };
 
     const handleSearch = () => {
-        let data = [...mockData];
-
-        if (filters.tipo !== 'Todos') {
-            data = data.filter(item => item.tipo === filters.tipo);
-        }
-
-        if (filters.tutor !== 'Todos') {
-            data = data.filter(item => item.tutor === filters.tutor);
-        }
-
-        // Mock filtering by semester could be added here if data had semester field
-
-        setFilteredData(data);
+        fetchData();
     };
 
     const handleExport = () => {
-        console.log("Exportando data...", filteredData);
-        alert("Función de exportar en desarrollo");
+        alert("Función de exportar aún no implementada");
     };
 
     const getStatusClass = (status) => {
@@ -95,11 +108,17 @@ const VerifConsultaTutorias = () => {
                     <p className={styles.subtitle}>Consulta por semestre, tipo y tutor</p>
                 </div>
                 <div className={styles.actions}>
-                    <button className={styles.actionButton} onClick={handleExport}>
+                    <button className={styles.actionButton} onClick={handleExport} disabled={loading}>
                         Exportar
                     </button>
                 </div>
             </div>
+
+            {error && (
+                <div style={{ padding: '1rem', color: '#721c24', backgroundColor: '#f8d7da', marginBottom: '1rem', borderRadius: '5px' }}>
+                    {error}
+                </div>
+            )}
 
             <div className={styles.controls}>
                 <div className={styles.filters}>
@@ -111,10 +130,12 @@ const VerifConsultaTutorias = () => {
                             className={styles.select}
                             value={filters.semestre}
                             onChange={handleFilterChange}
+                            disabled={loading}
                         >
                             <option value="2023-II">2023-II</option>
                             <option value="2023-I">2023-I</option>
                             <option value="2022-II">2022-II</option>
+                            <option value="2025-1">2025-1</option>
                         </select>
                     </div>
 
@@ -126,6 +147,7 @@ const VerifConsultaTutorias = () => {
                             className={styles.select}
                             value={filters.tipo}
                             onChange={handleFilterChange}
+                            disabled={loading}
                         >
                             <option value="Todos">Todos</option>
                             <option value="Académica">Académica</option>
@@ -135,23 +157,24 @@ const VerifConsultaTutorias = () => {
                     </div>
 
                     <div className={styles.selectGroup}>
-                        <label className={styles.label} htmlFor="tutor">Tutor</label>
+                        <label className={styles.label} htmlFor="tutor_id">Tutor</label>
                         <select
-                            id="tutor"
-                            name="tutor"
+                            id="tutor_id"
+                            name="tutor_id"
                             className={styles.select}
-                            value={filters.tutor}
+                            value={filters.tutor_id}
                             onChange={handleFilterChange}
+                            disabled={loading}
                         >
                             <option value="Todos">Todos</option>
-                            <option value="Dr. Roberto Carlos">Dr. Roberto Carlos</option>
-                            <option value="Dra. Ana Lopez">Dra. Ana Lopez</option>
-                            <option value="Ing. Pedro Castillo">Ing. Pedro Castillo</option>
+                            {tutorsList.map(t => (
+                                <option key={t.id} value={t.id}>{t.nombre}</option>
+                            ))}
                         </select>
                     </div>
 
-                    <button className={styles.searchButton} onClick={handleSearch}>
-                        Consultar
+                    <button className={styles.searchButton} onClick={handleSearch} disabled={loading}>
+                        {loading ? 'Consultando...' : 'Consultar'}
                     </button>
                 </div>
             </div>
@@ -169,8 +192,10 @@ const VerifConsultaTutorias = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredData.length > 0 ? (
-                                filteredData.map((item, index) => (
+                            {loading ? (
+                                <tr><td colSpan="5" style={{ textAlign: 'center', padding: '2rem' }}>Cargando...</td></tr>
+                            ) : data.length > 0 ? (
+                                data.map((item, index) => (
                                     <tr key={index}>
                                         <td>{item.estudiante}</td>
                                         <td>{item.tutor}</td>
