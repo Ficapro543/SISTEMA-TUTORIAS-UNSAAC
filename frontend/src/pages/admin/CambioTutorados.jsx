@@ -13,8 +13,7 @@ import styles from "../../styles/components/AsignacionTutorados.module.css";
 export default function CambioTutorados() {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
-    const [allSemesters, setAllSemesters] = useState([]);
-    const [selectedSemesterId, setSelectedSemesterId] = useState("");
+    const [activeSemester, setActiveSemester] = useState(null);
     const [tutores, setTutores] = useState([]);
     const [tutorOrigen, setTutorOrigen] = useState(null);
     const [tutorDestino, setTutorDestino] = useState(null);
@@ -45,12 +44,12 @@ export default function CambioTutorados() {
             const activeSem = await getActiveSemester();
             const sems = await getSemesters();
 
-            setAllSemesters(sems);
-
-            const semId = activeSem ? activeSem.id : (sems.length > 0 ? sems[0].id : null);
-            if (semId) {
-                setSelectedSemesterId(semId);
-                const tutorsList = await getTutors("", semId);
+            // Obtener el último semestre activo (ordenados por ID descendente)
+            const lastActiveSem = activeSem || (sems.length > 0 ? sems[0] : null);
+            
+            if (lastActiveSem) {
+                setActiveSemester(lastActiveSem);
+                const tutorsList = await getTutors("", lastActiveSem.id);
                 setTutores(tutorsList);
             }
         } catch (err) {
@@ -62,39 +61,14 @@ export default function CambioTutorados() {
     }
 
     useEffect(() => {
-        if (tutorOrigen && selectedSemesterId) {
+        if (tutorOrigen && activeSemester) {
             loadOriginStudents();
         } else {
             setEstudiantes([]);
         }
-    }, [tutorOrigen, selectedSemesterId]);
+    }, [tutorOrigen, activeSemester]);
 
-    useEffect(() => {
-        // Recargar tutores cuando cambie el semestre
-        if (selectedSemesterId) {
-            loadTutorsForSemester();
-        }
-    }, [selectedSemesterId]);
 
-    async function loadTutorsForSemester() {
-        try {
-            const tutorsList = await getTutors("", selectedSemesterId);
-            setTutores(tutorsList);
-            
-            // Actualizar tutores seleccionados si existen
-            if (tutorOrigen) {
-                const updatedOrigen = tutorsList.find(t => t.id === tutorOrigen.id);
-                setTutorOrigen(updatedOrigen || null);
-            }
-            if (tutorDestino) {
-                const updatedDestino = tutorsList.find(t => t.id === tutorDestino.id);
-                setTutorDestino(updatedDestino || null);
-            }
-        } catch (err) {
-            console.error(err);
-            setMessage({ type: "error", text: "Error cargando tutores: " + err.message });
-        }
-    }
 
     useEffect(() => {
         // Si modo masivo está activo, seleccionar todos automáticamente
@@ -107,7 +81,7 @@ export default function CambioTutorados() {
 
     async function loadOriginStudents() {
         try {
-            const data = await getStudentsByTutor(tutorOrigen.id, selectedSemesterId);
+            const data = await getStudentsByTutor(tutorOrigen.id, activeSemester.id);
             setEstudiantes(data);
             setSelectedStudentIds([]);
         } catch (err) {
@@ -159,7 +133,7 @@ export default function CambioTutorados() {
                 await transferAllStudents({
                     originTutorId: tutorOrigen.id,
                     destinationTutorId: tutorDestino.id,
-                    semesterId: selectedSemesterId
+                    semesterId: activeSemester.id
                 });
                 setMessage({ type: "success", text: `Transferencia masiva completada: ${selectedStudentIds.length} estudiantes.` });
             } else {
@@ -168,13 +142,13 @@ export default function CambioTutorados() {
                     originTutorId: tutorOrigen.id,
                     destinationTutorId: tutorDestino.id,
                     studentIds: selectedStudentIds,
-                    semesterId: selectedSemesterId
+                    semesterId: activeSemester.id
                 });
                 setMessage({ type: "success", text: "Transferencia completada correctamente." });
             }
 
             loadOriginStudents();
-            const updatedTutors = await getTutors("", selectedSemesterId);
+            const updatedTutors = await getTutors("", activeSemester.id);
             setTutores(updatedTutors);
             setTutorOrigen(updatedTutors.find(t => t.id === tutorOrigen.id));
             setTutorDestino(updatedTutors.find(t => t.id === tutorDestino.id));
@@ -200,29 +174,27 @@ export default function CambioTutorados() {
                 </p>
             </div>
 
-            <div className={styles.card} style={{ marginBottom: '24px', backgroundColor: '#f8fafc' }}>
+            <div className={styles.card} style={{ marginBottom: '24px', backgroundColor: '#f8fafc', border: '2px solid #3b82f6' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div>
                         <h3 className={styles.cardTitle} style={{ marginBottom: '4px' }}>Semestre Académico</h3>
-                        <p style={{ fontSize: '0.875rem', color: '#64748b', margin: 0 }}>Seleccione el semestre</p>
+                        <p style={{ fontSize: '0.875rem', color: '#64748b', margin: 0 }}>Trabajando con el semestre activo</p>
                     </div>
-                    <select
-                        value={selectedSemesterId}
-                        onChange={(e) => setSelectedSemesterId(e.target.value)}
-                        className={styles.searchInput}
-                        style={{ 
-                            width: '320px', 
-                            padding: '12px 16px',
-                            fontSize: '1rem',
-                            fontWeight: '500',
-                            border: '2px solid #3b82f6',
-                            borderRadius: '8px'
-                        }}
-                    >
-                        {allSemesters.map(s => (
-                            <option key={s.id} value={s.id}>{s.name} {s.is_active ? "✓ Actual" : ""}</option>
-                        ))}
-                    </select>
+                    <div style={{ 
+                        padding: '12px 24px',
+                        fontSize: '1.1rem',
+                        fontWeight: '600',
+                        color: '#1e40af',
+                        backgroundColor: '#dbeafe',
+                        border: '2px solid #3b82f6',
+                        borderRadius: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                    }}>
+                        <FaInfoCircle />
+                        {activeSemester ? activeSemester.name : 'Cargando...'}
+                    </div>
                 </div>
             </div>
 
@@ -405,7 +377,6 @@ export default function CambioTutorados() {
                                     </th>
                                     <th>Código</th>
                                     <th>Nombre Completo</th>
-                                    <th>Ciclo académico</th>
                                     <th>Tutorías registradas</th>
                                 </tr>
                             </thead>
@@ -423,7 +394,6 @@ export default function CambioTutorados() {
                                         <td><input type="checkbox" checked={selectedStudentIds.includes(s.id)} readOnly disabled={isMassiveMode} /></td>
                                         <td>{s.code}</td>
                                         <td>{s.first_name} {s.last_name}</td>
-                                        <td>{s.cycle || "N/A"}</td>
                                         <td style={{ textAlign: 'center' }}>
                                             <span style={{ 
                                                 backgroundColor: '#f1f5f9', 
@@ -438,7 +408,7 @@ export default function CambioTutorados() {
                                         </td>
                                     </tr>
                                 ))}
-                                {estudiantes.length === 0 && <tr><td colSpan="5" style={{ textAlign: 'center', padding: '20px' }}>No hay estudiantes</td></tr>}
+                                {estudiantes.length === 0 && <tr><td colSpan="4" style={{ textAlign: 'center', padding: '20px' }}>No hay estudiantes</td></tr>}
                             </tbody>
                         </table>
                     </div>
