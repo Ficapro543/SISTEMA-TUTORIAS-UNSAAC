@@ -10,6 +10,7 @@ import CuentaVerificada from "./pages/general/CuentaVerificada.jsx";
 import RecuperarPassword from "./pages/general/RecuperarPassword.jsx";
 import VerificarCodigo from "./pages/general/VerificarCodigo.jsx";
 import NuevaContrasena from "./pages/general/NuevaContraseña.jsx";
+import Cronogramas from "./pages/Cronogramas.jsx";
 
 import BackendStatus from "./pages/general/BackendStatus.jsx";
 import Dashboard from "./pages/Dashboard.jsx"
@@ -19,7 +20,7 @@ function App() {
     <Routes>
       {/* Landing Page */}
       <Route path="/" element={<LandingPage />} />
-      
+
       {/* General routes */}
       <Route path="/login" element={<Layout><Login /></Layout>} />
       <Route path="/registro" element={<Layout><Register /></Layout>} />
@@ -29,6 +30,7 @@ function App() {
       <Route path="/recuperar/verificar" element={<Layout><VerificarCodigo /></Layout>} />
       <Route path="/recuperar/nueva" element={<Layout><NuevaContrasena /></Layout>} />
       <Route path="/ping" element={<Layout><BackendStatus /></Layout>} />
+      <Route path="/admin/cronogramas" element={<Cronogramas />} />
 
       {/* MainPage */}
       <Route path="/dashboard" element={<Dashboard />} />
