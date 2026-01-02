@@ -1,0 +1,32 @@
+.badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    padding: 0.125rem 0.625rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transition: var(--transition);
+    font-family: var(--font-main);
+}
+
+.default {
+    background-color: var(--color-primary);
+    color: var(--color-text-light);
+}
+
+.secondary {
+    background-color: var(--color-secondary);
+    color: var(--color-text-light);
+}
+
+.accent {
+    background-color: #FFC107;
+    color: #222;
+}
+
+.outline {
+    border-color: var(--color-border);
+    color: var(--color-text-dark);
+    background-color: transparent;
+}

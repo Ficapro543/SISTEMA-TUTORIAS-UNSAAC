@@ -1,0 +1,380 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    font-family: var(--font-main);
+}
+
+/* Header */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.headerTitle {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text-dark);
+    margin: 0;
+}
+
+.headerSubtitle {
+    font-size: 0.875rem;
+    color: #666;
+    margin: 0.25rem 0 0 0;
+}
+
+/* Card Grid */
+.cardGrid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1rem;
+}
+
+@media (min-width: 768px) {
+    .cardGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .cardGrid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* User Card */
+.userCard {
+    overflow: hidden;
+    transition: box-shadow var(--transition);
+}
+
+.userCard:hover {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.decorativeBar {
+    height: 4px;
+    background: linear-gradient(to right, var(--color-primary), var(--color-secondary), #FFC107);
+}
+
+.cardHeader {
+    padding-bottom: 0.75rem;
+}
+
+.cardHeaderContent {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.userInfo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.avatar {
+    height: 2.5rem;
+    width: 2.5rem;
+    border-radius: 50%;
+    background-color: rgba(0, 78, 146, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatarIcon {
+    height: 1.25rem;
+    width: 1.25rem;
+    color: var(--color-primary);
+}
+
+.userName {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-dark);
+    line-height: 1.2;
+    margin: 0;
+}
+
+.userEmail {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: 0.25rem;
+}
+
+.smallIcon {
+    height: 0.75rem;
+    width: 0.75rem;
+    color: #666;
+}
+
+.emailText {
+    font-size: 0.75rem;
+    color: #666;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
+.cardContent {
+    padding-top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.dateTimeRow {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.75rem;
+    color: #666;
+}
+
+.dateTime {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.rolesSection {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.rolesLabel {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.badgeContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+}
+
+.badge {
+    font-size: 0.75rem;
+}
+
+.detailButton {
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+.icon {
+    height: 1rem;
+    width: 1rem;
+    margin-right: 0.5rem;
+}
+
+/* Empty State */
+.emptyCard {
+    border-color: var(--color-border);
+}
+
+.emptyContent {
+    padding: 3rem;
+    text-align: center;
+}
+
+.emptyIcon {
+    height: 3rem;
+    width: 3rem;
+    margin: 0 auto 1rem auto;
+    color: #666;
+}
+
+.emptyTitle {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text-dark);
+    margin: 0 0 0.5rem 0;
+}
+
+.emptyText {
+    color: #666;
+    margin: 0;
+}
+
+/* Modal */
+.dialogContent {
+    max-width: 28rem !important;
+}
+
+.dialogTitleSection {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dialogTitleIcon {
+    height: 1.25rem;
+    width: 1.25rem;
+    color: var(--color-primary);
+}
+
+.scrollArea {
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.modalContent {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding-right: 1rem;
+}
+
+.infoSection,
+.decisionsSection {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.sectionTitle {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    margin: 0;
+}
+
+.infoBox {
+    background-color: rgba(0, 78, 146, 0.05);
+    border-radius: var(--radius);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.userInfoModal {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.avatarLarge {
+    height: 3rem;
+    width: 3rem;
+    border-radius: 50%;
+    background-color: rgba(0, 78, 146, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatarIconLarge {
+    height: 1.5rem;
+    width: 1.5rem;
+    color: var(--color-primary);
+}
+
+.userNameModal {
+    font-weight: 600;
+    color: var(--color-text-dark);
+    margin: 0;
+}
+
+.userEmailModal {
+    font-size: 0.875rem;
+    color: #666;
+    margin: 0.25rem 0 0 0;
+}
+
+.separator {
+    height: 1px;
+    background-color: var(--color-border);
+}
+
+.gridTwo {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    font-size: 0.875rem;
+}
+
+.labelMuted {
+    color: #666;
+}
+
+.labelValue {
+    font-weight: 500;
+    margin: 0.25rem 0 0 0;
+}
+
+.rolesDecisions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.roleCard {
+    background-color: #fff;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 1rem;
+}
+
+.roleCardHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.approvedText {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #4CAF50;
+}
+
+.rejectedText {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #f44336;
+}
+
+.roleButtons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.roleButtons button {
+    flex: 1;
+}
+
+.approveButton {
+    background-color: #4CAF50 !important;
+    border-color: #4CAF50 !important;
+    color: #fff !important;
+}
+
+.approveButton:hover {
+    background-color: #45a049 !important;
+}
+
+.rejectButton {
+    background-color: #f44336 !important;
+    border-color: #f44336 !important;
+    color: #fff !important;
+}
+
+.rejectButton:hover {
+    background-color: #da190b !important;
+}
+
+.dialogFooter {
+    margin-top: 1rem;
+}
