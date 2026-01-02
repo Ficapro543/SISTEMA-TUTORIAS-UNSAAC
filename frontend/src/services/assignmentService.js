@@ -10,8 +10,12 @@ export async function getSemesters() {
     return res.data;
 }
 
-export async function getTutors(search = "") {
-    const res = await api.get(`/assignments/tutors?search=${encodeURIComponent(search)}`);
+export async function getTutors(search = "", semesterId = null) {
+    let url = `/assignments/tutors?search=${encodeURIComponent(search)}`;
+    if (semesterId) {
+        url += `&semesterId=${semesterId}`;
+    }
+    const res = await api.get(url);
     return res.data;
 }
 
@@ -37,5 +41,10 @@ export async function getStudentsByTutor(tutorId, semesterId) {
 
 export async function transferStudents(data) {
     const res = await api.put("/assignments/transfer", data);
+    return res.data;
+}
+
+export async function transferAllStudents(data) {
+    const res = await api.put("/assignments/transfer-all", data);
     return res.data;
 }

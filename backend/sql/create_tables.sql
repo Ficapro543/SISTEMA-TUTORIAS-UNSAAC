@@ -78,9 +78,10 @@ CREATE TABLE IF NOT EXISTS tutor_asignacion (
     estado TEXT NOT NULL DEFAULT 'activo',
     fecha_asignacion TIMESTAMP NOT NULL DEFAULT now(),
     fecha_fin TIMESTAMP,
+    fecha_reasignacion TIMESTAMP,
 
     CONSTRAINT chk_estado_asignacion
-        CHECK (estado IN ('activo', 'finalizado')),
+        CHECK (estado IN ('activo', 'finalizado', 'reasignado')),
 
     CONSTRAINT fk_asignacion_tutor
         FOREIGN KEY (tutor_user_id)

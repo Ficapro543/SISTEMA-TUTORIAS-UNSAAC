@@ -29,19 +29,31 @@ async function getAllSemesters(req, res, next) {
 
 async function getTutors(req, res, next) {
   try {
-    const { search } = req.query;
+    const { search, semesterId } = req.query;
+    const params = [];
+    let paramIndex = 1;
+
+    let studentCountSubquery = `(SELECT COUNT(*) FROM tutor_asignacion ta 
+         WHERE ta.tutor_user_id = u.id AND ta.estado = 'activo'`;
+    
+    if (semesterId) {
+      studentCountSubquery += ` AND ta.semestre = $${paramIndex}`;
+      params.push(semesterId);
+      paramIndex++;
+    }
+    
+    studentCountSubquery += `) as student_count`;
+
     let query = `
-      SELECT u.id, u.first_name, u.last_name, u.email,
-        (SELECT COUNT(*) FROM tutor_asignacion ta 
-         WHERE ta.tutor_user_id = u.id AND ta.estado = 'activo') as student_count
+      SELECT u.id, u.first_name, u.last_name, u.email, t.codigo as code,
+        ${studentCountSubquery}
       FROM users u
       INNER JOIN tutores t ON u.id = t.user_id
       WHERE 1=1
     `;
-    const params = [];
 
     if (search) {
-      query += ` AND (u.first_name ILIKE $1 OR u.last_name ILIKE $1 OR u.email ILIKE $1)`;
+      query += ` AND (u.first_name ILIKE $${paramIndex} OR u.last_name ILIKE $${paramIndex} OR u.email ILIKE $${paramIndex} OR t.codigo ILIKE $${paramIndex})`;
       params.push(`%${search}%`);
     }
 
@@ -170,26 +182,140 @@ async function transferStudents(req, res, next) {
       return res.status(400).json({ message: 'Datos incompletos para la transferencia.' });
     }
 
+    if (originTutorId === destinationTutorId) {
+      return res.status(400).json({ message: 'El tutor origen y destino no pueden ser el mismo.' });
+    }
+
     await client.query('BEGIN');
 
-    // Actualizar las asignaciones
+    // Marcar las asignaciones anteriores como 'reasignado' y establecer fecha_reasignacion
     const updateQuery = `
       UPDATE tutor_asignacion 
-      SET tutor_user_id = $1 
-      WHERE tutor_user_id = $2 AND semestre = $3 AND codigo_estudiante = ANY($4::text[]) AND estado = 'activo'
+      SET estado = 'reasignado',
+          fecha_reasignacion = now()
+      WHERE tutor_user_id = $1 
+        AND semestre = $2 
+        AND codigo_estudiante = ANY($3::text[]) 
+        AND estado = 'activo'
+      RETURNING codigo_estudiante
     `;
-    const updateResult = await client.query(updateQuery, [destinationTutorId, originTutorId, semesterId, studentIds]);
+    const updateResult = await client.query(updateQuery, [originTutorId, semesterId, studentIds]);
 
     if (updateResult.rowCount === 0) {
       await client.query('ROLLBACK');
-      return res.status(404).json({ message: 'No se encontraron asignaciones coincidentes para transferir.' });
+      return res.status(404).json({ message: 'No se encontraron asignaciones activas para transferir.' });
     }
 
-    // Nota: El usuario pidió no crear tablas adicionales, por lo que hemos eliminado transfer_logs.
-    // La auditoría tendría que ser a nivel de logs de la aplicación o disparadores si se requiere.
+    // Crear nuevas asignaciones activas para el tutor destino
+    const insertValues = updateResult.rows.map((row, idx) => 
+      `($${idx * 3 + 1}, $${idx * 3 + 2}, $${idx * 3 + 3}, 'activo')`
+    ).join(', ');
+
+    const insertParams = updateResult.rows.flatMap(row => [
+      destinationTutorId,
+      row.codigo_estudiante,
+      semesterId
+    ]);
+
+    const insertQuery = `
+      INSERT INTO tutor_asignacion (tutor_user_id, codigo_estudiante, semestre, estado)
+      VALUES ${insertValues}
+    `;
+
+    await client.query(insertQuery, insertParams);
 
     await client.query('COMMIT');
-    res.json({ message: 'Transferencia realizada con éxito.', count: updateResult.rowCount });
+    
+    res.json({ 
+      message: 'Transferencia realizada con éxito.', 
+      count: updateResult.rowCount,
+      transferred: updateResult.rows.map(r => r.codigo_estudiante)
+    });
+
+  } catch (err) {
+    await client.query('ROLLBACK');
+    next(err);
+  } finally {
+    client.release();
+  }
+}
+
+async function transferAllStudents(req, res, next) {
+  const client = await pool.connect();
+  try {
+    const { originTutorId, destinationTutorId, semesterId } = req.body;
+
+    if (!originTutorId || !destinationTutorId || !semesterId) {
+      return res.status(400).json({ message: 'Datos incompletos para la reasignación masiva.' });
+    }
+
+    if (originTutorId === destinationTutorId) {
+      return res.status(400).json({ message: 'El tutor origen y destino no pueden ser el mismo.' });
+    }
+
+    // Verificar que el tutor destino esté activo
+    const tutorCheck = await pool.query(
+      'SELECT u.is_active FROM users u INNER JOIN tutores t ON u.id = t.user_id WHERE t.user_id = $1',
+      [destinationTutorId]
+    );
+
+    if (tutorCheck.rows.length === 0 || !tutorCheck.rows[0].is_active) {
+      return res.status(400).json({ message: 'El tutor destino no está activo.' });
+    }
+
+    await client.query('BEGIN');
+
+    // Obtener todos los estudiantes activos del tutor origen
+    const studentsQuery = `
+      SELECT codigo_estudiante
+      FROM tutor_asignacion
+      WHERE tutor_user_id = $1 
+        AND semestre = $2 
+        AND estado = 'activo'
+    `;
+    const studentsResult = await client.query(studentsQuery, [originTutorId, semesterId]);
+
+    if (studentsResult.rowCount === 0) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ message: 'No hay estudiantes activos para reasignar.' });
+    }
+
+    // Marcar todas las asignaciones anteriores como 'reasignado'
+    const updateQuery = `
+      UPDATE tutor_asignacion 
+      SET estado = 'reasignado',
+          fecha_reasignacion = now()
+      WHERE tutor_user_id = $1 
+        AND semestre = $2 
+        AND estado = 'activo'
+    `;
+    await client.query(updateQuery, [originTutorId, semesterId]);
+
+    // Crear nuevas asignaciones activas para el tutor destino
+    const insertValues = studentsResult.rows.map((row, idx) => 
+      `($${idx * 3 + 1}, $${idx * 3 + 2}, $${idx * 3 + 3}, 'activo')`
+    ).join(', ');
+
+    const insertParams = studentsResult.rows.flatMap(row => [
+      destinationTutorId,
+      row.codigo_estudiante,
+      semesterId
+    ]);
+
+    const insertQuery = `
+      INSERT INTO tutor_asignacion (tutor_user_id, codigo_estudiante, semestre, estado)
+      VALUES ${insertValues}
+    `;
+
+    await client.query(insertQuery, insertParams);
+
+    await client.query('COMMIT');
+    
+    res.json({ 
+      message: 'Reasignación masiva completada con éxito.', 
+      count: studentsResult.rowCount,
+      transferred: studentsResult.rows.map(r => r.codigo_estudiante)
+    });
 
   } catch (err) {
     await client.query('ROLLBACK');
@@ -207,5 +333,6 @@ module.exports = {
   assignStudents,
   getDashboardStats,
   getStudentsByTutor,
-  transferStudents
+  transferStudents,
+  transferAllStudents
 };
