@@ -8,15 +8,13 @@ import {
 } from "react-icons/fa";
 import styles from "../styles/pages/Dashboard.module.css";
 // Admin Views
-import AprobarRegistro from "./admin/AprobarRegistro";
+import AprobarRegistro from "./admin/NuevoValidarUsuarios";
 import AsignacionTutorados from "./admin/AsignacionTutorados";
 import CambioTutorados from "./admin/CambioTutorados";
 import TutoriasHistoricas from "./admin/TutoriasHistoricas";
 
 // Tutor Views
-import TutoradosList from "./tutor/TutoradosList";
-import RegistrarSesion from "./tutor/RegistrarSesion";
-import ActividadesList from "./tutor/ActividadesList";
+import NuevoTutorPanel from "./tutor/NuevoTutorPanel";
 
 // Verifier Views
 import VerifEstudiantesAtendidos from "../pages/verificador/VerifEstudiantesAtendidos";
@@ -323,35 +321,6 @@ export default function Dashboard() {
                 </div>
             )}
 
-            {/* Tutor Secondary Navigation */}
-            {activeTab === 'tutor' && (
-                <div className={styles.secondaryNav}>
-                    <div className={styles.subTabsContainer}>
-                        <div
-                            className={`${styles.subTab} ${activeTutorTab === 'tutorados' ? styles.subTabActive : ''}`}
-                            onClick={() => handleTutorSubTabClick('tutorados')}
-                        >
-                            <FaUserCircle className={styles.subTabIcon} />
-                            <span>Mis Tutorados</span>
-                        </div>
-                        <div
-                            className={`${styles.subTab} ${activeTutorTab === 'sesiones' ? styles.subTabActive : ''}`}
-                            onClick={() => handleTutorSubTabClick('sesiones')}
-                        >
-                            <FaBook className={styles.subTabIcon} />
-                            <span>Registrar Sesiones</span>
-                        </div>
-                        <div
-                            className={`${styles.subTab} ${activeTutorTab === 'actividades' ? styles.subTabActive : ''}`}
-                            onClick={() => handleTutorSubTabClick('actividades')}
-                        >
-                            <FaCalendarAlt className={styles.subTabIcon} />
-                            <span>Actividades</span>
-                        </div>
-                    </div>
-                </div>
-            )}
-
             {/* Verificador Secondary Navigation */}
             {activeTab === 'verificador' && (
                 <div className={styles.secondaryNav}>
@@ -489,15 +458,7 @@ export default function Dashboard() {
             {activeTab === 'tutor' && (
                 <div className={styles.contentArea}>
                     <div className={styles.contentCard}>
-                        {activeTutorTab === 'tutorados' && (
-                            <TutoradosList />
-                        )}
-                        {activeTutorTab === 'sesiones' && (
-                            <RegistrarSesion />
-                        )}
-                        {activeTutorTab === 'actividades' && (
-                            <ActividadesList />
-                        )}
+                        <NuevoTutorPanel />
                     </div>
                 </div>
             )}
