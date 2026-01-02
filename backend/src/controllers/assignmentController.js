@@ -35,13 +35,13 @@ async function getTutors(req, res, next) {
 
     let studentCountSubquery = `(SELECT COUNT(*) FROM tutor_asignacion ta 
          WHERE ta.tutor_user_id = u.id AND ta.estado = 'activo'`;
-    
+
     if (semesterId) {
       studentCountSubquery += ` AND ta.semestre = $${paramIndex}`;
       params.push(semesterId);
       paramIndex++;
     }
-    
+
     studentCountSubquery += `) as student_count`;
 
     let query = `
