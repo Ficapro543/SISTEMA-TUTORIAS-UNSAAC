@@ -45,7 +45,7 @@ async function getTutors(req, res, next) {
     studentCountSubquery += `) as student_count`;
 
     let query = `
-      SELECT u.id, u.first_name, u.last_name, u.email, t.codigo as code,
+      SELECT u.id, u.first_name, u.last_name, u.email, u.email as code,
         ${studentCountSubquery}
       FROM users u
       INNER JOIN tutores t ON u.id = t.user_id
@@ -53,7 +53,7 @@ async function getTutors(req, res, next) {
     `;
 
     if (search) {
-      query += ` AND (u.first_name ILIKE $${paramIndex} OR u.last_name ILIKE $${paramIndex} OR u.email ILIKE $${paramIndex} OR t.codigo ILIKE $${paramIndex})`;
+      query += ` AND (u.first_name ILIKE $${paramIndex} OR u.last_name ILIKE $${paramIndex} OR u.email ILIKE $${paramIndex})`;
       params.push(`%${search}%`);
     }
 
@@ -157,6 +157,7 @@ async function getStudentsByTutor(req, res, next) {
 
     const query = `
       SELECT e.codigo_estudiante as id, e.codigo_estudiante as code, e.nombre_estudiante as first_name, e.apellido_estudiante as last_name,
+      ta.semestre as semester,
       (SELECT COUNT(*) FROM tutorias t 
        INNER JOIN cronogramas c ON t.cronograma_id = c.id
        WHERE c.codigo_estudiante = e.codigo_estudiante AND c.semestre = $2) as tutorias_count
@@ -188,6 +189,19 @@ async function transferStudents(req, res, next) {
 
     await client.query('BEGIN');
 
+    // Obtener el último semestre disponible (más reciente)
+    const lastSemesterQuery = `
+      SELECT DISTINCT semestre 
+      FROM tutor_asignacion 
+      UNION 
+      SELECT DISTINCT semestre 
+      FROM cronogramas 
+      ORDER BY semestre DESC 
+      LIMIT 1
+    `;
+    const lastSemesterResult = await client.query(lastSemesterQuery);
+    const targetSemester = lastSemesterResult.rows.length > 0 ? lastSemesterResult.rows[0].semestre : semesterId;
+
     // Marcar las asignaciones anteriores como 'reasignado' y establecer fecha_reasignacion
     const updateQuery = `
       UPDATE tutor_asignacion 
@@ -206,7 +220,7 @@ async function transferStudents(req, res, next) {
       return res.status(404).json({ message: 'No se encontraron asignaciones activas para transferir.' });
     }
 
-    // Crear nuevas asignaciones activas para el tutor destino
+    // Crear nuevas asignaciones activas para el tutor destino EN EL ÚLTIMO SEMESTRE
     const insertValues = updateResult.rows.map((row, idx) => 
       `($${idx * 3 + 1}, $${idx * 3 + 2}, $${idx * 3 + 3}, 'activo')`
     ).join(', ');
@@ -214,8 +228,10 @@ async function transferStudents(req, res, next) {
     const insertParams = updateResult.rows.flatMap(row => [
       destinationTutorId,
       row.codigo_estudiante,
-      semesterId
+      targetSemester
     ]);
+
+    console.log(`Transferencia: Asignaciones marcadas en semestre ${semesterId}, nuevas asignaciones creadas en semestre ${targetSemester}`);
 
     const insertQuery = `
       INSERT INTO tutor_asignacion (tutor_user_id, codigo_estudiante, semestre, estado)
@@ -227,9 +243,10 @@ async function transferStudents(req, res, next) {
     await client.query('COMMIT');
     
     res.json({ 
-      message: 'Transferencia realizada con éxito.', 
+      message: `Transferencia realizada con éxito. Estudiantes asignados al semestre ${targetSemester}.`, 
       count: updateResult.rowCount,
-      transferred: updateResult.rows.map(r => r.codigo_estudiante)
+      transferred: updateResult.rows.map(r => r.codigo_estudiante),
+      targetSemester: targetSemester
     });
 
   } catch (err) {
@@ -265,6 +282,19 @@ async function transferAllStudents(req, res, next) {
 
     await client.query('BEGIN');
 
+    // Obtener el último semestre disponible (más reciente)
+    const lastSemesterQuery = `
+      SELECT DISTINCT semestre 
+      FROM tutor_asignacion 
+      UNION 
+      SELECT DISTINCT semestre 
+      FROM cronogramas 
+      ORDER BY semestre DESC 
+      LIMIT 1
+    `;
+    const lastSemesterResult = await client.query(lastSemesterQuery);
+    const targetSemester = lastSemesterResult.rows.length > 0 ? lastSemesterResult.rows[0].semestre : semesterId;
+
     // Obtener todos los estudiantes activos del tutor origen
     const studentsQuery = `
       SELECT codigo_estudiante
@@ -291,7 +321,7 @@ async function transferAllStudents(req, res, next) {
     `;
     await client.query(updateQuery, [originTutorId, semesterId]);
 
-    // Crear nuevas asignaciones activas para el tutor destino
+    // Crear nuevas asignaciones activas para el tutor destino EN EL ÚLTIMO SEMESTRE
     const insertValues = studentsResult.rows.map((row, idx) => 
       `($${idx * 3 + 1}, $${idx * 3 + 2}, $${idx * 3 + 3}, 'activo')`
     ).join(', ');
@@ -299,8 +329,10 @@ async function transferAllStudents(req, res, next) {
     const insertParams = studentsResult.rows.flatMap(row => [
       destinationTutorId,
       row.codigo_estudiante,
-      semesterId
+      targetSemester
     ]);
+
+    console.log(`Transferencia masiva: Asignaciones marcadas en semestre ${semesterId}, nuevas asignaciones creadas en semestre ${targetSemester}`);
 
     const insertQuery = `
       INSERT INTO tutor_asignacion (tutor_user_id, codigo_estudiante, semestre, estado)
@@ -312,9 +344,10 @@ async function transferAllStudents(req, res, next) {
     await client.query('COMMIT');
     
     res.json({ 
-      message: 'Reasignación masiva completada con éxito.', 
+      message: `Reasignación masiva completada con éxito. Estudiantes asignados al semestre ${targetSemester}.`, 
       count: studentsResult.rowCount,
-      transferred: studentsResult.rows.map(r => r.codigo_estudiante)
+      transferred: studentsResult.rows.map(r => r.codigo_estudiante),
+      targetSemester: targetSemester
     });
 
   } catch (err) {
