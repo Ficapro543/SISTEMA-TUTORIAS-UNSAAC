@@ -28,6 +28,8 @@ app.get("/api/ping", (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/assignments', assignmentRoutes);
+app.use('/api/verificador', require('./routes/verificador'));
+
 
 // Error handler:
 app.use((err, req, res, next) => {

@@ -1,0 +1,223 @@
+.container {
+    padding: 2rem;
+    font-family: var(--font-main);
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+.header {
+    margin-bottom: 2rem;
+}
+
+.title {
+    color: var(--color-secondary);
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: var(--color-gray);
+    font-size: 1rem;
+    margin: 0;
+}
+
+/* Search Section */
+.searchSection {
+    background: white;
+    padding: 2rem;
+    border-radius: var(--radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.searchForm {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+    max-width: 600px;
+}
+
+.searchInput {
+    flex: 1;
+    padding: 0.8rem 1.2rem;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 1rem;
+    color: var(--color-text-dark);
+    transition: border-color var(--transition);
+}
+
+.searchInput:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(0, 78, 146, 0.1);
+}
+
+.searchButton {
+    padding: 0.8rem 2rem;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all var(--transition);
+    white-space: nowrap;
+}
+
+.searchButton:hover {
+    background-color: var(--color-secondary);
+    transform: translateY(-1px);
+}
+
+/* Results Section */
+.resultsContainer {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Student Card */
+.studentCard {
+    background: white;
+    border-radius: var(--radius);
+    border-left: 5px solid var(--color-primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    align-items: center;
+}
+
+.studentInfoGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.infoLabel {
+    font-size: 0.85rem;
+    color: var(--color-gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.infoValue {
+    font-size: 1.1rem;
+    color: var(--color-secondary);
+    font-weight: 500;
+}
+
+/* Table */
+.tableContainer {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    border: 1px solid rgba(0, 78, 146, 0.1);
+}
+
+.sectionTitle {
+    padding: 1.5rem 1.5rem 0;
+    margin: 0;
+    color: var(--color-secondary);
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.tableWrapper {
+    overflow-x: auto;
+    padding-top: 1rem;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+}
+
+.table th {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--color-secondary);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #e1e5eb;
+}
+
+.table td {
+    padding: 1rem 1.5rem;
+    color: var(--color-text-dark);
+    font-size: 0.95rem;
+    vertical-align: top;
+    border-bottom: 1px solid #e1e5eb;
+}
+
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Empty State */
+.emptyState {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--color-gray);
+}
+
+.emptyIcon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.3;
+}
+
+.emptyText {
+    font-size: 1.1rem;
+}
+
+/* Status Badges */
+.badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.badgeAsistio {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.badgeFalto {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.badgeProgramada {
+    background-color: #dbeafe;
+    color: #1e40af;
+}

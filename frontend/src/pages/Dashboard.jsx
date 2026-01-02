@@ -4,7 +4,7 @@ import {
     FaCog, FaBook, FaFolderOpen, FaArrowRight,
     FaCalendarAlt, FaClock, FaUserCircle, FaHashtag, FaEnvelope, FaCheckCircle,
     FaUserCheck, FaProjectDiagram, FaFileAlt, FaCaretDown, FaCaretUp, FaSignOutAlt,
-    FaExchangeAlt, FaShieldAlt
+    FaExchangeAlt, FaShieldAlt, FaSearch, FaChalkboardTeacher
 } from "react-icons/fa";
 import styles from "../styles/pages/Dashboard.module.css";
 // Admin Views
@@ -19,9 +19,10 @@ import RegistrarSesion from "./tutor/RegistrarSesion";
 import ActividadesList from "./tutor/ActividadesList";
 
 // Verifier Views
-import RevisionSesiones from "./verificador/RevisionSesiones";
-import ReportesVerificador from "./verificador/ReportesVerificador";
-import FichaTutoria from "./verificador/FichaTutoria";
+import VerifEstudiantesAtendidos from "../pages/verificador/VerifEstudiantesAtendidos";
+import VerifConsultaTutorias from "../pages/verificador/VerifConsultaTutorias";
+import VerifSeguimientoEstudiante from "../pages/verificador/VerifSeguimientoEstudiante";
+import VerifSeguimientoTutor from "../pages/verificador/VerifSeguimientoTutor";
 
 export default function Dashboard() {
     const navigate = useNavigate();
@@ -33,7 +34,7 @@ export default function Dashboard() {
     const [activeTab, setActiveTab] = useState('inicio'); // 'inicio', 'admin', 'tutor', 'verificador'
     const [activeAdminTab, setActiveAdminTab] = useState('reportes'); // 'validar', 'asignaciones', 'cambio', 'cronogramas', 'reportes','seguridad'
     const [activeTutorTab, setActiveTutorTab] = useState('tutorados'); // 'tutorados', 'sesiones', 'actividades'
-    const [activeVerifierTab, setActiveVerifierTab] = useState('revision'); // 'revision', 'reportes', 'ficha'
+    const [activeVerifierTab, setActiveVerifierTab] = useState('estudiantes'); // 'estudiantes', 'consulta', 'seguimiento_est', 'seguimiento_tut'
 
     const [showUserMenu, setShowUserMenu] = useState(false);
 
@@ -271,7 +272,7 @@ export default function Dashboard() {
                     </div>
                 </div>
             </div>
-            
+
             {/* Admin Secondary Navigation */}
             {activeTab === 'admin' && (
                 <div className={styles.secondaryNav}>
@@ -356,25 +357,32 @@ export default function Dashboard() {
                 <div className={styles.secondaryNav}>
                     <div className={styles.subTabsContainer}>
                         <div
-                            className={`${styles.subTab} ${activeVerifierTab === 'revision' ? styles.subTabActive : ''}`}
-                            onClick={() => handleVerifierSubTabClick('revision')}
+                            className={`${styles.subTab} ${activeVerifierTab === 'estudiantes' ? styles.subTabActive : ''}`}
+                            onClick={() => handleVerifierSubTabClick('estudiantes')}
                         >
-                            <FaCheckCircle className={styles.subTabIcon} />
-                            <span>Revisión de Sesiones</span>
+                            <FaUserCheck className={styles.subTabIcon} />
+                            <span>Estudiantes Atendidos</span>
                         </div>
                         <div
-                            className={`${styles.subTab} ${activeVerifierTab === 'reportes' ? styles.subTabActive : ''}`}
-                            onClick={() => handleVerifierSubTabClick('reportes')}
+                            className={`${styles.subTab} ${activeVerifierTab === 'consulta' ? styles.subTabActive : ''}`}
+                            onClick={() => handleVerifierSubTabClick('consulta')}
                         >
-                            <FaFileAlt className={styles.subTabIcon} />
-                            <span>Reportes del Tutor</span>
+                            <FaSearch className={styles.subTabIcon} />
+                            <span>Consulta Tutorías</span>
                         </div>
                         <div
-                            className={`${styles.subTab} ${activeVerifierTab === 'ficha' ? styles.subTabActive : ''}`}
-                            onClick={() => handleVerifierSubTabClick('ficha')}
+                            className={`${styles.subTab} ${activeVerifierTab === 'seguimiento_est' ? styles.subTabActive : ''}`}
+                            onClick={() => handleVerifierSubTabClick('seguimiento_est')}
                         >
                             <FaUserCircle className={styles.subTabIcon} />
-                            <span>Ficha de Tutoría</span>
+                            <span>Seguimiento Estudiante</span>
+                        </div>
+                        <div
+                            className={`${styles.subTab} ${activeVerifierTab === 'seguimiento_tut' ? styles.subTabActive : ''}`}
+                            onClick={() => handleVerifierSubTabClick('seguimiento_tut')}
+                        >
+                            <FaChalkboardTeacher className={styles.subTabIcon} />
+                            <span>Seguimiento Tutor</span>
                         </div>
                     </div>
                 </div>
@@ -462,7 +470,7 @@ export default function Dashboard() {
                         )}
 
                         {activeAdminTab === 'reportes' && (
-                            <TutoriasHistoricas embedded={true}/>
+                            <TutoriasHistoricas embedded={true} />
                         )}
 
                         {activeAdminTab === 'seguridad' && (
@@ -471,7 +479,7 @@ export default function Dashboard() {
                                 <div className={styles.contentPlaceholder}>
                                     <p>Sistema de Recuperación y Backup (Próximamente).</p>
                                 </div>
-                            </>                            
+                            </>
                         )}
                     </div>
                 </div>
@@ -498,14 +506,17 @@ export default function Dashboard() {
             {activeTab === 'verificador' && (
                 <div className={styles.contentArea}>
                     <div className={styles.contentCard}>
-                        {activeVerifierTab === 'revision' && (
-                            <RevisionSesiones />
+                        {activeVerifierTab === 'estudiantes' && (
+                            <VerifEstudiantesAtendidos />
                         )}
-                        {activeVerifierTab === 'reportes' && (
-                            <ReportesVerificador />
+                        {activeVerifierTab === 'consulta' && (
+                            <VerifConsultaTutorias />
                         )}
-                        {activeVerifierTab === 'ficha' && (
-                            <FichaTutoria />
+                        {activeVerifierTab === 'seguimiento_est' && (
+                            <VerifSeguimientoEstudiante />
+                        )}
+                        {activeVerifierTab === 'seguimiento_tut' && (
+                            <VerifSeguimientoTutor />
                         )}
                     </div>
                 </div>
