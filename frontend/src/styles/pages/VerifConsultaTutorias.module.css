@@ -1,0 +1,196 @@
+.container {
+    padding: 2rem;
+    font-family: var(--font-main);
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+.header {
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.titleSection {
+    flex: 1;
+}
+
+.title {
+    color: var(--color-secondary);
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: var(--color-gray);
+    font-size: 1rem;
+    margin: 0;
+}
+
+.actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.actionButton {
+    padding: 0.6rem 1.2rem;
+    background-color: white;
+    color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.actionButton:hover {
+    background-color: rgba(0, 78, 146, 0.05);
+}
+
+.controls {
+    background: white;
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2rem;
+}
+
+.filters {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.selectGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 200px;
+}
+
+.label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--color-secondary);
+}
+
+.select {
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: var(--color-text-dark);
+    background-color: white;
+    transition: border-color var(--transition);
+    width: 100%;
+}
+
+.select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.searchButton {
+    padding: 0.6rem 2rem;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background-color var(--transition);
+    height: 42px;
+    /* Visual alignment with inputs */
+}
+
+.searchButton:hover {
+    background-color: var(--color-secondary);
+}
+
+.tableContainer {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    border: 1px solid rgba(0, 78, 146, 0.1);
+}
+
+.tableWrapper {
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+}
+
+.table thead {
+    background-color: #f1f4f9;
+    border-bottom: 2px solid #e1e5eb;
+}
+
+.table th {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--color-secondary);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.table tbody tr {
+    border-bottom: 1px solid #e1e5eb;
+    transition: background-color 0.2s ease;
+}
+
+.table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(0, 78, 146, 0.02);
+}
+
+.table td {
+    padding: 1rem 1.5rem;
+    color: var(--color-text-dark);
+    font-size: 0.95rem;
+    vertical-align: middle;
+}
+
+/* Status styles for this specific table */
+.statusBadge {
+    display: inline-flex;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.statusRealizada {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.statusProgramada {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.statusCancelada {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
