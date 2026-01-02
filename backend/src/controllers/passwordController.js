@@ -47,7 +47,7 @@ const sendResetCode = async(req, res) =>{
         );
 
         //Enviamos correo
-        await sendEmailResetCode(email, resetCode);
+        await sendEmailResetCode(email, resetCode, `${user.first_name} + ${user.last_name}`);
 
         res.status(200).json({
             message: 'Si el correo está registrado, recibirás un código en breve.',
@@ -137,7 +137,7 @@ const resendResetCode = async(req, res) =>{
         );
 
         // Enviar correo
-        await resendEmailResetCode(email, resetCode);
+        await resendEmailResetCode(email, resetCode, `${user.first_name} + ${user.last_name}`);
 
         res.status(200).json({
             message: 'Se ha enviado un nuevo código',

@@ -31,7 +31,7 @@ async function createPendingUser(req, res, next) {
 
     // enviar notificación a administradores
     const adminEmail = process.env.ADMIN_EMAIL;
-    await sendAdminApprovalEmail(adminEmail, id);
+    await sendAdminApprovalEmail(adminEmail, `${first_name} ${last_name}`, email);
 
     // === PARA PRODUCCION ===
     // const adminsQuery = await pool.query(`
@@ -134,7 +134,7 @@ async function approvePendingUser(req, res, next) {
     await pool.query(`DELETE FROM pending_users WHERE id=$1`, [pendingUserId]);
 
     // Enviar correo con token, NO con userId
-    await sendUserActivationEmail(pendingUser.email, activationToken);
+    await sendUserActivationEmail(pendingUser.email, activationToken, `${pendingUser.first_name} ${last_name}`, finalRoles);
 
     res.json({
       message: 'Usuario aprobado y correo de activación enviado',
