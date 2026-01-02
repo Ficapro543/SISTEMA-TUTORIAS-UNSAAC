@@ -1,0 +1,195 @@
+/* TutorPanel.module.css */
+
+.container {
+    padding: 10px;
+}
+
+/* Header Section */
+.panelHeader {
+    background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+    border-radius: 12px;
+    padding: 24px 30px;
+    margin-bottom: 24px;
+    border: 1px solid #bae6fd;
+}
+
+.panelTitle {
+    color: #1a237e;
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    letter-spacing: 0.5px;
+}
+
+.welcomeText {
+    color: #1e293b;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+}
+
+.subtitle {
+    color: #64748b;
+    font-size: 0.95rem;
+    margin: 0;
+    font-weight: 400;
+}
+
+/* Table Container */
+.tableContainer {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 33, 71, 0.08);
+    border: 1px solid rgba(0, 78, 146, 0.12);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+}
+
+.table thead {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+}
+
+.table th {
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 16px 20px;
+    text-align: left;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.table th:last-child {
+    border-right: none;
+    text-align: center;
+}
+
+.table tbody tr {
+    border-bottom: 1px solid rgba(0, 78, 146, 0.08);
+    transition: background-color 0.2s ease;
+}
+
+.table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(0, 78, 146, 0.03);
+}
+
+.table td {
+    padding: 18px 20px;
+    color: var(--color-secondary);
+    font-size: 0.95rem;
+    vertical-align: middle;
+}
+
+/* Action Buttons */
+.actionsCell {
+    text-align: center;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+}
+
+.btnEditar,
+.btnRegistrar,
+.btnImprimir {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    letter-spacing: 0.2px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btnEditar {
+    background-color: #f59e0b;
+    color: white;
+}
+
+.btnEditar:hover {
+    background-color: #d97706;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3);
+}
+
+.btnRegistrar,
+.btnImprimir {
+    background-color: #1a237e;
+    color: white;
+}
+
+.btnRegistrar:hover,
+.btnImprimir:hover {
+    background-color: #0d144d;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(26, 35, 126, 0.3);
+}
+
+.btnEditar:active,
+.btnRegistrar:active,
+.btnImprimir:active {
+    transform: translateY(0);
+}
+
+/* Empty State */
+.emptyState {
+    text-align: center;
+    padding: 60px 24px;
+    color: #64748b;
+    font-size: 1rem;
+}
+
+.emptyIcon {
+    font-size: 3rem;
+    margin-bottom: 16px;
+    opacity: 0.4;
+}
+
+/* Loading State */
+.loadingState {
+    text-align: center;
+    padding: 40px;
+    color: #64748b;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .panelHeader {
+        padding: 20px;
+    }
+
+    .panelTitle {
+        font-size: 1.4rem;
+    }
+
+    .table {
+        min-width: 600px;
+    }
+
+    .actionsCell {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .btnEditar,
+    .btnRegistrar,
+    .btnImprimir {
+        font-size: 0.8rem;
+        padding: 6px 10px;
+    }
+}

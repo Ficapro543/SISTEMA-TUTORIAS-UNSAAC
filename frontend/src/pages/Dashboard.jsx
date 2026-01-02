@@ -14,6 +14,7 @@ import CambioTutorados from "./admin/CambioTutorados";
 import TutoriasHistoricas from "./admin/TutoriasHistoricas";
 
 // Tutor Views
+import TutorPanel from "./tutor/TutorPanel";
 import TutoradosList from "./tutor/TutoradosList";
 import RegistrarSesion from "./tutor/RegistrarSesion";
 import ActividadesList from "./tutor/ActividadesList";
@@ -32,7 +33,7 @@ export default function Dashboard() {
     // Navigation States
     const [activeTab, setActiveTab] = useState('inicio'); // 'inicio', 'admin', 'tutor', 'verificador'
     const [activeAdminTab, setActiveAdminTab] = useState('reportes'); // 'validar', 'asignaciones', 'cambio', 'cronogramas', 'reportes','seguridad'
-    const [activeTutorTab, setActiveTutorTab] = useState('tutorados'); // 'tutorados', 'sesiones', 'actividades'
+    const [activeTutorTab, setActiveTutorTab] = useState('panel'); // 'panel', 'tutorados', 'sesiones', 'actividades'
     const [activeVerifierTab, setActiveVerifierTab] = useState('revision'); // 'revision', 'reportes', 'ficha'
 
     const [showUserMenu, setShowUserMenu] = useState(false);
@@ -283,6 +284,13 @@ export default function Dashboard() {
                 <div className={styles.secondaryNav}>
                     <div className={styles.subTabsContainer}>
                         <div
+                            className={`${styles.subTab} ${activeTutorTab === 'panel' ? styles.subTabActive : ''}`}
+                            onClick={() => handleTutorSubTabClick('panel')}
+                        >
+                            <FaBook className={styles.subTabIcon} />
+                            <span>Panel</span>
+                        </div>
+                        <div
                             className={`${styles.subTab} ${activeTutorTab === 'tutorados' ? styles.subTabActive : ''}`}
                             onClick={() => handleTutorSubTabClick('tutorados')}
                         >
@@ -462,7 +470,7 @@ export default function Dashboard() {
                         )}
 
                         {activeAdminTab === 'reportes' && (
-                            <TutoriasHistoricas embedded={true}/>
+                            <TutoriasHistoricas embedded={true} />
                         )}
 
                         {activeAdminTab === 'seguridad' && (
@@ -471,7 +479,7 @@ export default function Dashboard() {
                                 <div className={styles.contentPlaceholder}>
                                     <p>Sistema de Recuperación y Backup (Próximamente).</p>
                                 </div>
-                            </>                            
+                            </>
                         )}
                     </div>
                 </div>
@@ -481,6 +489,9 @@ export default function Dashboard() {
             {activeTab === 'tutor' && (
                 <div className={styles.contentArea}>
                     <div className={styles.contentCard}>
+                        {activeTutorTab === 'panel' && (
+                            <TutorPanel />
+                        )}
                         {activeTutorTab === 'tutorados' && (
                             <TutoradosList />
                         )}

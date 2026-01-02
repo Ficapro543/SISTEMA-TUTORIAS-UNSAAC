@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 const assignmentRoutes = require('./routes/assignments');
+const tutorRoutes = require('./routes/tutor');
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.get("/api/ping", (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/assignments', assignmentRoutes);
+app.use('/api/tutor', tutorRoutes);
 
 // Error handler:
 app.use((err, req, res, next) => {
