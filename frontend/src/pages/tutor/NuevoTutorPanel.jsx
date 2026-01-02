@@ -19,7 +19,7 @@ import Textarea from '../../componentes/ui/Textarea';
 import Label from '../../componentes/ui/Label';
 import { RadioGroup, RadioGroupItem } from '../../componentes/ui/RadioGroup';
 import { Plus, Pencil, Printer, Check, CornerDownLeft, Loader2 } from '../../componentes/ui/icons';
-import styles from './NuevoTutorPanel.module.css';
+import styles from '../../styles/pages/NuevoTutorPanel.module.css';
 import { getTutorias, registrarTutoria, actualizarTutoria } from '../../services/tutorService';
 
 const NuevoTutorPanel = () => {
