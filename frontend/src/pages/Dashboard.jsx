@@ -12,6 +12,7 @@ import AprobarRegistro from "./admin/NuevoValidarUsuarios";
 import AsignacionTutorados from "./admin/AsignacionTutorados";
 import CambioTutorados from "./admin/CambioTutorados";
 import TutoriasHistoricas from "./admin/TutoriasHistoricas";
+import Cronogramas from "./Cronogramas";
 
 // Tutor Views
 import NuevoTutorPanel from "./tutor/NuevoTutorPanel";
@@ -430,12 +431,7 @@ export default function Dashboard() {
                         )}
 
                         {activeAdminTab === 'cronogramas' && (
-                            <>
-                                <h3 className={styles.contentTitle}>Cronogramas</h3>
-                                <div className={styles.contentPlaceholder}>
-                                    <p>Gestión de cronogramas académicas y de tutoría (Próximamente).</p>
-                                </div>
-                            </>
+                            <Cronogramas embedded = {true}/>
                         )}
 
                         {activeAdminTab === 'reportes' && (
