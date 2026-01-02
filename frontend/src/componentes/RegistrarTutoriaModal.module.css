@@ -1,0 +1,394 @@
+/* RegistrarTutoriaModal.module.css */
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.modal {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 700px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.header {
+    padding: 24px 30px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, #f8fafc, #ffffff);
+}
+
+.title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #1a237e;
+    margin: 0;
+}
+
+.closeBtn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #64748b;
+    cursor: pointer;
+    padding: 4px 8px;
+    transition: color 0.2s;
+}
+
+.closeBtn:hover {
+    color: #1a237e;
+}
+
+.body {
+    padding: 30px;
+}
+
+.infoSection {
+    background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    border: 1px solid #bae6fd;
+}
+
+.infoGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.infoItem {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.infoLabel {
+    font-size: 0.75rem;
+    color: #64748b;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.infoValue {
+    font-size: 0.95rem;
+    color: #1a237e;
+    font-weight: 600;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.label {
+    font-weight: 600;
+    color: #475569;
+    font-size: 0.9rem;
+}
+
+.textarea {
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    min-height: 100px;
+    resize: vertical;
+}
+
+.textarea:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.select {
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: white;
+    cursor: pointer;
+}
+
+.select:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.checkboxLabel {
+    font-weight: 500;
+    color: #334155;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    padding-top: 24px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.cancelBtn,
+.submitBtn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.cancelBtn {
+    background-color: #f1f5f9;
+    color: #475569;
+}
+
+.cancelBtn:hover {
+    background-color: #e2e8f0;
+}
+
+.submitBtn {
+    background-color: #1a237e;
+    color: white;
+}
+
+.submitBtn:hover {
+    background-color: #0d144d;
+}
+
+.submitBtn:disabled {
+    background-color: #cbd5e1;
+    cursor: not-allowed;
+}
+
+.statusMessage {
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.statusMessage.success {
+    background-color: #ecfdf5;
+    color: #059669;
+    border: 1px solid #86efac;
+}
+
+.statusMessage.error {
+    background-color: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fca5a5;
+}
+
+/* Derivación Section */
+.derivacionSection {
+    margin-top: 8px;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.infoTooltip {
+    cursor: help;
+    font-size: 0.9rem;
+    margin-left: 4px;
+}
+
+/* Radio Group */
+.radioGroup {
+    display: flex;
+    gap: 20px;
+    margin-top: 12px;
+    margin-bottom: 16px;
+}
+
+.radioOption {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 8px 16px;
+    background: white;
+    border: 2px solid #cbd5e1;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.radioOption:hover {
+    border-color: #2563eb;
+    background: #f8fafc;
+}
+
+.radioOption input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #1a237e;
+}
+
+.radioOption input[type="radio"]:checked+.radioLabel {
+    font-weight: 700;
+    color: #1a237e;
+}
+
+.radioLabel {
+    font-size: 0.95rem;
+    color: #334155;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Conditional Fields */
+.conditionalFields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 16px;
+    padding: 16px;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #bae6fd;
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.conditionalFields .formGroup {
+    margin: 0;
+}
+
+/* Input Field */
+.input {
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .modal {
+        max-width: 100%;
+        max-height: 100vh;
+        border-radius: 0;
+    }
+
+    .header {
+        padding: 20px;
+    }
+
+    .title {
+        font-size: 1.2rem;
+    }
+
+    .body {
+        padding: 20px;
+    }
+
+    .infoGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .actions {
+        flex-direction: column-reverse;
+    }
+
+    .cancelBtn,
+    .submitBtn {
+        width: 100%;
+    }
+
+    .conditionalFields {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .radioGroup {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
