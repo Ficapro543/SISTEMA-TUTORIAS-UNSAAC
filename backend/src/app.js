@@ -30,6 +30,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/assignments', assignmentRoutes);
 app.use('/api/verificador', require('./routes/verificador'));
 
+app.use('/api/cronogramas', require('./routes/cronogramas'));
 
 // Error handler:
 app.use((err, req, res, next) => {

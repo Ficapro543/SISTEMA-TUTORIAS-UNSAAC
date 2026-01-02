@@ -106,9 +106,7 @@ function Login() {
   const handleForgotPassword = () => navigate("/recuperar");
   const handleRegister = () => navigate("/registro");
 
-  const handleGoogleLogin = () => {
-    alert("🔐 Conexión con Google iniciada (pendiente de backend)");
-  };
+
 
   return (
     <div className={styles.loginPage}>
@@ -168,14 +166,7 @@ function Login() {
           </p>
         </form>
 
-        <div className={styles.divider}>
-          <span>O continúa con</span>
-        </div>
 
-        <button className={styles.googleBtn} onClick={handleGoogleLogin}>
-          <img src="/google.svg" alt="Google" />
-          Continuar con Google
-        </button>
 
         <div className={styles.registerSection}>
           <p>¿No tienes cuenta?</p>
