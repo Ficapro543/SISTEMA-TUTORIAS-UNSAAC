@@ -7,7 +7,7 @@ import CrearCronogramaModal from '../componentes/CrearCronogramaModal';
 import { getCronogramas, createCronograma } from '../services/cronogramaService';
 import styles from '../styles/pages/Cronogramas.module.css';
 
-export default function Cronogramas() {
+export default function Cronogramas({ embedded = false }) {
     const navigate = useNavigate();
     const [cronogramas, setCronogramas] = useState([]);
     const [visibleCount, setVisibleCount] = useState(5);
@@ -109,11 +109,123 @@ export default function Cronogramas() {
             throw err;
         }
     };
+    if(embedded){
+        return(
+
+            <>
+                {/* Title Section */}
+                <div className={styles.titleSection}>
+                    <div className={styles.titleGroup}>
+                        <h2 className={styles.pageTitle}>Cronograma de tutorías</h2>
+                    </div>
+                    <div className={styles.actionGroup}>
+                        <div className={styles.searchWrapper}>
+                            <Search className={styles.searchIcon} size={20} />
+                            <input
+                                type="text"
+                                placeholder="Buscar por tutor..."
+                                className={styles.searchInput}
+                                value={searchTerm}
+                                onChange={handleSearch}
+                            />
+                        </div>
+                        <button
+                            className={styles.createBtn}
+                            onClick={() => setIsModalOpen(true)}
+                        >
+                            <CalendarPlus size={20} />
+                            Crear nuevo cronograma
+                        </button>
+                    </div>
+                </div>
+
+                {/* Cronogramas Table */}
+                <div className={styles.tableCard}>
+                    <div className={styles.tableHeader}>
+                        <h3 className={styles.tableTitle}>Lista de Cronogramas</h3>
+                    </div>
+
+                    {loading ? (
+                        <div className={styles.emptyState}>Cargando cronogramas...</div>
+                    ) : error ? (
+                        <div className={styles.errorState}>{error}</div>
+                    ) : (
+                        <>
+                            {/* Table Header */}
+                            <div className={styles.tableHeaderRow}>
+                                <div className={styles.tableHeaderCell}>Fecha</div>
+                                <div className={styles.tableHeaderCell}>Horario</div>
+                                <div className={styles.tableHeaderCell}>Aula</div>
+                                <div className={styles.tableHeaderCell}>Tutor</div>
+                                <div className={styles.tableHeaderCell}>Estudiantes</div>
+                                <div className={styles.tableHeaderCell}></div>
+                            </div>
+
+                            {/* Table Body */}
+                            <div className={styles.tableBody}>
+                                {visibleCronogramas.length === 0 ? (
+                                    <div className={styles.emptyState}>
+                                        No se encontraron cronogramas
+                                        {searchTerm && ` para "${searchTerm}"`}
+                                    </div>
+                                ) : (
+                                    visibleCronogramas.map((cronograma) => (
+                                        <div key={cronograma.id} className={styles.tableRow}>
+                                            <div className={styles.tableCell}>{cronograma.fecha}</div>
+                                            <div className={styles.tableCell}>{cronograma.horario}</div>
+                                            <div className={styles.tableCell}>{cronograma.aula}</div>
+                                            <div className={styles.tableCell}>{cronograma.tutor}</div>
+                                            <div className={styles.tableCell}>
+                                                <span className={styles.badge}>
+                                                    {cronograma.estudiantes}
+                                                </span>
+                                            </div>
+                                            <div className={styles.tableCell}>
+                                                <button
+                                                    onClick={() => handlePrintSingle(cronograma)}
+                                                    disabled={isPrinting}
+                                                    className={styles.printBtn}
+                                                    title="Imprimir"
+                                                >
+                                                    <Printer size={20} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+
+                            {/* Footer Actions */}
+                            <div className={styles.tableFooter}>
+                                {hasMore && (
+                                    <button onClick={handleShowMore} className={styles.showMoreBtn}>
+                                        Mostrar más
+                                    </button>
+                                )}
+                                <button
+                                    onClick={handlePrintAll}
+                                    disabled={isPrinting || cronogramas.length === 0}
+                                    className={styles.printAllBtn}
+                                >
+                                    <Printer size={20} />
+                                    {isPrinting ? 'Generando PDF...' : 'Imprimir Todos'}
+                                </button>
+                            </div>
+                        </>
+                    )}
+                </div>
+                {/* Modal para crear cronograma */}
+                <CrearCronogramaModal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    onSubmit={handleCreateCronograma}
+                />
+            </>
+        );
+    }
 
     return (
         <div className={styles.container}>
-            {/* Header Removed as requested */}
-
             {/* Main Content */}
             <main className={styles.main}>
                 {/* Breadcrumb */}
@@ -129,9 +241,6 @@ export default function Cronogramas() {
                 <div className={styles.titleSection}>
                     <div className={styles.titleGroup}>
                         <h2 className={styles.pageTitle}>Cronograma de tutorías</h2>
-                        <button className={styles.infoBtn}>
-                            <div className={styles.infoIcon}></div>
-                        </button>
                     </div>
                     <div className={styles.actionGroup}>
                         <div className={styles.searchWrapper}>

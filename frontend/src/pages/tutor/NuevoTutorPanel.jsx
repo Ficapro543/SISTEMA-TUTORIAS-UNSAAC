@@ -19,7 +19,7 @@ import Textarea from '../../componentes/ui/Textarea';
 import Label from '../../componentes/ui/Label';
 import { RadioGroup, RadioGroupItem } from '../../componentes/ui/RadioGroup';
 import { Plus, Pencil, Printer, Check, CornerDownLeft, Loader2 } from '../../componentes/ui/icons';
-import styles from './NuevoTutorPanel.module.css';
+import styles from '../../styles/pages/NuevoTutorPanel.module.css';
 
 // Mock data basado en las tablas de la BDD
 const mockCronogramas = [
@@ -220,13 +220,7 @@ const NuevoTutorPanel = () => {
 
     return (
         <div className={styles.container}>
-            {/* Welcome Card */}
-            <div className={styles.welcomeCard}>
-                <h2 className={styles.welcomeTitle}>¡Bienvenido!</h2>
-                <h3 className={styles.welcomeName}>{userName}</h3>
-                <p className={styles.welcomeText}>Accede a las herramientas del sistema de tutorías</p>
-            </div>
-
+            
             {/* Table */}
             <div className={styles.tableCard}>
                 <Table>

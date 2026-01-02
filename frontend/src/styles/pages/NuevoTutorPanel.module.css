@@ -5,35 +5,6 @@
     font-family: var(--font-main);
 }
 
-/* Welcome Card */
-.welcomeCard {
-    background-color: #fff;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    padding: 2rem;
-    text-align: center;
-}
-
-.welcomeTitle {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--color-primary);
-    margin: 0 0 0.5rem 0;
-}
-
-.welcomeName {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--color-text-dark);
-    margin: 0 0 0.5rem 0;
-}
-
-.welcomeText {
-    font-size: 0.875rem;
-    color: #666;
-    margin: 0;
-}
-
 /* Table Card */
 .tableCard {
     background-color: #fff;
