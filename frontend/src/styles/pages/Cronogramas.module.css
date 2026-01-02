@@ -257,12 +257,13 @@
   gap: 1rem;
   padding: 1rem 1.5rem;
   border-bottom: 1px solid #e5e7eb;
-  background-color: #f9fafb;
+  background-color: #1e3a8a;
+  border-radius: 0.5rem 0.5rem 0 0;
 }
 
 .tableHeaderCell {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: white;
   font-weight: 500;
 }
 

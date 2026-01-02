@@ -17,7 +17,6 @@ async function getCronogramas(req, res, next) {
         c.id,
         c.fecha,
         c.hora,
-        c.hora_fin,
         c.ambiente,
         c.semestre,
         c.estado,
@@ -58,6 +57,15 @@ async function getCronogramas(req, res, next) {
             const key = `${row.tutor_id}-${row.fecha}-${row.hora}`;
 
             if (!cronogramasMap.has(key)) {
+                // Calcular hora fin (hora inicio + 15 minutos)
+                const [hours, minutes] = row.hora.split(':');
+                const date = new Date();
+                date.setHours(parseInt(hours), parseInt(minutes));
+                date.setMinutes(date.getMinutes() + 15);
+                const endHours = date.getHours().toString().padStart(2, '0');
+                const endMinutes = date.getMinutes().toString().padStart(2, '0');
+                const horaFin = `${endHours}:${endMinutes}`;
+
                 cronogramasMap.set(key, {
                     id: row.id,
                     fecha: new Date(row.fecha).toLocaleDateString('es-PE', {
@@ -65,9 +73,8 @@ async function getCronogramas(req, res, next) {
                         month: '2-digit',
                         year: '2-digit'
                     }),
-                    horario: `${row.hora.substring(0, 5)} - ${row.hora_fin ? row.hora_fin.substring(0, 5) : '??:??'}`,
+                    horario: `${row.hora.substring(0, 5)} - ${horaFin}`,
                     hora_inicio: row.hora.substring(0, 5),
-                    hora_fin: row.hora_fin ? row.hora_fin.substring(0, 5) : '',
                     aula: row.ambiente,
                     tutor: row.tutor_nombre,
                     tutor_id: row.tutor_id,
@@ -94,10 +101,10 @@ async function getCronogramas(req, res, next) {
  */
 async function createCronograma(req, res, next) {
     try {
-        const { tutor_user_id, codigo_estudiante, fecha, hora, hora_fin, ambiente, semestre } = req.body;
+        const { tutor_user_id, codigo_estudiante, fecha, hora, ambiente, semestre } = req.body;
 
-        if (!tutor_user_id || !codigo_estudiante || !fecha || !hora || !hora_fin || !ambiente || !semestre) {
-            return res.status(400).json({ message: 'Todos los campos son requeridos, incluyendo hora de fin' });
+        if (!tutor_user_id || !codigo_estudiante || !fecha || !hora || !ambiente || !semestre) {
+            return res.status(400).json({ message: 'Todos los campos son requeridos' });
         }
 
         // Verificar que existe una asignación activa
@@ -120,8 +127,8 @@ async function createCronograma(req, res, next) {
 
         // Insertar el cronograma
         const insertQuery = `
-      INSERT INTO cronogramas (tutor_user_id, codigo_estudiante, asignacion_id, fecha, hora, hora_fin, ambiente, semestre, estado)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'programada')
+      INSERT INTO cronogramas (tutor_user_id, codigo_estudiante, asignacion_id, fecha, hora, ambiente, semestre, estado)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, 'programada')
       RETURNING *
     `;
 
@@ -131,7 +138,6 @@ async function createCronograma(req, res, next) {
             asignacion_id,
             fecha,
             hora,
-            hora_fin,
             ambiente,
             semestre
         ]);
@@ -197,7 +203,7 @@ async function getCronogramaById(req, res, next) {
 async function updateCronograma(req, res, next) {
     try {
         const { id } = req.params;
-        const { fecha, hora, hora_fin, ambiente, estado } = req.body;
+        const { fecha, hora, ambiente, estado } = req.body;
 
         // Verificar que el cronograma existe
         const checkResult = await pool.query('SELECT * FROM cronogramas WHERE id = $1', [id]);
@@ -218,10 +224,6 @@ async function updateCronograma(req, res, next) {
         if (hora !== undefined) {
             updates.push(`hora = $${paramCount++}`);
             params.push(hora);
-        }
-        if (hora_fin !== undefined) {
-            updates.push(`hora_fin = $${paramCount++}`);
-            params.push(hora_fin);
         }
         if (ambiente !== undefined) {
             updates.push(`ambiente = $${paramCount++}`);

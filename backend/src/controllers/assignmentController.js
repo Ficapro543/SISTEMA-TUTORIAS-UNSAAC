@@ -35,17 +35,17 @@ async function getTutors(req, res, next) {
 
     let studentCountSubquery = `(SELECT COUNT(*) FROM tutor_asignacion ta 
          WHERE ta.tutor_user_id = u.id AND ta.estado = 'activo'`;
-    
+
     if (semesterId) {
       studentCountSubquery += ` AND ta.semestre = $${paramIndex}`;
       params.push(semesterId);
       paramIndex++;
     }
-    
+
     studentCountSubquery += `) as student_count`;
 
     let query = `
-      SELECT u.id, u.first_name, u.last_name, u.email, t.codigo as code,
+      SELECT u.id, u.first_name, u.last_name, u.email,
         ${studentCountSubquery}
       FROM users u
       INNER JOIN tutores t ON u.id = t.user_id
@@ -53,7 +53,7 @@ async function getTutors(req, res, next) {
     `;
 
     if (search) {
-      query += ` AND (u.first_name ILIKE $${paramIndex} OR u.last_name ILIKE $${paramIndex} OR u.email ILIKE $${paramIndex} OR t.codigo ILIKE $${paramIndex})`;
+      query += ` AND (u.first_name ILIKE $${paramIndex} OR u.last_name ILIKE $${paramIndex} OR u.email ILIKE $${paramIndex})`;
       params.push(`%${search}%`);
     }
 
@@ -207,7 +207,7 @@ async function transferStudents(req, res, next) {
     }
 
     // Crear nuevas asignaciones activas para el tutor destino
-    const insertValues = updateResult.rows.map((row, idx) => 
+    const insertValues = updateResult.rows.map((row, idx) =>
       `($${idx * 3 + 1}, $${idx * 3 + 2}, $${idx * 3 + 3}, 'activo')`
     ).join(', ');
 
@@ -225,9 +225,9 @@ async function transferStudents(req, res, next) {
     await client.query(insertQuery, insertParams);
 
     await client.query('COMMIT');
-    
-    res.json({ 
-      message: 'Transferencia realizada con éxito.', 
+
+    res.json({
+      message: 'Transferencia realizada con éxito.',
       count: updateResult.rowCount,
       transferred: updateResult.rows.map(r => r.codigo_estudiante)
     });
@@ -292,7 +292,7 @@ async function transferAllStudents(req, res, next) {
     await client.query(updateQuery, [originTutorId, semesterId]);
 
     // Crear nuevas asignaciones activas para el tutor destino
-    const insertValues = studentsResult.rows.map((row, idx) => 
+    const insertValues = studentsResult.rows.map((row, idx) =>
       `($${idx * 3 + 1}, $${idx * 3 + 2}, $${idx * 3 + 3}, 'activo')`
     ).join(', ');
 
@@ -310,9 +310,9 @@ async function transferAllStudents(req, res, next) {
     await client.query(insertQuery, insertParams);
 
     await client.query('COMMIT');
-    
-    res.json({ 
-      message: 'Reasignación masiva completada con éxito.', 
+
+    res.json({
+      message: 'Reasignación masiva completada con éxito.',
       count: studentsResult.rowCount,
       transferred: studentsResult.rows.map(r => r.codigo_estudiante)
     });
