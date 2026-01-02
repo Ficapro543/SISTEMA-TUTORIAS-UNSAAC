@@ -9,6 +9,7 @@ export default function CrearCronogramaModal({ isOpen, onClose, onSubmit }) {
         codigo_estudiante: '',
         fecha: '',
         hora: '',
+        hora_fin: '',
         ambiente: '',
         semestre: ''
     });
@@ -85,7 +86,7 @@ export default function CrearCronogramaModal({ isOpen, onClose, onSubmit }) {
 
         // Validaciones
         if (!formData.tutor_user_id || !formData.codigo_estudiante || !formData.fecha ||
-            !formData.hora || !formData.ambiente || !formData.semestre) {
+            !formData.hora || !formData.hora_fin || !formData.ambiente || !formData.semestre) {
             setError('Todos los campos son requeridos');
             return;
         }
@@ -111,6 +112,7 @@ export default function CrearCronogramaModal({ isOpen, onClose, onSubmit }) {
                 codigo_estudiante: '',
                 fecha: '',
                 hora: '',
+                hora_fin: '',
                 ambiente: '',
                 semestre: semestres.length > 0 ? semestres[0].id : ''
             });
@@ -228,13 +230,28 @@ export default function CrearCronogramaModal({ isOpen, onClose, onSubmit }) {
 
                         <div className={styles.formGroup}>
                             <label htmlFor="hora" className={styles.label}>
-                                Hora <span className={styles.required}>*</span>
+                                Hora Inicio <span className={styles.required}>*</span>
                             </label>
                             <input
                                 type="time"
                                 id="hora"
                                 name="hora"
                                 value={formData.hora}
+                                onChange={handleChange}
+                                className={styles.input}
+                                required
+                            />
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <label htmlFor="hora_fin" className={styles.label}>
+                                Hora Fin <span className={styles.required}>*</span>
+                            </label>
+                            <input
+                                type="time"
+                                id="hora_fin"
+                                name="hora_fin"
+                                value={formData.hora_fin}
                                 onChange={handleChange}
                                 className={styles.input}
                                 required
