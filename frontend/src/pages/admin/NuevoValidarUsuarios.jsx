@@ -71,6 +71,7 @@ const NuevoValidarUsuarios = () => {
     const [roleDecisions, setRoleDecisions] = useState({});
     const [submitting, setSubmitting] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [loadingDetailId, setLoadingDetailId] = useState(null);
     const [error, setError] = useState(null);
 
     // Cargar solicitudes pendientes al montar el componente
@@ -106,6 +107,8 @@ const NuevoValidarUsuarios = () => {
 
     const openDetails = async (user) => {
         try {
+
+            setLoadingDetailId(user.id);
             // Obtener detalles actualizados del usuario
             const userDetail = await getRequestDetail(user.id);
             
@@ -136,6 +139,8 @@ const NuevoValidarUsuarios = () => {
         } catch (err) {
             console.error('Error fetching user details:', err);
             alert('Error al cargar los detalles del usuario');
+        } finally{
+            setLoadingDetailId(null);
         }
     };
 
@@ -375,9 +380,16 @@ const NuevoValidarUsuarios = () => {
                                 size="sm"
                                 className={styles.detailButton}
                                 onClick={() => openDetails(user)}
+                                disabled={loadingDetailId === user.id}
                             >
-                                <Eye className={styles.icon} />
-                                Ver Detalle
+                                {loadingDetailId === user.id ? (
+                                    'Cargando...'
+                                ):(
+                                    <>
+                                        <Eye className={styles.icon}/>
+                                        Ver Detalle
+                                    </>
+                                )}
                             </Button>
                         </CardContent>
                     </Card>
@@ -393,7 +405,7 @@ const NuevoValidarUsuarios = () => {
                             Revisar Solicitud
                         </DialogTitle>
                         <DialogDescription>
-                            Revisa los detalles y decide sobre cada rol solicitado (ordenados por jerarquía).
+                            Revisa los detalles y decide sobre cada rol solicitado.
                         </DialogDescription>
                     </DialogHeader>
 
