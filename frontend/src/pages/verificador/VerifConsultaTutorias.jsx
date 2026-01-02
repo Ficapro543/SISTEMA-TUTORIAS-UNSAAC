@@ -6,12 +6,26 @@ const VerifConsultaTutorias = () => {
     const [filters, setFilters] = useState({
         semestre: '2023-II',
         tipo: 'Todos',
-        tutor: '' // Cambio inicial a vacío para input de texto o futuro select
+        tutor_id: 'Todos' // Usamos ID para el filtro
     });
 
+    const [tutorsList, setTutorsList] = useState([]);
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+
+    // Cargar lista de tutores al inicio
+    useEffect(() => {
+        const fetchTutors = async () => {
+            try {
+                const res = await api.get('/verificador/tutores');
+                setTutorsList(res.data || []);
+            } catch (err) {
+                console.error("Error al cargar tutores:", err);
+            }
+        };
+        fetchTutors();
+    }, []);
 
     // Normalizar estado
     const normalizeEstado = (estadoRaw) => {
@@ -36,8 +50,8 @@ const VerifConsultaTutorias = () => {
             if (filters.tipo !== 'Todos') {
                 params.tipo = filters.tipo;
             }
-            if (filters.tutor && filters.tutor !== 'Todos') { // Si fuera select con 'Todos'
-                params.tutor = filters.tutor;
+            if (filters.tutor_id !== 'Todos') {
+                params.tutor_id = filters.tutor_id;
             }
 
             console.log("GET /verificador/tutorias Params:", params);
@@ -45,15 +59,10 @@ const VerifConsultaTutorias = () => {
             console.log("Respuesta backend:", response.data);
 
             if (Array.isArray(response.data)) {
-                // Normalizar respuesta
-                const normalized = response.data.map(item => ({
-                    estudiante: item.estudiante || '-',
-                    tutor: item.tutor || '-',
-                    tipo: item.tipo || '-',
-                    fecha: item.fecha || '-',
+                setData(response.data.map(item => ({
+                    ...item,
                     estado: normalizeEstado(item.estado)
-                }));
-                setData(normalized);
+                })));
             } else {
                 setData([]);
             }
@@ -148,17 +157,20 @@ const VerifConsultaTutorias = () => {
                     </div>
 
                     <div className={styles.selectGroup}>
-                        <label className={styles.label} htmlFor="tutor">Tutor (Nombre)</label>
-                        <input
-                            type="text"
-                            id="tutor"
-                            name="tutor"
-                            className={styles.select} // Reusamos clase para estilo
-                            value={filters.tutor}
+                        <label className={styles.label} htmlFor="tutor_id">Tutor</label>
+                        <select
+                            id="tutor_id"
+                            name="tutor_id"
+                            className={styles.select}
+                            value={filters.tutor_id}
                             onChange={handleFilterChange}
-                            placeholder="Nombre del tutor..." // Dejamos open text por simplicidad según backend logic
                             disabled={loading}
-                        />
+                        >
+                            <option value="Todos">Todos</option>
+                            {tutorsList.map(t => (
+                                <option key={t.id} value={t.id}>{t.nombre}</option>
+                            ))}
+                        </select>
                     </div>
 
                     <button className={styles.searchButton} onClick={handleSearch} disabled={loading}>
