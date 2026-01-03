@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Printer, CalendarPlus, Search } from 'lucide-react';
+import { Printer, CalendarPlus, Search, Trash2 } from 'lucide-react';
 import { pdf } from '@react-pdf/renderer';
 import { SingleCronogramaPDF, AllCronogramasPDF } from '../componentes/pdf-documents';
 import CrearCronogramaModal from '../componentes/CrearCronogramaModal';
-import { getCronogramas, createCronograma } from '../services/cronogramaService';
+import { getCronogramas, createCronograma, deleteCronograma } from '../services/cronogramaService';
 import styles from '../styles/pages/Cronogramas.module.css';
 
 export default function Cronogramas({ embedded = false }) {
@@ -109,8 +109,21 @@ export default function Cronogramas({ embedded = false }) {
             throw err;
         }
     };
-    if(embedded){
-        return(
+
+    const handleDelete = async (id) => {
+        if (window.confirm('¿Estás seguro de que deseas eliminar este cronograma?')) {
+            try {
+                await deleteCronograma(id);
+                await loadCronogramas(searchTerm);
+                // alert('Cronograma eliminado'); // Opcional: mostrar notificación
+            } catch (error) {
+                console.error('Error al eliminar:', error);
+                alert('Hubo un error al eliminar el cronograma');
+            }
+        }
+    };
+    if (embedded) {
+        return (
 
             <>
                 {/* Title Section */}
@@ -157,7 +170,8 @@ export default function Cronogramas({ embedded = false }) {
                                 <div className={styles.tableHeaderCell}>Horario</div>
                                 <div className={styles.tableHeaderCell}>Aula</div>
                                 <div className={styles.tableHeaderCell}>Tutor</div>
-                                <div className={styles.tableHeaderCell}>Estudiantes</div>
+                                <div className={styles.tableHeaderCell}>Estudiante</div>
+                                <div className={styles.tableHeaderCell}></div>
                                 <div className={styles.tableHeaderCell}></div>
                             </div>
 
@@ -188,6 +202,16 @@ export default function Cronogramas({ embedded = false }) {
                                                     title="Imprimir"
                                                 >
                                                     <Printer size={20} />
+                                                </button>
+                                            </div>
+                                            <div className={styles.tableCell}>
+                                                <button
+                                                    onClick={() => handleDelete(cronograma.id)}
+                                                    className={styles.deleteBtn}
+                                                    title="Eliminar"
+                                                    style={{ color: 'red', background: 'none', border: 'none', cursor: 'pointer' }}
+                                                >
+                                                    <Trash2 size={20} />
                                                 </button>
                                             </div>
                                         </div>
@@ -281,7 +305,8 @@ export default function Cronogramas({ embedded = false }) {
                                 <div className={styles.tableHeaderCell}>Horario</div>
                                 <div className={styles.tableHeaderCell}>Aula</div>
                                 <div className={styles.tableHeaderCell}>Tutor</div>
-                                <div className={styles.tableHeaderCell}>Estudiantes</div>
+                                <div className={styles.tableHeaderCell}>Estudiante</div>
+                                <div className={styles.tableHeaderCell}></div>
                                 <div className={styles.tableHeaderCell}></div>
                             </div>
 
@@ -312,6 +337,16 @@ export default function Cronogramas({ embedded = false }) {
                                                     title="Imprimir"
                                                 >
                                                     <Printer size={20} />
+                                                </button>
+                                            </div>
+                                            <div className={styles.tableCell}>
+                                                <button
+                                                    onClick={() => handleDelete(cronograma.id)}
+                                                    className={styles.deleteBtn}
+                                                    title="Eliminar"
+                                                    style={{ color: 'red', background: 'none', border: 'none', cursor: 'pointer' }}
+                                                >
+                                                    <Trash2 size={20} />
                                                 </button>
                                             </div>
                                         </div>

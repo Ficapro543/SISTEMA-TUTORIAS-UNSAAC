@@ -77,7 +77,7 @@ export const SingleCronogramaPDF = ({ cronograma }) => (
                     <Text style={styles.value}>{cronograma.tutor}</Text>
                 </View>
                 <View style={styles.row}>
-                    <Text style={styles.label}>Estudiantes:</Text>
+                    <Text style={styles.label}>Estudiante:</Text>
                     <Text style={styles.value}>{cronograma.estudiantes}</Text>
                 </View>
             </View>
@@ -118,7 +118,7 @@ export const AllCronogramasPDF = ({ cronogramas }) => (
                         <Text style={styles.value}>{cronograma.tutor}</Text>
                     </View>
                     <View style={styles.row}>
-                        <Text style={styles.label}>Estudiantes:</Text>
+                        <Text style={styles.label}>Estudiante:</Text>
                         <Text style={styles.value}>{cronograma.estudiantes}</Text>
                     </View>
                 </View>

@@ -78,7 +78,7 @@ async function getCronogramas(req, res, next) {
                     aula: row.ambiente,
                     tutor: row.tutor_nombre,
                     tutor_id: row.tutor_id,
-                    estudiantes: `${row.num_estudiantes} estudiante${row.num_estudiantes !== 1 ? 's' : ''}`,
+                    estudiantes: row.estudiante_nombre,
                     num_estudiantes: row.num_estudiantes,
                     semestre: row.semestre,
                     estado: row.estado,
