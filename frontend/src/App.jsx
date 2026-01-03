@@ -10,7 +10,7 @@ import CuentaVerificada from "./pages/general/CuentaVerificada.jsx";
 import RecuperarPassword from "./pages/general/RecuperarPassword.jsx";
 import VerificarCodigo from "./pages/general/VerificarCodigo.jsx";
 import NuevaContrasena from "./pages/general/NuevaContraseña.jsx";
-import Cronogramas from "./pages/Cronogramas.jsx";
+import Cronogramas from "./pages/admin/Cronogramas.jsx";
 
 import BackendStatus from "./pages/general/BackendStatus.jsx";
 import Dashboard from "./pages/Dashboard.jsx"

@@ -12,27 +12,86 @@
 /* --- Main Header with Logos --- */
 .mainHeader {
     width: 100%;
+    padding: 15px 10px;
+    background: var(--lovable-header-gradient);
+    font-family: var(--font-main);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Elementos decorativos de Lovable */
+.mainHeader::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, 
+        transparent, 
+        hsla(45, 70%, 47%, 0.05), 
+        transparent
+    );
+}
+.mainHeader::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(to right, 
+        hsla(45, 70%, 47%, 0.6), 
+        hsl(45, 70%, 47%), 
+        hsla(45, 70%, 47%, 0.6)
+    );
+}
+
+.headerContainer {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0.15rem 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+.headerContent {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 25px 60px;
-    background: linear-gradient(135deg, #002147, #004e92);
-    flex-shrink: 0;
 }
 
-.logoLeft,
-.logoRight {
-    height: 90px;
+.logoLeft{
+    height: 6rem;
+    width: auto;
     object-fit: contain;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.25));
+}
+
+.logoRight {
+    height: 7rem;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.25));
+}
+
+.titleContainer {
+    flex: 1;
+    text-align: center;
+    padding: 0 1rem;
 }
 
 .mainTitle {
-    font-size: 2.3rem;
-    text-align: center;
-    letter-spacing: 1px;
-    font-weight: 600;
-    color: #ffffff;
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: white;
+    letter-spacing: 0.025em;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     margin: 0;
+}
+
+.subtitleHeader{
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.8);
+    letter-spacing: 0.1em;
 }
 
 /* --- Top Info Bar --- */
@@ -530,6 +589,22 @@
 
 /* Responsiveness */
 @media (max-width: 768px) {
+    .mainTitle {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: white;
+        letter-spacing: 0.025em;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        margin: 0;
+    }
+
+    .subtitleHeader{
+        font-size: 1rem;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.8);
+        letter-spacing: 0.1em;
+    }
+
     .infoBar {
         flex-direction: column;
         gap: 15px;

@@ -1,4 +1,4 @@
-import styles from "../styles/components/DetalleTutoriaModal.module.css";
+import styles from "@/styles/components/DetalleTutoriaModal.module.css";
 
 function DetalleTutoriaModal({ tutoria, onClose }) {
   if (!tutoria) return null;

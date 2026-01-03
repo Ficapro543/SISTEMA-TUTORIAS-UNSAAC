@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Printer, CalendarPlus, Search, Trash2, Pencil } from 'lucide-react';
 import { pdf } from '@react-pdf/renderer';
-import { SingleCronogramaPDF, AllCronogramasPDF } from '../componentes/pdf-documents';
-import CrearCronogramaModal from '../componentes/CrearCronogramaModal';
-import { getCronogramas, createCronograma, deleteCronograma, updateCronograma } from '../services/cronogramaService';
-import { getSemesters } from '../services/assignmentService';
-import styles from '../styles/pages/Cronogramas.module.css';
+import { SingleCronogramaPDF, AllCronogramasPDF } from '@/componentes/pdf-documents';
+import CrearCronogramaModal from '@/componentes/CrearCronogramaModal';
+import { getCronogramas, createCronograma, deleteCronograma, updateCronograma } from '@/services/cronogramaService';
+import { getSemesters } from '@/services/assignmentService';
+import styles from '@/styles/pages/admin/Cronogramas.module.css';
 
 export default function Cronogramas({ embedded = false }) {
     const navigate = useNavigate();

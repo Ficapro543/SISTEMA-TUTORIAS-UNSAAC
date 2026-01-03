@@ -7,8 +7,8 @@ import {
 import {
     getActiveSemester, getSemesters, getTutors,
     getStudentsByTutor, transferStudents, transferAllStudents
-} from "../../services/assignmentService";
-import styles from "../../styles/components/AsignacionTutorados.module.css";
+} from "@/services/assignmentService";
+import styles from "@/styles/pages/admin/AsignacionTutorados.module.css";
 
 export default function CambioTutorados() {
     const navigate = useNavigate();

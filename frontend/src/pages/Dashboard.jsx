@@ -4,24 +4,25 @@ import {
     FaCog, FaBook, FaFolderOpen, FaArrowRight,
     FaCalendarAlt, FaClock, FaUserCircle, FaHashtag, FaEnvelope, FaCheckCircle,
     FaUserCheck, FaProjectDiagram, FaFileAlt, FaCaretDown, FaCaretUp, FaSignOutAlt,
-    FaExchangeAlt, FaShieldAlt, FaSearch, FaChalkboardTeacher
+    FaExchangeAlt, FaShieldAlt, FaSearch, FaChalkboardTeacher, FaHome, FaBookOpen
 } from "react-icons/fa";
-import styles from "../styles/pages/Dashboard.module.css";
+import { Home, Shield, BookOpen, ClipboardCheck } from "lucide-react";
+import styles from "@/styles/pages/Dashboard.module.css";
 // Admin Views
 import AprobarRegistro from "./admin/NuevoValidarUsuarios";
 import AsignacionTutorados from "./admin/AsignacionTutorados";
 import CambioTutorados from "./admin/CambioTutorados";
 import TutoriasHistoricas from "./admin/TutoriasHistoricas";
-import Cronogramas from "./Cronogramas";
+import Cronogramas from "./admin/Cronogramas";
 
 // Tutor Views
 import NuevoTutorPanel from "./tutor/NuevoTutorPanel";
 
 // Verifier Views
-import VerifEstudiantesAtendidos from "../pages/verificador/VerifEstudiantesAtendidos";
-import VerifConsultaTutorias from "../pages/verificador/VerifConsultaTutorias";
-import VerifSeguimientoEstudiante from "../pages/verificador/VerifSeguimientoEstudiante";
-import VerifSeguimientoTutor from "../pages/verificador/VerifSeguimientoTutor";
+import VerifEstudiantesAtendidos from "./verificador/VerifEstudiantesAtendidos";
+import VerifConsultaTutorias from "./verificador/VerifConsultaTutorias";
+import VerifSeguimientoEstudiante from "./verificador/VerifSeguimientoEstudiante";
+import VerifSeguimientoTutor from "./verificador/VerifSeguimientoTutor";
 
 export default function Dashboard() {
     const navigate = useNavigate();
@@ -131,9 +132,26 @@ export default function Dashboard() {
         <div className={styles.dashboardContainer}>
             {/* Header with Logos and Title */}
             <header className={styles.mainHeader}>
-                <img src="/logo_izquierdo.png" alt="Logo UNSAAC" className={styles.logoLeft} />
-                <h1 className={styles.mainTitle}>SISTEMA DE TUTORÍAS UNSAAC</h1>
-                <img src="/logo_derecho.png" alt="Logo Derecho" className={styles.logoRight} />
+                <div className={styles.headerContainer}>
+                    <div className={styles.headerContent}>
+                        <img 
+                            src="/logo_izquierdo.png" 
+                            alt="Logo UNSAAC" 
+                            className={styles.logoLeft} 
+                        />
+                        
+                        <div className={styles.titleContainer}>
+                            <h1 className={styles.mainTitle}>SISTEMA DE TUTORÍAS</h1>
+                            <p className={styles.subtitleHeader}>UNSAAC</p>
+                        </div>
+                        
+                        <img 
+                            src="/logo_derecho.png" 
+                            alt="Logo Derecho" 
+                            className={styles.logoRight} 
+                        />
+                    </div>
+                </div>
             </header>
 
             {/* Top Info Bar: Date/Time + User Profile */}
@@ -200,14 +218,16 @@ export default function Dashboard() {
                     className={`${styles.tab} ${activeTab === 'inicio' ? styles.tabActive : ''}`}
                     onClick={() => handleTabClick('inicio')}
                 >
-                    <span>🏠 INICIO</span>
+                    <Home/>
+                    <span>INICIO</span>
                 </div>
                 {roles.includes('administrador') && (
                     <div
                         className={`${styles.tab} ${activeTab === 'admin' ? styles.tabActive : ''}`}
                         onClick={() => handleTabClick('admin')}
                     >
-                        <span>🛡️ ADMINISTRADOR</span>
+                        <Shield/>
+                        <span>ADMINISTRADOR</span>
                     </div>
                 )}
                 {roles.includes('tutor') && (
@@ -215,7 +235,8 @@ export default function Dashboard() {
                         className={`${styles.tab} ${activeTab === 'tutor' ? styles.tabActive : ''}`}
                         onClick={() => handleTabClick('tutor')}
                     >
-                        <span>📖 TUTOR</span>
+                        <BookOpen/>
+                        <span>TUTOR</span>
                     </div>
                 )}
                 {roles.includes('verificador') && (
@@ -223,7 +244,8 @@ export default function Dashboard() {
                         className={`${styles.tab} ${activeTab === 'verificador' ? styles.tabActive : ''}`}
                         onClick={() => handleTabClick('verificador')}
                     >
-                        <span>📋 VERIFICADOR</span>
+                        <ClipboardCheck/>
+                        <span>VERIFICADOR</span>
                     </div>
                 )}
             </nav>

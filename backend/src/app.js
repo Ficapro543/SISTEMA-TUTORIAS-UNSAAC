@@ -7,6 +7,8 @@ const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 const assignmentRoutes = require('./routes/assignments');
 const tutoriasRoutes = require('./routes/tutorias');
+const verificadorRoutes = require('./routes/verificador');
+const cronogramasRoutes = require('./routes/cronogramas');
 
 const app = express();
 
@@ -28,11 +30,10 @@ app.get("/api/ping", (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/assignments', assignmentRoutes);
+app.use('/api/assignments', assignmentRoutes); //-- TODO: Integrarlo dentro cronogramas xd
 app.use('/api/tutorias', tutoriasRoutes);
-app.use('/api/verificador', require('./routes/verificador'));
-
-app.use('/api/cronogramas', require('./routes/cronogramas'));
+app.use('/api/verificador', verificadorRoutes);
+app.use('/api/cronogramas', cronogramasRoutes); //-- TODO: Integrarlo dentro de admin 
 
 // Error handler:
 app.use((err, req, res, next) => {

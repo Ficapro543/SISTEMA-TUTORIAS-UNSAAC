@@ -1,12 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { createPendingUser,
+const { 
+    createPendingUser,
     approvePendingUser,
-    getAllPendingUser,
     getOnePendingUser,
     getPendingUsers,
-    getPendingUserDetail,
-    rejectOnePendingUser,
     rejectPendingUser,
     decideRol,
     getSemestresCerrados,
@@ -23,13 +21,10 @@ router.get('/tutorias/:id', requireAdmin, getTutoriaDetalle);
 //Auth
 router.post('/solicitud', createPendingUser);
 router.get('/solicitudes', getPendingUsers);
-router.get('/solicitudes/:id', getPendingUserDetail);
-router.post('/aprobar', approvePendingUser);
-router.get('/solicitudes', getAllPendingUser);
 router.get('/solicitud/:id', getOnePendingUser);
 router.put('/solicitud/:pendingUserId/rol/:rol', decideRol);
-//router.post('/rechazar/',rejectOnePendingUser);
 
+router.post('/aprobar', approvePendingUser);
 router.post('/rechazar', rejectPendingUser);
 
 module.exports = router;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
-import { getTutors, getSemesters } from '../services/assignmentService';
-import styles from '../styles/components/CrearCronogramaModal.module.css';
+import { getTutors, getSemesters } from '@/services/assignmentService';
+import styles from '@/styles/components/CrearCronogramaModal.module.css';
 
 export default function CrearCronogramaModal({ isOpen, onClose, onSubmit, initialData = null, isEditing = false }) {
     const [formData, setFormData] = useState({

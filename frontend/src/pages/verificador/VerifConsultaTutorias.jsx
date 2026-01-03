@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import styles from '../../styles/pages/VerifConsultaTutorias.module.css';
-import api from '../../utils/api';
-import { printElementById } from '../../utils/print';
+import styles from '@/styles/pages/verificador/VerifConsultaTutorias.module.css';
+import api from '@/utils/api';
+import { printElementById } from '@/utils/print';
 // REUSE: Importamos el modal existente de Admin
-import DetalleTutoriaModal from '../../componentes/DetalleTutoriaModal';
+import DetalleTutoriaModal from '@/componentes/DetalleTutoriaModal';
 
 const VerifConsultaTutorias = () => {
     // Filtros: Semestre + Tipo (No Tutor)

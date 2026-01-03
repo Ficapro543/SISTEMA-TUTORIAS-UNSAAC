@@ -1,7 +1,7 @@
 // NuevoValidarUsuarios.jsx
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader } from '../../componentes/ui/Card';
-import Button from '../../componentes/ui/Button';
+import { Card, CardContent, CardHeader } from '@/componentes/ui/Card';
+import Button from '@/componentes/ui/Button';
 import {
     Dialog,
     DialogContent,
@@ -9,8 +9,8 @@ import {
     DialogTitle,
     DialogDescription,
     DialogFooter,
-} from '../../componentes/ui/Dialog';
-import Badge from '../../componentes/ui/Badge';
+} from '@/componentes/ui/Dialog';
+import Badge from '@/componentes/ui/Badge';
 import {
     User,
     Mail,
@@ -21,14 +21,14 @@ import {
     CheckCircle2,
     XCircle,
     Send,
-} from '../../componentes/ui/icons';
+} from '@/componentes/ui/icons';
 import { 
     getPendingRequests, 
     approveUser, 
     rejectUser,
     getRequestDetail 
-} from '../../services/adminService';
-import styles from './NuevoValidarUsuarios.module.css';
+} from '@/services/adminService';
+import styles from '@/styles/pages/admin/NuevoValidarUsuarios.module.css';
 
 // Definir jerarquía de roles
 const roleHierarchy = ['administrador', 'tutor', 'verificador'];
