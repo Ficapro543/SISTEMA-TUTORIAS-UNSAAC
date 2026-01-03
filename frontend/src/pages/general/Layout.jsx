@@ -1,4 +1,4 @@
-import styles from "../../styles/pages/Layout.module.css";
+import styles from "@/styles/pages/general/Layout.module.css";
 
 export default function Layout({ children }) {
     return (

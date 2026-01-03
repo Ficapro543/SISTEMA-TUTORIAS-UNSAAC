@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import styles from "../styles/components/TablaTutorias.module.css";
+import styles from "@/styles/components/TablaTutorias.module.css";
 
 function TablaTutorias({ tutorias, onVerDetalle, modo = "semestre", estudiantesCount = null }) {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });

@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import styles from "../../styles/pages/TutoriasHistoricas.module.css";
-import api from "../../utils/api";
+import styles from "@/styles/pages/admin/TutoriasHistoricas.module.css";
+import api from "@/utils/api";
 
-import BusquedaSelector from "../../componentes/BusquedaSelector.jsx";
-import SemestreSelector from "../../componentes/SemestreSelector";
-import TablaTutorias from "../../componentes/TablaTutorias";
-import DetalleTutoriaModal from "../../componentes/DetalleTutoriaModal";
-import BusquedaEstudiante from "../../componentes/BusquedaEstudiante";
+import BusquedaSelector from "@/componentes/BusquedaSelector.jsx";
+import SemestreSelector from "@/componentes/SemestreSelector";
+import TablaTutorias from "@/componentes/TablaTutorias";
+import DetalleTutoriaModal from "@/componentes/DetalleTutoriaModal";
+import BusquedaEstudiante from "@/componentes/BusquedaEstudiante";
 
 function TutoriasHistoricas({ embedded = false }) {
   const [isAdmin, setIsAdmin] = useState(false);

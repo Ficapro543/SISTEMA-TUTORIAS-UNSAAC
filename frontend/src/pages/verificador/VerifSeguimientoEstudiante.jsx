@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import styles from '../../styles/pages/VerifSeguimientoEstudiante.module.css';
-import api from '../../utils/api';
+import styles from '@/styles/pages/verificador/VerifSeguimientoEstudiante.module.css';
+import api from '@/utils/api';
 
 const VerifSeguimientoEstudiante = () => {
     const [searchTerm, setSearchTerm] = useState('');

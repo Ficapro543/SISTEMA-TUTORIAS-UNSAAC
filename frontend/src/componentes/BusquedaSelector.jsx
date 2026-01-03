@@ -1,4 +1,4 @@
-import styles from "../styles/components/BusquedaSelector.module.css";
+import styles from "@/styles/components/BusquedaSelector.module.css";
 
 function BusquedaSelector({modo, onChange}){
   return(

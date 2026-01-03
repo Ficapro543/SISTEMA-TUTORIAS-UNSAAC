@@ -6,22 +6,22 @@ import {
     FaUserCheck, FaProjectDiagram, FaFileAlt, FaCaretDown, FaCaretUp, FaSignOutAlt,
     FaExchangeAlt, FaShieldAlt, FaSearch, FaChalkboardTeacher
 } from "react-icons/fa";
-import styles from "../styles/pages/Dashboard.module.css";
+import styles from "@/styles/pages/Dashboard.module.css";
 // Admin Views
 import AprobarRegistro from "./admin/NuevoValidarUsuarios";
 import AsignacionTutorados from "./admin/AsignacionTutorados";
 import CambioTutorados from "./admin/CambioTutorados";
 import TutoriasHistoricas from "./admin/TutoriasHistoricas";
-import Cronogramas from "./Cronogramas";
+import Cronogramas from "./admin/Cronogramas";
 
 // Tutor Views
 import NuevoTutorPanel from "./tutor/NuevoTutorPanel";
 
 // Verifier Views
-import VerifEstudiantesAtendidos from "../pages/verificador/VerifEstudiantesAtendidos";
-import VerifConsultaTutorias from "../pages/verificador/VerifConsultaTutorias";
-import VerifSeguimientoEstudiante from "../pages/verificador/VerifSeguimientoEstudiante";
-import VerifSeguimientoTutor from "../pages/verificador/VerifSeguimientoTutor";
+import VerifEstudiantesAtendidos from "./verificador/VerifEstudiantesAtendidos";
+import VerifConsultaTutorias from "./verificador/VerifConsultaTutorias";
+import VerifSeguimientoEstudiante from "./verificador/VerifSeguimientoEstudiante";
+import VerifSeguimientoTutor from "./verificador/VerifSeguimientoTutor";
 
 export default function Dashboard() {
     const navigate = useNavigate();

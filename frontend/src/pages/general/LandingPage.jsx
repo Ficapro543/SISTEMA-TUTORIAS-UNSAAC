@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import styles from '../../styles/pages/LandingPage.module.css';
+import styles from '@/styles/pages/general/LandingPage.module.css';
+import { LogIn } from 'lucide-react';
 
 export default function LandingPage() {
     const navigate = useNavigate();
@@ -23,7 +24,7 @@ export default function LandingPage() {
                     <h1 className={styles.mainTitle}>
                         Sistema de Tutorías
                     </h1>
-                    <h2 className={styles.universityName}>UNSAAC</h2>
+                    <h2 className={styles.universityName}>EPIIS - UNSAAC</h2>
                     <p className={styles.subtitle}>Escuela Profesional de Ingeniería de Sistemas</p>
 
                     <p className={styles.description}>
@@ -67,9 +68,7 @@ export default function LandingPage() {
 
                     {/* Login Button */}
                     <button className={styles.loginButton} onClick={handleLogin}>
-                        <svg className={styles.buttonIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                        </svg>
+                        <LogIn className={styles.buttonIcon} />
                         Iniciar Sesión
                     </button>
                 </div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import styles from '../../styles/pages/VerifEstudiantesAtendidos.module.css';
-import api from '../../utils/api';
-import { printElementById } from '../../utils/print';
+import styles from '@/styles/pages/verificador/VerifEstudiantesAtendidos.module.css';
+import api from '@/utils/api';
+import { printElementById } from '@/utils/print';
 
 const VerifEstudiantesAtendidos = () => {
     // 1) Filtro: FECHA (obligatoria) + Estado (opcional)

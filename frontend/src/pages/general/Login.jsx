@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../../utils/api"; // Importar el api configurado
-import styles from "../../styles/pages/Login.module.css";
+import api from "@/utils/api"; // Importar el api configurado
+import styles from "@/styles/pages/general/Login.module.css";
 
 function Login() {
   const navigate = useNavigate();

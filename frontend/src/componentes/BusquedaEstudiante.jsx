@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import styles from "../styles/components/BusquedaEstudiante.module.css";
+import styles from "@/styles/components/BusquedaEstudiante.module.css";
 
 function BusquedaEstudiante({ onBuscar, onLimpiar, valores = {} }) {
   const [codigo, setCodigo] = useState(valores.codigo || "");

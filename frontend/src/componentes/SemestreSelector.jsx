@@ -1,5 +1,5 @@
 import { useState } from "react";
-import styles from "../styles/components/SemestreSelector.module.css";
+import styles from "@/styles/components/SemestreSelector.module.css";
 
 function SemestreSelector({ semestres, onChange }) {
   const [selectedValue, setSelectedValue] = useState("");

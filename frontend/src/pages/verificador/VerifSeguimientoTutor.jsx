@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import styles from '../../styles/pages/VerifSeguimientoTutor.module.css';
-import api from '../../utils/api';
+import styles from '@/styles/pages/verificador/VerifSeguimientoTutor.module.css';
+import api from '@/utils/api';
 
 const VerifSeguimientoTutor = () => {
     // Estado para filtros

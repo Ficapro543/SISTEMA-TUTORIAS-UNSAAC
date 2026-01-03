@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../../styles/pages/TutorInterface.module.css';
+import styles from '@/styles/pages/verificador/TutorInterface.module.css';
 
 const FichaTutoria = () => {
     return (
