@@ -1,28 +1,34 @@
 const express = require('express');
-
 const router = express.Router();
 const requireVerifier = require('../middleware/requireVerifier');
 
 const {
-    getEstudiantesPorSemestreEstado,
-    getTutoriasPorSemestre,
+    getEstudiantes,
+    getTutorias,
+    getFiltrosEstudiantes,
+    getFiltrosTutorias,
+    getTutoriaDetalle,
     buscarEstudiante,
     getHistorialEstudiante,
     getTutores,
     getSeguimientoTutor
 } = require('../controllers/verificadorController');
 
-// HU-VER-01
-router.get('/estudiantes', requireVerifier, getEstudiantesPorSemestreEstado);
+// Filtros Dinámicos
+router.get('/filtros/estudiantes-atendidos', requireVerifier, getFiltrosEstudiantes);
+router.get('/filtros/consulta-tutorias', requireVerifier, getFiltrosTutorias);
 
-// HU-VER-02
-router.get('/tutorias', requireVerifier, getTutoriasPorSemestre);
+// HU-VER-01: Estudiantes Atendidos (Fecha + Estado)
+router.get('/estudiantes', requireVerifier, getEstudiantes);
 
-// HU-VER-03
+// HU-VER-02: Consulta Tutorias
+router.get('/tutorias', requireVerifier, getTutorias);
+// FIX: Ruta explicita antes de rutas con parametros variables si hubiera conflicto
+router.get('/tutorias/detalle', requireVerifier, getTutoriaDetalle); // usa ?cronogramaId=
+
 router.get('/estudiantes/buscar', requireVerifier, buscarEstudiante);
 router.get('/estudiantes/:codigo/historial', requireVerifier, getHistorialEstudiante);
 
-// HU-VER-04
 router.get('/tutores', requireVerifier, getTutores);
 router.get('/tutores/:id/seguimiento', requireVerifier, getSeguimientoTutor);
 

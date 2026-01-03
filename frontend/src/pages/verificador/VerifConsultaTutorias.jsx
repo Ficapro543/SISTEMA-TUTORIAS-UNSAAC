@@ -1,41 +1,46 @@
 import React, { useState, useEffect } from 'react';
 import styles from '../../styles/pages/VerifConsultaTutorias.module.css';
 import api from '../../utils/api';
+import { printElementById } from '../../utils/print';
+// REUSE: Importamos el modal existente de Admin
+import DetalleTutoriaModal from '../../componentes/DetalleTutoriaModal';
 
 const VerifConsultaTutorias = () => {
+    // Filtros: Semestre + Tipo (No Tutor)
     const [filters, setFilters] = useState({
-        semestre: '2023-II',
-        tipo: 'Todos',
-        tutor_id: 'Todos' // Usamos ID para el filtro
+        semestre: '',
+        tipo: 'Todos'
     });
 
-    const [tutorsList, setTutorsList] = useState([]);
+    const [semestresList, setSemestresList] = useState([]);
+    const [tiposList, setTiposList] = useState([]);
+
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    // Cargar lista de tutores al inicio
+    // Modal state
+    const [selectedTutoria, setSelectedTutoria] = useState(null);
+    const [modalOpen, setModalOpen] = useState(false);
+    // const [modalLoading, setModalLoading] = useState(false); // Modal shows immediate if data ready, but we fetch before open
+
     useEffect(() => {
-        const fetchTutors = async () => {
+        const fetchFiltros = async () => {
             try {
-                const res = await api.get('/verificador/tutores');
-                setTutorsList(res.data || []);
+                const res = await api.get('/verificador/filtros/consulta-tutorias');
+                if (res.data) {
+                    setSemestresList(res.data.semestres || []);
+                    setTiposList(res.data.tipos || []);
+                    if (res.data.semestres && res.data.semestres.length > 0) {
+                        setFilters(prev => ({ ...prev, semestre: res.data.semestres[0] }));
+                    }
+                }
             } catch (err) {
-                console.error("Error al cargar tutores:", err);
+                console.error("Error al cargar filtros:", err);
             }
         };
-        fetchTutors();
+        fetchFiltros();
     }, []);
-
-    // Normalizar estado
-    const normalizeEstado = (estadoRaw) => {
-        if (!estadoRaw) return '-';
-        const lower = String(estadoRaw).toLowerCase();
-        if (lower === 'realizada') return 'Realizada';
-        if (lower === 'programada') return 'Programada';
-        if (lower === 'cancelada') return 'Cancelada';
-        return estadoRaw; // "Asistió", "Faltó", etc.
-    };
 
     const fetchData = async () => {
         setLoading(true);
@@ -43,26 +48,16 @@ const VerifConsultaTutorias = () => {
         setData([]);
 
         try {
-            const params = {
-                semestre: filters.semestre
-            };
-
-            if (filters.tipo !== 'Todos') {
-                params.tipo = filters.tipo;
-            }
-            if (filters.tutor_id !== 'Todos') {
-                params.tutor_id = filters.tutor_id;
-            }
+            const params = {};
+            if (filters.semestre && filters.semestre !== 'Todos') params.semestre = filters.semestre;
+            if (filters.tipo && filters.tipo !== 'Todos') params.tipo = filters.tipo;
 
             console.log("GET /verificador/tutorias Params:", params);
             const response = await api.get('/verificador/tutorias', { params });
             console.log("Respuesta backend:", response.data);
 
             if (Array.isArray(response.data)) {
-                setData(response.data.map(item => ({
-                    ...item,
-                    estado: normalizeEstado(item.estado)
-                })));
+                setData(response.data);
             } else {
                 setData([]);
             }
@@ -77,27 +72,50 @@ const VerifConsultaTutorias = () => {
 
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
-        setFilters(prev => ({
-            ...prev,
-            [name]: value
-        }));
+        setFilters(prev => ({ ...prev, [name]: value }));
     };
 
     const handleSearch = () => {
         fetchData();
     };
 
-    const handleExport = () => {
-        alert("Función de exportar aún no implementada");
+    const handlePrint = () => {
+        // Imprime solo la tabla (contenedor principal)
+        printElementById('print-area-consulta-tutorias', 'Consulta de Tutorías');
     };
 
-    const getStatusClass = (status) => {
-        switch (status) {
-            case 'Realizada': return styles.statusRealizada;
-            case 'Programada': return styles.statusProgramada;
-            case 'Cancelada': return styles.statusCancelada;
-            default: return '';
+    // LOGIC: Ver Detalles
+    const handleVerDetalles = async (cronogramaId) => {
+        console.log("Intentando ver detalles para CronogramaID:", cronogramaId);
+
+        if (!cronogramaId) {
+            alert("Error: No se encontró ID de cronograma.");
+            return;
         }
+
+        try {
+            // Usamos Query Param ?cronogramaId=
+            const url = `/verificador/tutorias/detalle`;
+            console.log(`Fetching ${url}?cronogramaId=${cronogramaId}`);
+
+            const res = await api.get(url, { params: { cronogramaId } });
+            console.log("Detalle Response:", res.data);
+
+            // La data del backend YA VIENE con la estructura exacta que espera DetalleTutoriaModal
+            // (verificado en verificadorController.js getTutoriaDetalle)
+            setSelectedTutoria(res.data);
+            setModalOpen(true);
+
+        } catch (err) {
+            console.error("Error cargando detalles:", err);
+            const msg = err.response?.data?.message || "No se pudieron cargar los detalles.";
+            alert(`Error: ${msg}`);
+        }
+    };
+
+    const handleCloseModal = () => {
+        setModalOpen(false);
+        setSelectedTutoria(null);
     };
 
     return (
@@ -105,11 +123,12 @@ const VerifConsultaTutorias = () => {
             <div className={styles.header}>
                 <div className={styles.titleSection}>
                     <h1 className={styles.title}>Consulta de Tutorías</h1>
-                    <p className={styles.subtitle}>Consulta por semestre, tipo y tutor</p>
+                    <p className={styles.subtitle}>Consulta general de actividades de tutoría</p>
                 </div>
                 <div className={styles.actions}>
-                    <button className={styles.actionButton} onClick={handleExport} disabled={loading}>
-                        Exportar
+                    {/* Imprimir OK. Exportar ELIMINADO. */}
+                    <button className={styles.actionButton} onClick={handlePrint} disabled={loading}>
+                        Imprimir
                     </button>
                 </div>
             </div>
@@ -132,10 +151,10 @@ const VerifConsultaTutorias = () => {
                             onChange={handleFilterChange}
                             disabled={loading}
                         >
-                            <option value="2023-II">2023-II</option>
-                            <option value="2023-I">2023-I</option>
-                            <option value="2022-II">2022-II</option>
-                            <option value="2025-1">2025-1</option>
+                            <option value="Todos">Todos</option>
+                            {semestresList.map((sem, idx) => (
+                                <option key={idx} value={sem}>{sem}</option>
+                            ))}
                         </select>
                     </div>
 
@@ -150,28 +169,13 @@ const VerifConsultaTutorias = () => {
                             disabled={loading}
                         >
                             <option value="Todos">Todos</option>
-                            <option value="Académica">Académica</option>
-                            <option value="Personal">Personal</option>
-                            <option value="Profesional">Profesional</option>
-                        </select>
-                    </div>
-
-                    <div className={styles.selectGroup}>
-                        <label className={styles.label} htmlFor="tutor_id">Tutor</label>
-                        <select
-                            id="tutor_id"
-                            name="tutor_id"
-                            className={styles.select}
-                            value={filters.tutor_id}
-                            onChange={handleFilterChange}
-                            disabled={loading}
-                        >
-                            <option value="Todos">Todos</option>
-                            {tutorsList.map(t => (
-                                <option key={t.id} value={t.id}>{t.nombre}</option>
+                            {tiposList.map((t, idx) => (
+                                <option key={idx} value={t}>{t}</option>
                             ))}
                         </select>
                     </div>
+
+                    {/* Filtro Tutor ELIMINADO */}
 
                     <button className={styles.searchButton} onClick={handleSearch} disabled={loading}>
                         {loading ? 'Consultando...' : 'Consultar'}
@@ -179,38 +183,44 @@ const VerifConsultaTutorias = () => {
                 </div>
             </div>
 
-            <div className={styles.tableContainer}>
+            <div id="print-area-consulta-tutorias" className={styles.tableContainer}>
                 <div className={styles.tableWrapper}>
                     <table className={styles.table}>
                         <thead>
                             <tr>
                                 <th>Estudiante</th>
                                 <th>Tutor</th>
-                                <th>Tipo</th>
                                 <th>Fecha</th>
-                                <th>Estado</th>
+                                <th>Acciones</th> {/* Reemplaza Estado */}
                             </tr>
                         </thead>
                         <tbody>
                             {loading ? (
-                                <tr><td colSpan="5" style={{ textAlign: 'center', padding: '2rem' }}>Cargando...</td></tr>
+                                <tr><td colSpan="4" style={{ textAlign: 'center', padding: '2rem' }}>Cargando...</td></tr>
                             ) : data.length > 0 ? (
                                 data.map((item, index) => (
                                     <tr key={index}>
                                         <td>{item.estudiante}</td>
                                         <td>{item.tutor}</td>
-                                        <td>{item.tipo}</td>
                                         <td>{item.fecha}</td>
                                         <td>
-                                            <span className={`${styles.statusBadge} ${getStatusClass(item.estado)}`}>
-                                                {item.estado}
-                                            </span>
+                                            <button
+                                                className={styles.detailButton}
+                                                style={{
+                                                    background: 'none', border: 'none', color: '#0056b3',
+                                                    cursor: 'pointer', textDecoration: 'underline', fontWeight: 'bold'
+                                                }}
+                                                // CRITICAL: enviamos cronograma_id
+                                                onClick={() => handleVerDetalles(item.cronograma_id)}
+                                            >
+                                                Ver detalles →
+                                            </button>
                                         </td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="5" style={{ textAlign: 'center', padding: '2rem' }}>
+                                    <td colSpan="4" style={{ textAlign: 'center', padding: '2rem' }}>
                                         No se encontraron registros
                                     </td>
                                 </tr>
@@ -219,6 +229,14 @@ const VerifConsultaTutorias = () => {
                     </table>
                 </div>
             </div>
+
+            {/* Modal Reusado */}
+            {modalOpen && selectedTutoria && (
+                <DetalleTutoriaModal
+                    tutoria={selectedTutoria}
+                    onClose={handleCloseModal}
+                />
+            )}
         </div>
     );
 };
