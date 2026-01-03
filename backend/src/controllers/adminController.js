@@ -67,17 +67,6 @@ async function getPendingUsers(req, res, next) {
   }
 }
 
-async function getPendingUserDetail(req, res, next) {
-  try {
-    const { id } = req.params;
-    const result = await pool.query('SELECT * FROM pending_users WHERE id = $1', [id]);
-    if (result.rowCount === 0) return res.status(404).json({ message: 'Solicitud no encontrada' });
-    res.json(result.rows[0]);
-  } catch (err) {
-    next(err);
-  }
-}
-
 async function approvePendingUser(req, res, next) {
   try {
     const { pendingUserId, rolesDecisions } = req.body;
@@ -194,19 +183,6 @@ async function approvePendingUser(req, res, next) {
   }
 }
 
-async function getAllPendingUser(req, res, next) {
-  try {
-    const q = await pool.query(`
-      SELECT id, first_name, last_name, email, roles, created_at
-      FROM pending_users
-      ORDER BY created_at DESC
-    `);
-    res.json(q.rows);
-  } catch (err) {
-    next(err);
-  }
-}
-
 async function getOnePendingUser(req, res, next) {
   try {
     const { id } = req.params;
@@ -229,38 +205,6 @@ async function getOnePendingUser(req, res, next) {
     res.json(q.rows[0]);
   } catch (err) {
     console.error("Error en getOnePendingUser:", err);
-    next(err);
-  }
-}
-
-async function rejectOnePendingUser(req, res, next) {
-  try {
-    const { pendingUserId } = req.body;
-
-    const q = await pool.query(`SELECT roles FROM pending_users WHERE id=$1`, [pendingUserId]);
-    if (q.rowCount === 0)
-      return res.status(404).json({ message: 'Solicitud no encontrada' });
-
-    const pendingUser = q.rows[0];
-
-    // Crear decisiones para todos los roles como rechazados
-    const rolesDecisiones = pendingUser.roles.map(rol => ({
-      rol,
-      decision: 'rechazado'
-    }));
-
-    // Actualizar las decisiones antes de rechazar
-    await pool.query(
-      `UPDATE pending_users 
-       SET roles_decisiones=$1 
-       WHERE id=$2`,
-      [JSON.stringify(rolesDecisiones), pendingUserId]
-    );
-
-    await pool.query(`DELETE FROM pending_users WHERE id=$1`, [pendingUserId]);
-
-    res.json({ message: 'Solicitud rechazada' });
-  } catch (err) {
     next(err);
   }
 }
@@ -691,11 +635,8 @@ async function getTutoriaDetalle(req, res, next) {
 module.exports = {
   createPendingUser,
   approvePendingUser,
-  getAllPendingUser,
   getOnePendingUser,
   getPendingUsers,
-  getPendingUserDetail,
-  rejectOnePendingUser,
   rejectPendingUser,
   decideRol,
   getSemestresCerrados,
