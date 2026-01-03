@@ -25,7 +25,7 @@ function App() {
       <Route path="/login" element={<Layout><Login /></Layout>} />
       <Route path="/registro" element={<Layout><Register /></Layout>} />
       <Route path="/confirmacion" element={<Layout><RegisterConfirmation /></Layout>} />
-      <Route path="/verificado" element={<Layout><CuentaVerificada /></Layout>} />
+      <Route path="/verificado/:token" element={<Layout><CuentaVerificada /></Layout>} />
       <Route path="/recuperar" element={<Layout><RecuperarPassword /></Layout>} />
       <Route path="/recuperar/verificar" element={<Layout><VerificarCodigo /></Layout>} />
       <Route path="/recuperar/nueva" element={<Layout><NuevaContrasena /></Layout>} />

@@ -18,7 +18,7 @@ const {
 
 //Rutas publicas
 router.post('/login', login);
-router.get('/activarCuenta/:token', activateAccount);
+router.post('/activarCuenta/:token', activateAccount);
 
 router.post('/forgot-password',sendResetCode);
 router.post('/verify-code',verifyResetCode);

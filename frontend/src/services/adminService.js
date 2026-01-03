@@ -45,19 +45,25 @@ export async function approveUser(pendingUserId, rolesDecisions) {
     try {
         // Primero actualizamos cada rol individualmente
         const updatePromises = Object.entries(rolesDecisions).map(
-            ([role, approved]) => 
-                updateRoleDecision(pendingUserId, role, approved)
+            ([role, approved]) => {
+                return updateRoleDecision(pendingUserId, role, approved)
+            }
         );
         
-        await Promise.all(updatePromises);
+        const results = await Promise.all(updatePromises);
         
-        // Luego aprobamos al usuario
-        const response = await api.post(`${API_URL}/aprobar`, {
+        const userDetail = await getRequestDetail(pendingUserId);
+        
+        const requestData = {
             pendingUserId,
-            roles: Object.keys(rolesDecisions).filter(role => rolesDecisions[role] === true)
-        });
+            rolesDecisions: rolesDecisions
+        };
+
+        // Luego aprobamos al usuario
+        const response = await api.post(`${API_URL}/aprobar`, requestData);
         
         return response.data;
+
     } catch (error) {
         console.error('Error approving user:', error);
         throw error;

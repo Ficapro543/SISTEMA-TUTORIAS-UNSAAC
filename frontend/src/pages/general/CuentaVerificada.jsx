@@ -20,10 +20,10 @@ function CuentaVerificada() {
 
     const activateAccount = async () => {
       if (!token) {
-        setError("Enlace de activación INVÁLIDO o EXPIRADO");
+        setError("Token de activación no proporcionado");
         setTimeout(() => {
           navigate("/login");
-        }, 7000);
+        }, 5000);
         return;
       }
 
@@ -32,9 +32,12 @@ function CuentaVerificada() {
         setActivationStatus('activating');
         console.log("Activando cuenta con token:", token);
         
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/activarCuenta/${token}`,{
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/activarCuenta/${token}`,
+        {
+          method: 'POST',
           // Agregar headers para prevenir cache
           headers: {
+            'Content-Type': 'application/json',
             'Cache-Control': 'no-cache, no-store, must-revalidate',
             'Pragma': 'no-cache'
           },
@@ -67,7 +70,9 @@ function CuentaVerificada() {
             await new Promise(resolve => setTimeout(resolve, 1000));
 
             const retryResponse = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/activarCuenta/${token}`, {
+              method: 'POST',
               headers: {
+                'Content-Type': 'application/json',
                 'Cache-Control': 'no-cache, no-store, must-revalidate',
                 'Pragma': 'no-cache'
               },
@@ -97,12 +102,11 @@ function CuentaVerificada() {
         }
 
         // Datos del usuario activado
-        setUserEmail(data.user?.email || "usuario@unsaac.edu.pe");
+        setUserEmail(data.user?.email || "");
         setUserName(data.user?.nombre || "user");
         
         // Procesar roles aprobados y rechazados
         const approvedRoles = data.user?.approvedRoles || data.user?.roles || [];
-        const rejectedRoles = data.user?.rejectedRoles || [];
         
         if (approvedRoles.length === 0) {
           setError("No se aprobaron roles de acceso. Contacta con el administrador del Sistema.");
@@ -112,28 +116,18 @@ function CuentaVerificada() {
           return;
         }
 
-        // Crear array solo con roles solicitados
-        const requestedRoles = [];
+        //Capitalizar nombres
+        const capitalizarRoleName = (role) =>{
+          if(!role) return '';
+          return role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+        }
 
-        // Agregar roles aprobados
-        approvedRoles.forEach(roleName => {
-          const icono = getIconForRole(roleName);
-          requestedRoles.push({
-            nombre: roleName,
-            estado: "aprobado",
-            icono: icono
-          });
-        });
-
-        // Agregar roles rechazados (si hay)
-        rejectedRoles.forEach(roleName => {
-          const icono = getIconForRole(roleName);
-          requestedRoles.push({
-            nombre: roleName,
-            estado: "rechazado",
-            icono: icono
-          });
-        });
+        //Creamos array con roles aprobados
+        const requestedRoles = approvedRoles.map(roleName => ({
+          nombre: capitalizarRoleName(roleName),
+          estado: "aprobado",
+          icono: getIconForRole(roleName)
+        }));
 
         setRolesData(requestedRoles);
         
@@ -147,31 +141,17 @@ function CuentaVerificada() {
         console.error("Error al activar cuenta:", err);
         setActivationStatus('error');
 
-        //Manejamos errores especificos
-        if(err.message.includes('Token expirado')){
-          setError('El enlace de activación ha expirado. Contacta al administrador para un nuevo enlace.')
+        if (err.message.includes('Token expirado') || err.message.includes('inválido')) {
+          setError('El enlace de activación ha expirado. Contacta al administrador para un nuevo enlace.');
+        } else if (err.message.includes("La cuenta ya está activada") || err.message.includes("ya estaba activada")) {
 
-        } else if(err.message.includes("La cuenta ya está activada")){
+          setActivationStatus('already_active');
           setError("Esta cuenta ya está activada. Puedes iniciar sesión con tus credenciales.");
           setTimeout(()=>{
             navigate("/login");
           },5000);
 
-        } else if(err.message.includes("ya estaba activada")){
-          setActivationStatus('already_active');
-          //Parseamos datos si estan en el mensaje
-          try{
-            const match = err.message.match(/\{[^}]+\}/);
-            if (match) {
-              const data = JSON.parse(match[0]);
-              setUserEmail(data.user?.email || "");
-              setUserName(data.user?.nombre || "");
-              return;
-            }
-          }catch(e){
-
-          }
-        }else{
+        } else {
           setError(err.message || "Error al activar la cuenta. El enlace puede ser inválido o haber expirado.");
         }
         
@@ -198,17 +178,17 @@ function CuentaVerificada() {
 
   // Icono por rol
   const getIconForRole = (roleName) => {
+    const roleLower = roleName.toLowerCase();
     const iconMap = {
-      "Tutor": "/tutorIcon.svg",
-      "Evaluador": "/evaluadorIcon.svg",
-      "Administrador": "/administradorIcon.svg"
+      "tutor": "/tutorIcon.svg",
+      "verificador": "/evaluadorIcon.svg",
+      "administrador": "/administradorIcon.svg"
     };
-    return iconMap[roleName] || "tutorIcon.svg"; //Default
+    return iconMap[roleName] || "/tutorIcon.svg"; //Default
   };
 
   // Calcular estadísticas de roles
-  const rolesAprobados = rolesData.filter(rol => rol.estado === "aprobado").length;
-  const rolesRechazados = rolesData.filter(rol => rol.estado === "rechazado").length;
+  const rolesAprobados = rolesData.length;
   
   //Handle para regresar a login
   const handleBackToLogin = () =>{
@@ -233,7 +213,7 @@ function CuentaVerificada() {
   }
 
    // Estado de error
-  if (error) {
+  if (error && activationStatus !== 'already_active') {
     return (
       <div className={styles.verificationPage}>
         <div className={styles.verificationContainer}>
@@ -301,15 +281,9 @@ function CuentaVerificada() {
                 <>
                   {" "}Se han aprobado <strong>{rolesAprobados}</strong>{" "}
                   {rolesAprobados === 1 ? "rol de acceso" : "roles de acceso"}
+                  . Ya puedes iniciar sesión con tus credenciales.
                 </>
               )}
-              {rolesRechazados > 0 && (
-                <>
-                  {" "}y <strong>{rolesRechazados}</strong>{" "}
-                  {rolesRechazados === 1 ? "rol no fue aceptado" : "roles no fueron aceptados"}
-                </>
-              )}
-              . Ya puedes iniciar sesión con tus credenciales.
             </p>
           </div>
         </div>
@@ -317,11 +291,11 @@ function CuentaVerificada() {
         {/* Lista de roles solicitados */}
         {rolesData.length > 0 && (
           <div className={styles.rolesSection}>
-            <h3 className={styles.rolesTitle}>Roles Solicitados:</h3>
+            <h3 className={styles.rolesTitle}>Roles Aprobados:</h3>
               {rolesData.map((rol, index)=>(
                 <div
                   key={index}
-                  className={`${styles.roleCard} ${rol.estado === 'aprobado' ? styles.roleApproved : styles.roleRejected}`}
+                  className={`${styles.roleCard} ${styles.roleApproved}`}
                 >
                   <div className = {styles.roleInfo}>
                     <div className = {styles.roleIcon}>
@@ -331,17 +305,8 @@ function CuentaVerificada() {
                   </div>
 
                   <div className={styles.roleStatus}>
-                    {rol.estado === 'aprobado' ? (
-                      <>
-                        <img src="/check-icon.svg" alt="Aprobado" className={styles.statusIcon}/>
-                        <span className={styles.statusTextApproved}>Aprobado</span>
-                      </>
-                    ):(
-                      <>
-                        <img src="/error-icon.svg" alt="No aprobado" className={styles.statusIcon}/>
-                        <span className={styles.statusTextRejected}>No aprobado</span>
-                      </>
-                    )}
+                    <img src="/check-icon.svg" alt="Aprobado" className={styles.statusIcon}/>
+                    <span className={styles.statusTextApproved}>Aprobado</span>
                   </div>
                 </div>
               ))}

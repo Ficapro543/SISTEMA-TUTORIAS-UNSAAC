@@ -2,7 +2,7 @@
 const pool = require('../db/pool');
 const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
-const { sendAdminApprovalEmail, sendUserActivationEmail } = require('../services/mailService');
+const { sendAdminApprovalEmail, sendUserActivationEmail, sendUserRejectionEmail } = require('../services/mailService');
 
 async function createPendingUser(req, res, next) {
   try {
@@ -80,31 +80,68 @@ async function getPendingUserDetail(req, res, next) {
 
 async function approvePendingUser(req, res, next) {
   try {
-    const { pendingUserId, roles } = req.body; // allow overriding roles during approval
+    const { pendingUserId, rolesDecisions } = req.body;
 
     const q = await pool.query(`SELECT * FROM pending_users WHERE id=$1`, [pendingUserId]);
     if (q.rowCount === 0)
       return res.status(404).json({ message: 'Solicitud no encontrada' });
 
     const pendingUser = q.rows[0];
-    const finalRoles = roles || pendingUser.roles;
 
-    // Crear decisiones para todos los roles como aprobados
-    const rolesDecisiones = pendingUser.roles.map(rol => ({
-      rol,
-      decision: 'aprobado'
-    }));
+    let approvedRoles = [];
+    let rejectedRoles = [];
 
-    // Actualizar las decisiones antes de aprobar
-    await pool.query(
-      `UPDATE pending_users 
-       SET roles_decisiones=$1 
-       WHERE id=$2`,
-      [JSON.stringify(rolesDecisiones), pendingUserId]
-    );
+    // Obtener todos los roles solicitados
+    const allRoles = pendingUser.roles || [];
+    
+    if (rolesDecisions && Object.keys(rolesDecisions).length > 0) {
+      console.log("Usando decisions del frontend:", rolesDecisions);
+      
+      // Usar las decisiones del frontend
+      allRoles.forEach(role => {
+        const decision = rolesDecisions[role];
+        if (decision === true) {
+          approvedRoles.push(role);
+        } else if (decision === false) {
+          rejectedRoles.push(role);
+        } else {
+          // Si no hay decisión específica, usar las guardadas en DB
+          const dbDecision = pendingUser.roles_decisiones?.find(d => d.rol === role);
+          if (dbDecision) {
+            if (dbDecision.decision === 'aprobado') {
+              approvedRoles.push(role);
+            } else if (dbDecision.decision === 'rechazado') {
+              rejectedRoles.push(role);
+            }
+          }
+        }
+      });
+    } else {
+      // Fallback: usar roles_decisiones de la BD
+      console.log("Usando decisions de la BD:", pendingUser.roles_decisiones);
+      
+      if (pendingUser.roles_decisiones && pendingUser.roles_decisiones.length > 0) {
+        pendingUser.roles_decisiones.forEach(decision => {
+          if (decision.decision === 'aprobado') {
+            approvedRoles.push(decision.rol);
+          } else if (decision.decision === 'rechazado') {
+            rejectedRoles.push(decision.rol);
+          }
+        });
+      } else {
+        // Si no hay decisiones, todos fueron aprobados
+        approvedRoles = allRoles;
+      }
+    }
+    
+    // Si no hay roles aprobados, rechazar automáticamente
+    if (approvedRoles.length === 0) {
+      return rejectPendingUser(req, res, next);
+    }
 
     const newUserId = uuidv4();
 
+    // Crear usuario con is_active = FALSE
     await pool.query(
       `INSERT INTO users (id, first_name, last_name, email, password_hash, roles, is_active)
        VALUES ($1,$2,$3,$4,$5,$6,$7)`,
@@ -114,8 +151,8 @@ async function approvePendingUser(req, res, next) {
         pendingUser.last_name,
         pendingUser.email,
         pendingUser.password_hash,
-        finalRoles,
-        true // ACTIVACIÓN DIRECTA
+        approvedRoles,
+        false
       ]
     );
 
@@ -133,13 +170,22 @@ async function approvePendingUser(req, res, next) {
     // Eliminar de pending_users
     await pool.query(`DELETE FROM pending_users WHERE id=$1`, [pendingUserId]);
 
-    // Enviar correo con token, NO con userId
-    await sendUserActivationEmail(pendingUser.email, activationToken, `${pendingUser.first_name} ${last_name}`, finalRoles);
+    // Enviar correo con los roles aprobados y rechazados
+    await sendUserActivationEmail(
+      pendingUser.email,
+      activationToken,
+      `${pendingUser.first_name} ${pendingUser.last_name}`,
+      approvedRoles,
+      rejectedRoles
+    );
 
     res.json({
       message: 'Usuario aprobado y correo de activación enviado',
       userId: newUserId,
-      email: pendingUser.email
+      email: pendingUser.email,
+      requiereActivacion: true,
+      approvedRoles,
+      rejectedRoles
     });
 
   } catch (err) {
@@ -222,11 +268,30 @@ async function rejectOnePendingUser(req, res, next) {
 async function rejectPendingUser(req, res, next) {
   try {
     const { pendingUserId } = req.body;
-    const result = await pool.query('DELETE FROM pending_users WHERE id = $1 RETURNING email', [pendingUserId]);
-    if (result.rowCount === 0) return res.status(404).json({ message: 'Solicitud no encontrada' });
-
-    // Optionally send an email notifying rejection
-    res.json({ message: 'Solicitud rechazada y eliminada.' });
+    
+    // Obtener información del usuario antes de eliminar
+    const userQuery = await pool.query(
+      'SELECT * FROM pending_users WHERE id = $1', 
+      [pendingUserId]
+    );
+    
+    if (userQuery.rowCount === 0) {
+      return res.status(404).json({ message: 'Solicitud no encontrada' });
+    }
+    
+    const pendingUser = userQuery.rows[0];
+    
+    // Eliminar solicitud
+    await pool.query('DELETE FROM pending_users WHERE id = $1', [pendingUserId]);
+    
+    // Enviar correo de solicitud rechazada
+    await sendUserRejectionEmail(pendingUser.email, pendingUser.first_name);
+    
+    res.json({ 
+      message: 'Solicitud rechazada y eliminada.',
+      userEmail: pendingUser.email
+    });
+    
   } catch (err) {
     next(err);
   }

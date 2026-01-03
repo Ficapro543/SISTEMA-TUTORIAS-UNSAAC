@@ -149,14 +149,12 @@ async function activateAccount(req, res, next) {
         user: {
           id: tokenData.user_id_exists,
           email: tokenData.email,
-          nombre: `${tokenData.first_name} ${tokenData.last_name}`,
+          nombre: `${user.first_name} ${user.last_name}`,
           roles: tokenData.roles,
-          approvedRoles: tokenData.roles,
-          rejectedRoles: []
         }
       });
     }
-
+  
     // 3. Verificar expiracion
     if (tokenData.expires_at < new Date()) {
       console.log("⚠️ Token expirado");
@@ -169,13 +167,15 @@ async function activateAccount(req, res, next) {
     // 4. Verificar si ya está activo
     if (tokenData.is_active) {
       console.log("ℹ️ Cuenta ya activada anteriormente");
+
       // Marcar token como usado
       await client.query(
         `UPDATE activation_tokens 
-         SET used = true, used_at = NOW() 
-         WHERE token=$1`,
+         SET used = true, used_at = NOW()
+         WHERE token = $1`,
         [token]
       );
+      
       await client.query('COMMIT');
 
       return res.status(200).json({
@@ -184,9 +184,7 @@ async function activateAccount(req, res, next) {
           id: tokenData.user_id_exists,
           email: tokenData.email,
           nombre: `${tokenData.first_name} ${tokenData.last_name}`,
-          roles: tokenData.roles,
-          approvedRoles: tokenData.roles,
-          rejectedRoles: []
+          roles: tokenData.roles
         }
       });
     }
@@ -216,6 +214,13 @@ async function activateAccount(req, res, next) {
         message: 'No se pudo activar la cuenta. Intente nuevamente.'
       });
     }
+
+    // 6. Eliminar de pending_users si existe
+    await client.query(
+      `DELETE FROM pending_users WHERE email = $1`,
+      [tokenData.email]
+    );
+
     await client.query('COMMIT');
 
     const user = updateResult.rows[0];
@@ -227,9 +232,7 @@ async function activateAccount(req, res, next) {
         id: user.id,
         email: user.email,
         nombre: `${user.first_name} ${user.last_name}`,
-        roles: user.roles,
-        approvedRoles: user.roles,
-        rejectedRoles: []
+        roles: user.roles
       }
     });
 

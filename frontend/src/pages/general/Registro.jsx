@@ -15,6 +15,7 @@ function Register() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [tooltip, setTooltip] = useState({ visible: false, content: "", x: 0, y: 0, align: 'center' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Estados para mostrar contraseña
   const [showPassword, setShowPassword] = useState(false);
@@ -74,6 +75,8 @@ function Register() {
     setError("");
     setSuccess("");
 
+    if(isSubmitting) return;
+
     // Validaciones
     if (!nombres || !apellidos || !correo || !password || !confirmar) {
       setError("Por favor, completa todos los campos.");
@@ -102,7 +105,8 @@ function Register() {
       return;
     }
 
-    // TEMPORAL: Simulando éxito sin backend
+    setIsSubmitting(true);
+
     const simulateSuccess = false; //Cambiar a falso para probar errores
     if (simulateSuccess) {
       navigate("/confirmacion", {
@@ -143,6 +147,9 @@ function Register() {
       }
     } catch (err) {
       setError("No se pudo conectar con el servidor.");
+    
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -315,8 +322,8 @@ function Register() {
           {error && <p className={styles.errorMessage}>{error}</p>}
           {success && <p className={styles.successMessage}>{success}</p>}
 
-          <button type="submit" className={styles.registerBtn}>
-            Registrarse
+          <button type="submit" className={styles.registerBtn} disabled={isSubmitting}>
+            {isSubmitting ? "Enviando solicitud..." : "Registrarse"}
           </button>
 
           <div className={styles.divider}>

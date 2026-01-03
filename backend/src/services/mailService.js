@@ -139,28 +139,35 @@ Este es un correo automático del sistema, por favor no responder.`
   return info;
 }
 
-async function sendUserActivationEmail(userEmail, token, userName = 'Usuario', roles = []) {
+async function sendUserActivationEmail(userEmail, token, userName = 'Usuario', approvedRoles = [], rejectedRoles = []) {
   const transporter = await createTransporter();
-  const activationLink = `${process.env.FRONTEND_URL}/activar-cuenta/${token}`;
+  const activationLink = `${process.env.FRONTEND_URL}/verificado/${token}`;
   
   // Colores según la paleta UNSAAC
   const primaryColor = '#1a365d'; // hsl(230 70% 20%)
   const secondaryColor = '#1e40af'; // hsl(220 60% 30%)
   const accentColor = '#d97706'; // hsl(45 70% 47%)
   const successColor = '#059669'; // Verde para éxito
+  const warningColor = '#dc2626'; // Rojo para rechazados
   const lightBg = '#f8fafc'; // hsl(210 20% 98%)
 
-  // Formatear roles para mostrar
-  const rolesText = roles.length > 0 
-    ? roles.map(role => `<li style="margin: 5px 0; padding: 8px 12px; background-color: #f1f5f9; border-radius: 4px; border-left: 3px solid ${accentColor};">${role}</li>`).join('')
-    : '<li style="color: #6b7280; font-style: italic;">Roles pendientes de asignación</li>';
+  // Formatear roles aprobados
+  const approvedRolesHTML = approvedRoles.length > 0 
+    ? approvedRoles.map(role => `<li style="margin: 5px 0; padding: 8px 12px; background-color: #f0fdf4; border-radius: 4px; border-left: 3px solid ${successColor};"><span style="color: ${successColor};">✓</span> ${role}</li>`).join('')
+    : '<li style="color: #6b7280; font-style: italic;">No se aprobaron roles</li>';
+
+  // Formatear roles rechazados
+  const rejectedRolesHTML = rejectedRoles.length > 0 
+    ? rejectedRoles.map(role => `<li style="margin: 5px 0; padding: 8px 12px; background-color: #fef2f2; border-radius: 4px; border-left: 3px solid ${warningColor};"><span style="color: ${warningColor};">✗</span> ${role}</li>`).join('')
+    : '<li style="color: #6b7280; font-style: italic;">No hay roles rechazados</li>';
 
   const mailOptions = {
     from: process.env.MAIL_FROM || process.env.EMAIL_FROM || 'no-reply@unsaac.edu.pe',
     to: userEmail,
     subject: '✅ Solicitud aprobada - Activa tu cuenta UNSAAC',
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px; background: ${lightBg};">
+    html: 
+    `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px; background: ${lightBg};">
         <div style="text-align: center; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 2px solid ${successColor};">
           <h2 style="color: ${successColor}; margin-bottom: 10px;">¡Solicitud Aprobada!</h2>
           <p style="color: ${primaryColor}; font-size: 14px;">Universidad Nacional de San Antonio Abad del Cusco</p>
@@ -173,11 +180,23 @@ async function sendUserActivationEmail(userEmail, token, userName = 'Usuario', r
           </p>
           
           <div style="margin: 20px 0; padding: 15px; background-color: #f0fdf4; border-radius: 6px;">
-            <p style="margin: 0 0 10px 0; font-size: 14px; color: ${successColor};"><strong>📋 Roles asignados:</strong></p>
+            <p style="margin: 0 0 10px 0; font-size: 14px; color: ${successColor};"><strong>✅ Roles aprobados:</strong></p>
             <ul style="margin: 0; padding-left: 20px; font-size: 14px;">
-              ${rolesText}
+              ${approvedRolesHTML}
             </ul>
           </div>
+          
+          ${rejectedRoles.length > 0 ? `
+          <div style="margin: 20px 0; padding: 15px; background-color: #fef2f2; border-radius: 6px;">
+            <p style="margin: 0 0 10px 0; font-size: 14px; color: ${warningColor};"><strong>❌ Roles no aprobados:</strong></p>
+            <ul style="margin: 0; padding-left: 20px; font-size: 14px;">
+              ${rejectedRolesHTML}
+            </ul>
+            <p style="margin: 10px 0 0 0; font-size: 12px; color: #6b7280;">
+              <em>Estos roles no estarán disponibles en tu cuenta.</em>
+            </p>
+          </div>
+          ` : ''}
           
           <p style="margin: 15px 0; font-size: 14px; color: #4b5563;">
             Para completar el proceso, debes <strong>activar tu cuenta</strong> haciendo clic en el siguiente enlace:
@@ -194,7 +213,7 @@ async function sendUserActivationEmail(userEmail, token, userName = 'Usuario', r
             Enlace de activación: ${activationLink}
           </p>
           <p style="margin-top: 5px; font-size: 11px; color: #9ca3af;">
-            ⚠️ Este enlace expira en 24 horas
+            ⚠️ Este enlace expira en 72 horas
           </p>
         </div>
         
@@ -204,47 +223,38 @@ async function sendUserActivationEmail(userEmail, token, userName = 'Usuario', r
           </p>
         </div>
         
-        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
-          <p style="font-size: 12px; color: #6b7280; margin: 5px 0;">
-            <strong>🔒 Seguridad:</strong>
-          </p>
-          <ul style="font-size: 12px; color: #6b7280; padding-left: 20px; margin: 10px 0;">
-            <li>No compartas este enlace con nadie</li>
-            <li>Si no solicitaste acceso al sistema, ignora este mensaje</li>
-            <li>Protege tus credenciales de inicio de sesión</li>
-          </ul>
-        </div>
-        
         <div style="margin-top: 30px; text-align: center; font-size: 12px; color: #9ca3af; padding-top: 20px; border-top: 1px solid #e5e7eb;">
           <p>© ${new Date().getFullYear()} Universidad Nacional de San Antonio Abad del Cusco. Todos los derechos reservados.</p>
-          <p>Este es un correo automático del Sistema de Tutorias UNSAAC, por favor no responder.</p>
+          <p>Este es un correo automático del sistema de gestión, por favor no responder.</p>
         </div>
       </div>
     `,
     text: `SOLICITUD APROBADA - ACTIVA TU CUENTA UNSAAC
 
-¡Hola ${userName}!
+    ¡Hola ${userName}!
 
-Tu solicitud de acceso al sistema ha sido APROBADA por el administrador.
+    Tu solicitud de acceso al sistema ha sido APROBADA por el administrador.
 
-📋 Roles asignados:
-${roles.length > 0 ? roles.map(r => `• ${r}`).join('\n') : '• Roles pendientes de asignación'}
+    ✅ ROLES APROBADOS:
+    ${approvedRoles.length > 0 ? approvedRoles.map(r => `• ✓ ${r}`).join('\n') : '• No se aprobaron roles'}
 
-Para completar el proceso, debes ACTIVAR TU CUENTA haciendo clic en el siguiente enlace:
+    ${rejectedRoles.length > 0 ? `
+    ❌ ROLES NO APROBADOS:
+    ${rejectedRoles.map(r => `• ✗ ${r}`).join('\n')}
+    (Estos roles no estarán disponibles en tu cuenta)
+    ` : ''}
 
-${activationLink}
+    Para completar el proceso, debes ACTIVAR TU CUENTA haciendo clic en el siguiente enlace:
 
-⚠️ Este enlace expira en 24 horas
+    ${activationLink}
 
-📝 IMPORTANTE: Después de activar tu cuenta, podrás iniciar sesión con tu email y la contraseña que estableciste durante el registro.
+    ⚠️ Este enlace expira en 72 horas
 
-🔒 SEGURIDAD:
-- No compartas este enlace con nadie
-- Si no solicitaste acceso al sistema, ignora este mensaje
-- Protege tus credenciales de inicio de sesión
+    📝 IMPORTANTE: Después de activar tu cuenta, podrás iniciar sesión con tu email y la contraseña que estableciste durante el registro.
 
-© ${new Date().getFullYear()} Universidad Nacional de San Antonio Abad del Cusco.
-Este es un correo automático del Sistema de Tutorias UNSAAC, por favor no responder.`
+    © ${new Date().getFullYear()} Universidad Nacional de San Antonio Abad del Cusco.
+    Este es un correo automático del sistema de gestión, por favor no responder.  
+    `
   };
 
   const info = transporter
@@ -252,6 +262,112 @@ Este es un correo automático del Sistema de Tutorias UNSAAC, por favor no respo
     : await sendMailFallback(mailOptions);
 
   console.log('User activation email procesado:', info.messageId);
+  return info;
+}
+
+async function sendUserRejectionEmail(userEmail, userName = 'Usuario') {
+  const transporter = await createTransporter();
+  
+  // Colores según la paleta UNSAAC
+  const primaryColor = '#1a365d'; // hsl(230 70% 20%)
+  const secondaryColor = '#1e40af'; // hsl(220 60% 30%)
+  const accentColor = '#d97706'; // hsl(45 70% 47%)
+  const warningColor = '#dc2626'; // Rojo para rechazo
+  const lightBg = '#f8fafc'; // hsl(210 20% 98%)
+
+  const mailOptions = {
+    from: process.env.MAIL_FROM || process.env.EMAIL_FROM || 'no-reply@unsaac.edu.pe',
+    to: userEmail,
+    subject: '❌ Solicitud de acceso no aprobada - Sistema de Tutorias UNSAAC',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px; background: ${lightBg};">
+        <div style="text-align: center; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 2px solid ${warningColor};">
+          <h2 style="color: ${warningColor}; margin-bottom: 10px;">Solicitud No Aprobada</h2>
+          <p style="color: ${primaryColor}; font-size: 14px;">Sistema de Tutorias UNSAAC</p>
+        </div>
+        
+        <div style="background-color: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid ${warningColor};">
+          <p style="margin: 5px 0; font-size: 16px;"><strong>Hola ${userName},</strong></p>
+          <p style="margin: 10px 0; font-size: 14px; color: #4b5563;">
+            Lamentamos informarte que tu solicitud de acceso al <strong>Sistema de Tutorías UNSAAC</strong> <strong>no ha sido aprobada</strong>.
+          </p>
+          <p style="margin: 10px 0; font-size: 14px; color: #4b5563;">
+            Después de revisar tu solicitud, el administrador ha determinado que no cumple con los criterios necesarios para acceder al sistema en este momento.
+          </p>
+        </div>
+        
+        <div style="background-color: #fef2f2; padding: 15px; border-radius: 8px; margin: 25px 0; border-left: 4px solid ${warningColor};">
+          <div style="display: flex; align-items: center; margin-bottom: 10px;">
+            <div style="background-color: ${warningColor}; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 10px;">
+              !
+            </div>
+            <p style="margin: 0; font-size: 14px; color: ${warningColor};">
+              <strong>Si crees que esto es un error</strong>
+            </p>
+          </div>
+          <p style="margin: 10px 0 0 0; font-size: 13px; color: #991b1b;">
+            Por favor contacta con el administrador del sistema para obtener más información o volver a solicitar acceso con información adicional.
+          </p>
+        </div>
+        
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+          <p style="font-size: 12px; color: ${primaryColor}; margin: 5px 0; font-weight: bold;">
+            📞 Contacto para consultas:
+          </p>
+          <ul style="font-size: 12px; color: #6b7280; padding-left: 20px; margin: 10px 0;">
+            <li>Email: ${process.env.ADMIN_EMAIL || 'administracion.tutorias@unsaac.edu.pe'}</li>
+            <li>Horario: Lunes a Viernes 8:00 AM - 4:00 PM</li>
+            <li>Teléfono: (084) 123456</li>
+          </ul>
+        </div>
+        
+        <div style="margin-top: 25px; padding: 15px; background-color: #f3f4f6; border-radius: 8px;">
+          <p style="margin: 0 0 10px 0; font-size: 13px; color: ${secondaryColor};">
+            <strong>💡 Puedes solicitar acceso nuevamente si:</strong>
+          </p>
+          <ul style="font-size: 12px; color: #6b7280; padding-left: 20px; margin: 0;">
+            <li>Tienes información adicional que respalde tu solicitud</li>
+            <li>Tu situación ha cambiado</li>
+            <li>Cuentas con la autorización correspondiente</li>
+          </ul>
+        </div>
+        
+        <div style="margin-top: 30px; text-align: center; font-size: 12px; color: #9ca3af; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+          <p>© ${new Date().getFullYear()} Universidad Nacional de San Antonio Abad del Cusco. Todos los derechos reservados.</p>
+          <p>Este es un correo automático del sistema de tutorías, por favor no responder.</p>
+        </div>
+      </div>
+    `,
+    text: `SOLICITUD NO APROBADA - SISTEMA DE TUTORIAS UNSAAC
+
+Hola ${userName},
+
+Lamentamos informarte que tu solicitud de acceso al Sistema de Tutorías UNSAAC NO HA SIDO APROBADA.
+
+Después de revisar tu solicitud, el administrador ha determinado que no cumple con los criterios necesarios para acceder al sistema en este momento.
+
+⚠️ SI CREES QUE ESTO ES UN ERROR:
+Por favor contacta con el administrador del sistema para obtener más información o volver a solicitar acceso con información adicional.
+
+📞 CONTACTO PARA CONSULTAS:
+• Email: ${process.env.ADMIN_EMAIL || 'administracion.tutorias@unsaac.edu.pe'}
+• Horario: Lunes a Viernes 8:00 AM - 4:00 PM
+• Teléfono: (084) 123456
+
+💡 PUEDES SOLICITAR ACCESO NUEVAMENTE SI:
+• Tienes información adicional que respalde tu solicitud
+• Tu situación ha cambiado
+• Cuentas con la autorización correspondiente
+
+© ${new Date().getFullYear()} Universidad Nacional de San Antonio Abad del Cusco.
+Este es un correo automático del sistema de tutorías, por favor no responder.`
+  };
+
+  const info = transporter
+    ? await transporter.sendMail(mailOptions)
+    : await sendMailFallback(mailOptions);
+
+  console.log('User rejection email procesado:', info.messageId);
   return info;
 }
 
@@ -399,6 +515,7 @@ Este es un correo automático, por favor no responder.`
 module.exports = {
   sendAdminApprovalEmail,
   sendUserActivationEmail,
+  sendUserRejectionEmail,
   sendEmailResetCode,
   resendEmailResetCode
 };

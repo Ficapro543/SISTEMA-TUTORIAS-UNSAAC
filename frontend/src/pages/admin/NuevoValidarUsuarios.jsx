@@ -73,11 +73,24 @@ const NuevoValidarUsuarios = () => {
     const [loading, setLoading] = useState(true);
     const [loadingDetailId, setLoadingDetailId] = useState(null);
     const [error, setError] = useState(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     // Cargar solicitudes pendientes al montar el componente
     useEffect(() => {
         fetchPendingUsers();
     }, []);
+
+    // Efecto para limpiar decisiones cuando se cierra el diálogo
+    useEffect(() => {
+        if (!isDialogOpen) {
+            // Limpiar decisiones después de un pequeño delay para asegurar
+            // que la animación de cierre se complete
+            const timer = setTimeout(() => {
+                setRoleDecisions({});
+            }, 300);
+            return () => clearTimeout(timer);
+        }
+    }, [isDialogOpen]);
 
     const fetchPendingUsers = async () => {
         try {
@@ -107,8 +120,8 @@ const NuevoValidarUsuarios = () => {
 
     const openDetails = async (user) => {
         try {
-
             setLoadingDetailId(user.id);
+            setIsDialogOpen(true);
             // Obtener detalles actualizados del usuario
             const userDetail = await getRequestDetail(user.id);
             
@@ -147,6 +160,7 @@ const NuevoValidarUsuarios = () => {
     const closeDetails = () => {
         setSelectedUser(null);
         setRoleDecisions({});
+        setIsDialogOpen(false);
     };
 
     const handleRoleDecision = (role, approved) => {
@@ -397,7 +411,10 @@ const NuevoValidarUsuarios = () => {
             </div>
 
             {/* Modal de detalles */}
-            <Dialog open={!!selectedUser} onOpenChange={(open) => !open && closeDetails()}>
+            <Dialog open={!!selectedUser} onOpenChange={(open) => {
+                    setIsDialogOpen(open);
+                    if(!open) closeDetails();
+                }}>
                 <DialogContent className={styles.dialogContent}>
                     <DialogHeader>
                         <DialogTitle className={styles.dialogTitleSection}>
