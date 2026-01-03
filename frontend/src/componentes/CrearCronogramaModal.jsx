@@ -3,7 +3,7 @@ import { X } from 'lucide-react';
 import { getTutors, getSemesters } from '../services/assignmentService';
 import styles from '../styles/components/CrearCronogramaModal.module.css';
 
-export default function CrearCronogramaModal({ isOpen, onClose, onSubmit }) {
+export default function CrearCronogramaModal({ isOpen, onClose, onSubmit, initialData = null, isEditing = false }) {
     const [formData, setFormData] = useState({
         tutor_user_id: '',
         codigo_estudiante: '',
@@ -22,8 +22,29 @@ export default function CrearCronogramaModal({ isOpen, onClose, onSubmit }) {
     useEffect(() => {
         if (isOpen) {
             loadInitialData();
+            if (isEditing && initialData) {
+                // Populate form with initial data
+                setFormData({
+                    tutor_user_id: initialData.tutor_id || '',
+                    codigo_estudiante: initialData.codigo_estudiante || '', // Need to ensure we have this
+                    fecha: initialData.raw_fecha ? initialData.raw_fecha.split('T')[0] : '',
+                    hora: initialData.raw_hora || '',
+                    ambiente: initialData.aula || '',
+                    semestre: initialData.semestre || ''
+                });
+            } else {
+                // Reset for creation
+                setFormData({
+                    tutor_user_id: '',
+                    codigo_estudiante: '',
+                    fecha: '',
+                    hora: '',
+                    ambiente: '',
+                    semestre: ''
+                });
+            }
         }
-    }, [isOpen]);
+    }, [isOpen, isEditing, initialData]);
 
     useEffect(() => {
         if (formData.tutor_user_id && formData.semestre) {
@@ -40,8 +61,8 @@ export default function CrearCronogramaModal({ isOpen, onClose, onSubmit }) {
             setTutores(tutoresData);
             setSemestres(semestresData);
 
-            // Establecer el semestre más reciente por defecto
-            if (semestresData.length > 0) {
+            // Establecer el semestre más reciente por defecto SOLO si no estamos editando
+            if (!isEditing && semestresData.length > 0) {
                 setFormData(prev => ({ ...prev, semestre: semestresData[0].id }));
             }
         } catch (err) {
@@ -130,7 +151,7 @@ export default function CrearCronogramaModal({ isOpen, onClose, onSubmit }) {
         <div className={styles.modalOverlay} onClick={onClose}>
             <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                 <div className={styles.modalHeader}>
-                    <h2 className={styles.modalTitle}>Crear Nuevo Cronograma</h2>
+                    <h2 className={styles.modalTitle}>{isEditing ? 'Editar Cronograma' : 'Crear Nuevo Cronograma'}</h2>
                     <button className={styles.closeButton} onClick={onClose}>
                         <X size={24} />
                     </button>
@@ -143,73 +164,81 @@ export default function CrearCronogramaModal({ isOpen, onClose, onSubmit }) {
                 )}
 
                 <form onSubmit={handleSubmit} className={styles.form}>
-                    <div className={styles.formGroup}>
-                        <label htmlFor="semestre" className={styles.label}>
-                            Semestre <span className={styles.required}>*</span>
-                        </label>
-                        <select
-                            id="semestre"
-                            name="semestre"
-                            value={formData.semestre}
-                            onChange={handleChange}
-                            className={styles.select}
-                            required
-                        >
-                            <option value="">Seleccione un semestre</option>
-                            {semestres.map(sem => (
-                                <option key={sem.id} value={sem.id}>
-                                    {sem.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                    {!isEditing && (
+                        <div className={styles.formGroup}>
+                            <label htmlFor="semestre" className={styles.label}>
+                                Semestre <span className={styles.required}>*</span>
+                            </label>
+                            <select
+                                id="semestre"
+                                name="semestre"
+                                value={formData.semestre}
+                                onChange={handleChange}
+                                className={styles.select}
+                                required
+                                disabled={isEditing}
+                            >
+                                <option value="">Seleccione un semestre</option>
+                                {semestres.map(sem => (
+                                    <option key={sem.id} value={sem.id}>
+                                        {sem.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
 
-                    <div className={styles.formGroup}>
-                        <label htmlFor="tutor_user_id" className={styles.label}>
-                            Tutor <span className={styles.required}>*</span>
-                        </label>
-                        <select
-                            id="tutor_user_id"
-                            name="tutor_user_id"
-                            value={formData.tutor_user_id}
-                            onChange={handleChange}
-                            className={styles.select}
-                            required
-                        >
-                            <option value="">Seleccione un tutor</option>
-                            {tutores.map(tutor => (
-                                <option key={tutor.id} value={tutor.id}>
-                                    {tutor.first_name} {tutor.last_name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                    {!isEditing && (
+                        <>
+                            <div className={styles.formGroup}>
+                                <label htmlFor="tutor_user_id" className={styles.label}>
+                                    Tutor <span className={styles.required}>*</span>
+                                </label>
+                                <select
+                                    id="tutor_user_id"
+                                    name="tutor_user_id"
+                                    value={formData.tutor_user_id}
+                                    onChange={handleChange}
+                                    className={styles.select}
+                                    required
+                                    disabled={isEditing}
+                                >
+                                    <option value="">Seleccione un tutor</option>
+                                    {tutores.map(tutor => (
+                                        <option key={tutor.id} value={tutor.id}>
+                                            {tutor.first_name} {tutor.last_name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
 
-                    <div className={styles.formGroup}>
-                        <label htmlFor="codigo_estudiante" className={styles.label}>
-                            Estudiante <span className={styles.required}>*</span>
-                        </label>
-                        <select
-                            id="codigo_estudiante"
-                            name="codigo_estudiante"
-                            value={formData.codigo_estudiante}
-                            onChange={handleChange}
-                            className={styles.select}
-                            required
-                            disabled={!formData.tutor_user_id || !formData.semestre}
-                        >
-                            <option value="">
-                                {!formData.tutor_user_id || !formData.semestre
-                                    ? 'Primero seleccione tutor y semestre'
-                                    : 'Seleccione un estudiante'}
-                            </option>
-                            {estudiantes.map(est => (
-                                <option key={est.code} value={est.code}>
-                                    {est.code} - {est.first_name} {est.last_name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                            <div className={styles.formGroup}>
+                                <label htmlFor="codigo_estudiante" className={styles.label}>
+                                    Estudiante <span className={styles.required}>*</span>
+                                </label>
+                                <select
+                                    id="codigo_estudiante"
+                                    name="codigo_estudiante"
+                                    value={formData.codigo_estudiante}
+                                    onChange={handleChange}
+                                    className={styles.select}
+                                    required
+                                    disabled={(!formData.tutor_user_id || !formData.semestre) || isEditing}
+                                >
+                                    <option value="">
+                                        {!formData.tutor_user_id || !formData.semestre
+                                            ? 'Primero seleccione tutor y semestre'
+                                            : 'Seleccione un estudiante'}
+                                    </option>
+                                    {estudiantes.map(est => (
+                                        <option key={est.code} value={est.code}>
+                                            {est.code} - {est.first_name} {est.last_name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </>
+                    )}
 
                     <div className={styles.formRow}>
                         <div className={styles.formGroup}>
@@ -266,14 +295,14 @@ export default function CrearCronogramaModal({ isOpen, onClose, onSubmit }) {
                             className={styles.cancelButton}
                             disabled={loading}
                         >
-                            Cancelar
+                            Volver atrás
                         </button>
                         <button
                             type="submit"
                             className={styles.submitButton}
                             disabled={loading}
                         >
-                            {loading ? 'Creando...' : 'Crear Cronograma'}
+                            {loading ? (isEditing ? 'Guardando...' : 'Creando...') : (isEditing ? 'Confirmar' : 'Crear Cronograma')}
                         </button>
                     </div>
                 </form>
