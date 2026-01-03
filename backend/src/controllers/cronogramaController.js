@@ -10,7 +10,7 @@ const pool = require('../db/pool');
  */
 async function getCronogramas(req, res, next) {
     try {
-        const { search } = req.query;
+        const { search, semestre } = req.query;
 
         let query = `
       SELECT 
@@ -46,6 +46,11 @@ async function getCronogramas(req, res, next) {
             params.push(`%${search}%`);
         }
 
+        if (semestre) {
+            query += ` AND c.semestre = $${params.length + 1}`;
+            params.push(semestre);
+        }
+
         query += ` ORDER BY c.fecha DESC, c.hora DESC`;
 
         const result = await pool.query(query, params);
@@ -79,6 +84,7 @@ async function getCronogramas(req, res, next) {
                     tutor: row.tutor_nombre,
                     tutor_id: row.tutor_id,
                     estudiantes: row.estudiante_nombre,
+                    codigo_estudiante: row.codigo_estudiante,
                     num_estudiantes: row.num_estudiantes,
                     semestre: row.semestre,
                     estado: row.estado,
@@ -278,6 +284,13 @@ async function deleteCronograma(req, res, next) {
         res.json({ message: 'Cronograma eliminado exitosamente' });
 
     } catch (err) {
+        console.error('Error al eliminar cronograma:', err);
+        // Check for foreign key constraint violation
+        if (err.code === '23503') {
+            return res.status(400).json({
+                message: 'No se puede eliminar el cronograma porque tiene registros relacionados (ej. asistencia).'
+            });
+        }
         next(err);
     }
 }
