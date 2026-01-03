@@ -2,13 +2,16 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 /**
  * Obtener todos los cronogramas
- * @param {string} search - Término de búsqueda por nombre de tutor
+ * @param {Object} filters - Filtros de búsqueda { semestre }
  */
-export async function getCronogramas(search = '') {
+export async function getCronogramas(filters = {}) {
     const token = localStorage.getItem('accessToken');
-    const url = search
-        ? `${API_URL}/api/cronogramas?search=${encodeURIComponent(search)}`
-        : `${API_URL}/api/cronogramas`;
+    const params = new URLSearchParams();
+
+    if (filters.semestre) params.append('semestre', filters.semestre);
+    if (filters.search) params.append('search', filters.search);
+
+    const url = `${API_URL}/api/cronogramas?${params.toString()}`;
 
     const response = await fetch(url, {
         headers: {
