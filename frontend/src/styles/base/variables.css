@@ -1,19 +1,122 @@
+/* variables.css */
+
 :root {
-  /* 🎨 Colores principales */
-  --color-primary: #004e92;
-  --color-secondary: #002147;
-  --color-text-dark: #222;
-  --color-text-light: #fff;
-  --color-border: #ccc;
-  --color-gray: #444;
-  --color-gray-light: #f3f3f3;
+  /* 🎨 TUS COLORES PRINCIPALES (los que ya tenías) */
+  --color-primary: #004e92;          /* Azul principal */
+  --color-secondary: #002147;        /* Azul secundario oscuro */
+  --color-text-dark: #222;           /* Texto oscuro */
+  --color-text-light: #fff;          /* Texto claro */
+  --color-border: #ccc;              /* Borde gris */
+  --color-gray: #444;                /* Gris oscuro */
+  --color-gray-light: #f3f3f3;       /* Gris claro */
 
-  /* 🖋️ Tipografía */
-  --font-main: "Poppins", sans-serif;
-
-  /* 📏 Dimensiones y bordes */
+  /* 🎨 COLORES DE LOVABLE COMO VALORES HSL CONCRETOS */
+  /* Estos son los valores HSL de tu archivo index.css de Lovable */
+  
+  /* Sistema de color principal */
+  --lovable-background: hsl(210, 20%, 98%);
+  --lovable-foreground: hsl(230, 70%, 20%);
+  --lovable-card: hsl(0, 0%, 100%);
+  --lovable-card-foreground: hsl(230, 70%, 20%);
+  --lovable-popover: hsl(0, 0%, 100%);
+  --lovable-popover-foreground: hsl(230, 70%, 20%);
+  
+  /* Colores temáticos */
+  --lovable-primary: hsl(230, 70%, 20%);
+  --lovable-primary-foreground: hsl(0, 0%, 100%);
+  --lovable-secondary: hsl(220, 60%, 30%);
+  --lovable-secondary-foreground: hsl(0, 0%, 100%);
+  --lovable-accent: hsl(45, 70%, 47%);
+  --lovable-accent-foreground: hsl(230, 70%, 15%);
+  --lovable-destructive: hsl(0, 84%, 60%);
+  --lovable-destructive-foreground: hsl(0, 0%, 100%);
+  
+  /* Estados y utilidades */
+  --lovable-muted: hsl(210, 30%, 96%);
+  --lovable-muted-foreground: hsl(220, 15%, 45%);
+  --lovable-border: hsl(214, 32%, 91%);
+  --lovable-input: hsl(214, 32%, 91%);
+  --lovable-ring: hsl(230, 70%, 20%);
+  
+  /* Componentes específicos */
+  --lovable-info-panel: hsl(205, 80%, 95%);
+  --lovable-info-panel-foreground: hsl(230, 70%, 20%);
+  --lovable-header-start: hsl(230, 70%, 18%);
+  --lovable-header-end: hsl(220, 60%, 25%);
+  
+  /* Sidebar */
+  --lovable-sidebar-background: hsl(0, 0%, 98%);
+  --lovable-sidebar-foreground: hsl(240, 5%, 26%);
+  --lovable-sidebar-primary: hsl(230, 70%, 20%);
+  --lovable-sidebar-primary-foreground: hsl(0, 0%, 98%);
+  --lovable-sidebar-accent: hsl(210, 30%, 96%);
+  --lovable-sidebar-accent-foreground: hsl(230, 70%, 20%);
+  --lovable-sidebar-border: hsl(220, 13%, 91%);
+  --lovable-sidebar-ring: hsl(230, 70%, 40%);
+  
+  /* 🎨 GRADIENTES DE LOVABLE */
+  --lovable-header-gradient: linear-gradient(135deg, hsl(230, 70%, 18%), hsl(220, 60%, 25%));
+  --lovable-info-gradient: linear-gradient(135deg, hsl(205, 80%, 95%), hsla(205, 80%, 95%, 0.7));
+  
+  /* 📏 TUS DIMENSIONES (las que ya tenías) */
   --radius: 10px;
   --shadow: 0 10px 35px rgba(0, 0, 0, 0.35);
   --transition: 0.3s ease;
+  
+  /* 📏 DIMENSIONES DE LOVABLE */
+  --lovable-radius: 0.5rem;
+  --lovable-radius-sm: calc(var(--lovable-radius) - 4px);
+  --lovable-radius-md: calc(var(--lovable-radius) - 2px);
+  --lovable-radius-lg: var(--lovable-radius);
+  
+  /* 🖋️ TIPOGRAFÍA */
+  --font-main: "Poppins", sans-serif;
+}
 
+/* 🎨 MODO OSCURO DE LOVABLE */
+.dark {
+  /* Sistema de color principal */
+  --lovable-background: hsl(230, 50%, 8%);
+  --lovable-foreground: hsl(210, 40%, 98%);
+  --lovable-card: hsl(230, 50%, 12%);
+  --lovable-card-foreground: hsl(210, 40%, 98%);
+  --lovable-popover: hsl(230, 50%, 12%);
+  --lovable-popover-foreground: hsl(210, 40%, 98%);
+  
+  /* Colores temáticos */
+  --lovable-primary: hsl(210, 40%, 98%);
+  --lovable-primary-foreground: hsl(230, 70%, 20%);
+  --lovable-secondary: hsl(220, 40%, 25%);
+  --lovable-secondary-foreground: hsl(210, 40%, 98%);
+  --lovable-accent: hsl(45, 70%, 50%);
+  --lovable-accent-foreground: hsl(230, 70%, 10%);
+  --lovable-destructive: hsl(0, 63%, 31%);
+  --lovable-destructive-foreground: hsl(210, 40%, 98%);
+  
+  /* Estados y utilidades */
+  --lovable-muted: hsl(220, 40%, 20%);
+  --lovable-muted-foreground: hsl(215, 20%, 65%);
+  --lovable-border: hsl(220, 40%, 20%);
+  --lovable-input: hsl(220, 40%, 20%);
+  --lovable-ring: hsl(213, 27%, 84%);
+  
+  /* Componentes específicos */
+  --lovable-info-panel: hsl(220, 50%, 15%);
+  --lovable-info-panel-foreground: hsl(210, 40%, 98%);
+  --lovable-header-start: hsl(230, 70%, 12%);
+  --lovable-header-end: hsl(220, 60%, 18%);
+  
+  /* Sidebar */
+  --lovable-sidebar-background: hsl(230, 50%, 10%);
+  --lovable-sidebar-foreground: hsl(210, 40%, 96%);
+  --lovable-sidebar-primary: hsl(220, 76%, 48%);
+  --lovable-sidebar-primary-foreground: hsl(0, 0%, 100%);
+  --lovable-sidebar-accent: hsl(220, 40%, 16%);
+  --lovable-sidebar-accent-foreground: hsl(210, 40%, 96%);
+  --lovable-sidebar-border: hsl(220, 40%, 16%);
+  --lovable-sidebar-ring: hsl(230, 70%, 60%);
+  
+  /* 🎨 GRADIENTES DE LOVABLE EN MODO OSCURO */
+  --lovable-header-gradient: linear-gradient(135deg, hsl(230, 70%, 12%), hsl(220, 60%, 18%));
+  --lovable-info-gradient: linear-gradient(135deg, hsl(220, 50%, 15%), hsla(220, 50%, 15%, 0.7));
 }
