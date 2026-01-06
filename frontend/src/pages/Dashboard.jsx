@@ -14,6 +14,7 @@ import AsignacionTutorados from "./admin/AsignacionTutorados";
 import CambioTutorados from "./admin/CambioTutorados";
 import TutoriasHistoricas from "./admin/TutoriasHistoricas";
 import Cronogramas from "./admin/Cronogramas";
+import Seguridad from "./admin/Seguridad";
 
 // Tutor Views
 import NuevoTutorPanel from "./tutor/NuevoTutorPanel";
@@ -498,12 +499,7 @@ export default function Dashboard() {
                         )}
 
                         {activeAdminTab === 'seguridad' && (
-                            <>
-                                <h3 className={styles.contentTitle}>Seguridad</h3>
-                                <div className={styles.contentPlaceholder}>
-                                    <p>Sistema de Recuperación y Backup (Próximamente).</p>
-                                </div>
-                            </>
+                            <Seguridad />
                         )}
                     </div>
                 </div>

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const tutoriasController = require('../controllers/tutoriasController');
 const authenticateToken = require('../middleware/authMiddleware');
-const upload = require('../utils/multerConfig');
+const upload = require('../utils/multerMemory'); // Updated to Memory Storage
 
 // Todas las rutas requieren autenticación
 router.use(authenticateToken);

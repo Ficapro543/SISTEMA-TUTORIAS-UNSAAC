@@ -46,11 +46,7 @@ const getTutoriasByTutor = async (req, res) => {
 
 /**
  * Registrar una nueva tutoría.
- * Se asume que existe un cronograma previo.
- * Realiza una transacción para:
- * 1. Insertar en 'tutorias'
- * 2. Actualizar 'cronogramas' a 'realizada'
- * 3. Insertar 'derivaciones' si corresponde
+ * Ahora guarda el archivo en la columna 'data' (BYTEA).
  */
 const registrarTutoria = async (req, res) => {
     const {
@@ -82,19 +78,25 @@ const registrarTutoria = async (req, res) => {
         ]);
         const newTutoriaId = tutoriaResult.rows[0].id;
 
-        // 2. Insertar Archivo (si existe)
+        // 2. Insertar Archivo (si existe - BYTEA)
         if (req.file) {
             const insertArchivoQuery = `
-                INSERT INTO archivos_tutoria (tutoria_id, filename, original_name, path, mimetype, size)
-                VALUES ($1, $2, $3, $4, $5, $6)
+                INSERT INTO archivos_tutoria (tutoria_id, filename, original_name, mimetype, size, data, path)
+                VALUES ($1, $2, $3, $4, $5, $6, $7)
             `;
+            // Note: path is kept optionally NULL or valid if we wanted hybrid, but here we set NULL or placeholder
+            // Given the user wants DB storage, we save Buffer to 'data'. 
+            // We can leave 'path' as NULL if the schema allows, or empty string.
+            // Based on previous instructions, schema 'path' is now nullable.
+
             await client.query(insertArchivoQuery, [
                 newTutoriaId,
-                req.file.filename,
+                req.file.originalname, // Using original name as filename too or generate one? Let's use original for now or logic from before.
                 req.file.originalname,
-                req.file.path,
                 req.file.mimetype,
-                req.file.size
+                req.file.size,
+                req.file.buffer, // <--- The file data
+                null // path is null
             ]);
         }
 
@@ -150,34 +152,34 @@ const actualizarTutoria = async (req, res) => {
 
         // Manejo de derivación
         if (requiere_derivacion) {
-            // Upsert derivación (si ya existe actualiza, si no inserta)
-            // Postgres 9.5+ soporta ON CONFLICT pero necesitamos constraint. 
-            // Haremos delete e insert para simplificar, dado que es 1:1 o 0:1
             await client.query(`DELETE FROM derivaciones WHERE tutoria_id = $1`, [id]);
-
             if (derivacion && derivacion.especialidad) {
                 await client.query(`
                     INSERT INTO derivaciones (tutoria_id, especialidad, motivo) VALUES ($1, $2, $3)
                 `, [id, derivacion.especialidad, derivacion.motivo]);
             }
         } else {
-            // Si ya no requiere, eliminamos cualquier derivación existente
             await client.query(`DELETE FROM derivaciones WHERE tutoria_id = $1`, [id]);
         }
 
         // Manejo de archivo (si se sube uno nuevo)
         if (req.file) {
+            // Eliminar anterior si existe? O reemplazar?
+            // Vamos a borrar lo que haya y poner el nuevo.
+            await client.query(`DELETE FROM archivos_tutoria WHERE tutoria_id = $1`, [id]);
+
             const insertArchivoQuery = `
-                INSERT INTO archivos_tutoria (tutoria_id, filename, original_name, path, mimetype, size)
-                VALUES ($1, $2, $3, $4, $5, $6)
+                INSERT INTO archivos_tutoria (tutoria_id, filename, original_name, mimetype, size, data, path)
+                VALUES ($1, $2, $3, $4, $5, $6, $7)
             `;
             await client.query(insertArchivoQuery, [
                 id,
-                req.file.filename,
                 req.file.originalname,
-                req.file.path,
+                req.file.originalname,
                 req.file.mimetype,
-                req.file.size
+                req.file.size,
+                req.file.buffer,
+                null
             ]);
         }
 
@@ -223,13 +225,14 @@ const getHistorialEstudiante = async (req, res) => {
 };
 
 /**
- * Descargar/Ver el archivo adjunto de una tutoría.
+ * Descargar/Ver el archivo adjunto desde la BD.
  */
 const descargarArchivo = async (req, res) => {
     const { tutoriaId } = req.params;
 
     try {
-        const query = `SELECT path, mimetype, original_name FROM archivos_tutoria WHERE tutoria_id = $1`;
+        // Seleccionamos data, mimetype, name
+        const query = `SELECT data, mimetype, original_name FROM archivos_tutoria WHERE tutoria_id = $1`;
         const result = await pool.query(query, [tutoriaId]);
 
         if (result.rows.length === 0) {
@@ -238,17 +241,13 @@ const descargarArchivo = async (req, res) => {
 
         const archivo = result.rows[0];
 
-        // Verificar si el archivo existe en disco
-        const fs = require('fs');
-        if (!fs.existsSync(archivo.path)) {
-            return res.status(404).json({ message: 'El archivo físico no se encuentra en el servidor.' });
+        if (!archivo.data) {
+            return res.status(404).json({ message: 'El contenido del archivo no se encuentra en la base de datos.' });
         }
 
         res.setHeader('Content-Type', archivo.mimetype);
         res.setHeader('Content-Disposition', `inline; filename="${archivo.original_name}"`);
-        // O usar res.download si se prefiere forzar descarga:
-        // res.download(archivo.path, archivo.original_name);
-        res.sendFile(require('path').resolve(archivo.path));
+        res.send(archivo.data);
 
     } catch (error) {
         console.error('Error en descargarArchivo:', error);
