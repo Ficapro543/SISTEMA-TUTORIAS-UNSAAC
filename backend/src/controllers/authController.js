@@ -3,6 +3,15 @@ const pool = require('../db/pool');
 const bcrypt = require('bcrypt');
 const { signAccessToken, signRefreshToken, verifyRefreshToken } = require('../utils/tokens');
 
+// Helpper para generar codigo de usuario
+function generateUserCode() {
+  const number = Math.floor(Math.random() * 1e8)
+    .toString()
+    .padStart(8, '0');
+
+  return `U-${number}`;
+}
+
 async function login(req, res, next) {
   try {
     console.log('🔍 Login attempt:', { email: req.body.email });
@@ -87,6 +96,7 @@ async function login(req, res, next) {
       refreshToken,
       user: {
         id: user.id,
+        code: generateUserCode(user.id), // Added Code
         email: user.email,
         first_name: user.first_name,
         last_name: user.last_name,
@@ -183,6 +193,7 @@ async function googleLogin(req, res, next) {
         refreshToken,
         user: {
           id: user.id,
+          code: generateUserCode(user.id), // Added Code
           email: user.email,
           first_name: user.first_name,
           last_name: user.last_name,
@@ -263,6 +274,7 @@ async function activateAccount(req, res, next) {
         message: 'La cuenta ya fue activada anteriormente con este enlace.',
         user: {
           id: tokenData.user_id_exists,
+          code: generateUserCode(tokenData.user_id_exists), // Added Code
           email: tokenData.email,
           nombre: `${user.first_name} ${user.last_name}`,
           roles: tokenData.roles,
@@ -297,6 +309,7 @@ async function activateAccount(req, res, next) {
         message: 'La cuenta ya estaba activada anteriormente',
         user: {
           id: tokenData.user_id_exists,
+          code: generateUserCode(tokenData.user_id_exists), // Added Code
           email: tokenData.email,
           nombre: `${tokenData.first_name} ${tokenData.last_name}`,
           roles: tokenData.roles
@@ -345,6 +358,7 @@ async function activateAccount(req, res, next) {
       message: '¡Cuenta activada exitosamente!',
       user: {
         id: user.id,
+        code: generateUserCode(user.id), // Added Code
         email: user.email,
         nombre: `${user.first_name} ${user.last_name}`,
         roles: user.roles
@@ -464,20 +478,149 @@ async function logout(req, res, next) {
 // Obtener perfil del usuario actual
 async function getProfile(req, res, next) {
   try {
-    const rolesLower = req.user.roles.map(r => r.toLowerCase());
+    const userId = req.user.id;
+
+    // Query DB for fresh user data
+    const result = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    const user = result.rows[0];
+
+    // Recalculate roles
+    // Assuming roles is an array in DB or jsonb. Original code implied `req.user.roles` was array.
+    // Let's verify what `user.roles` is in DB. Usually text array or string based on previous usage.
+    // In previous `authenticateToken` it likely came from DB too.
+    // If it's a simple array of strings:
+    const rolesLower = (user.roles || []).map(r => r.toLowerCase());
     const rolesBoolean = {
       administrador: rolesLower.includes('administrador'),
       tutor: rolesLower.includes('tutor'),
       verificador: rolesLower.includes('verificador')
     };
 
-    // El usuario ya está adjunto por el middleware authenticateToken
     res.json({
       user: {
-        ...req.user,
+        id: user.id,
+        email: user.email,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        roles: rolesBoolean,
+        code: generateUserCode(user.id), // Dynamic code
+        // Don't send password hash
+      }
+    });
+
+  } catch (err) {
+    next(err);
+  }
+}
+
+// Actualizar información personal (nombre y apellido)
+async function updateProfile(req, res, next) {
+  try {
+    const { nombre, apellido } = req.body;
+    const userId = req.user.id;
+
+    if (!nombre || !apellido) {
+      return res.status(400).json({ message: 'Nombre y apellido son requeridos' });
+    }
+
+    await pool.query(
+      'UPDATE users SET first_name = $1, last_name = $2 WHERE id = $3',
+      [nombre, apellido, userId]
+    );
+
+    // Obtener usuario actualizado para devolverlo (y actualizar frontend)
+    const userQuery = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
+    const user = userQuery.rows[0];
+
+    // Recalcular roles booleanos
+    const rolesLower = user.roles.map(r => r.toLowerCase());
+    const rolesBoolean = {
+      administrador: rolesLower.includes('administrador'),
+      tutor: rolesLower.includes('tutor'),
+      verificador: rolesLower.includes('verificador')
+    };
+
+    res.json({
+      message: 'Información actualizada correctamente',
+      user: {
+        id: user.id,
+        code: generateUserCode(user.id),
+        email: user.email,
+        first_name: user.first_name,
+        last_name: user.last_name,
         roles: rolesBoolean
       }
     });
+
+  } catch (err) {
+    next(err);
+  }
+}
+
+// Cambiar contraseña
+async function changePassword(req, res, next) {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user.id;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: 'Faltan datos' });
+    }
+
+    if (newPassword.length < 8) {
+      return res.status(400).json({ message: 'La nueva contraseña debe tener al menos 8 caracteres' });
+    }
+
+    // Obtener hash actual
+    const userQuery = await pool.query('SELECT password_hash FROM users WHERE id = $1', [userId]);
+    const user = userQuery.rows[0];
+
+    // Verificar contraseña actual
+    const validPassword = await bcrypt.compare(currentPassword, user.password_hash);
+    if (!validPassword) {
+      return res.status(401).json({ message: 'La contraseña actual es incorrecta' });
+    }
+
+    // Hash nueva contraseña
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(newPassword, salt);
+
+    await pool.query('UPDATE users SET password_hash = $1 WHERE id = $2', [hash, userId]);
+
+    res.json({ message: 'Contraseña actualizada correctamente' });
+
+  } catch (err) {
+    next(err);
+  }
+}
+
+// Eliminar cuenta
+async function deleteAccount(req, res, next) {
+  try {
+    const userId = req.user.id;
+
+    // Intento de eliminación física (Hard Delete)
+    // Esto fallará si existen restricciones de clave foránea (ON DELETE RESTRICT) 
+    // en tablas como tutor_asignacion o cronogramas con datos activos.
+    try {
+      await pool.query('DELETE FROM users WHERE id = $1', [userId]);
+    } catch (dbErr) {
+      // Violación de Foreign Key (código 23503 en Postgres)
+      if (dbErr.code === '23503') {
+        return res.status(409).json({
+          message: 'No se puede eliminar la cuenta porque tiene registros asociados (ej. asignaciones o cronogramas).'
+        });
+      }
+      throw dbErr;
+    }
+
+    res.json({ message: 'Cuenta eliminada correctamente' });
+
   } catch (err) {
     next(err);
   }
@@ -489,5 +632,8 @@ module.exports = {
   activateAccount,
   refreshToken,
   logout,
-  getProfile
+  getProfile,
+  updateProfile,
+  changePassword,
+  deleteAccount
 };
