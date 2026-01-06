@@ -38,24 +38,24 @@ async function createPendingUser(req, res, next) {
     );
 
     // enviar notificación a administradores
-    const adminEmail = process.env.ADMIN_EMAIL;
-    await sendAdminApprovalEmail(adminEmail, `${first_name} ${last_name}`, email);
+    // const adminEmail = process.env.ADMIN_EMAIL;
+    // await sendAdminApprovalEmail(adminEmail, `${first_name} ${last_name}`, email);
 
     // === PARA PRODUCCION ===
-    // const adminsQuery = await pool.query(`
-    //   SELECT email
-    //   FROM users
-    //   WHERE is_active = true
-    //   AND 'Administrador' = ANY(roles)
-    // `);
-    // if (adminsQuery.rowCount === 0){
-    //   console.warn('⚠️ No hay administradores activos para notificar');
-    // }else{
-    //   //Enviar correo a cada administrador
-    //   for(const admin of adminsQuery.rows){
-    //     await sendAdminApprovalEmail(admin.email, id);
-    //   }
-    // }
+    const adminsQuery = await pool.query(`
+      SELECT email
+      FROM users
+      WHERE is_active = true
+      AND 'Administrador' = ANY(roles)
+    `);
+    if (adminsQuery.rowCount === 0) {
+      console.warn('⚠️ No hay administradores activos para notificar');
+    } else {
+      //Enviar correo a cada administrador
+      for (const admin of adminsQuery.rows) {
+        await sendAdminApprovalEmail(admin.email, id);
+      }
+    }
 
     res.json({ message: 'Solicitud enviada, esperando aprobación' });
   } catch (err) {
