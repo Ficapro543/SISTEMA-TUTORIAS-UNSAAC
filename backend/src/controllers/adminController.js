@@ -6,7 +6,7 @@ const { sendAdminApprovalEmail, sendUserActivationEmail, sendUserRejectionEmail 
 
 async function createPendingUser(req, res, next) {
   try {
-    const { first_name, last_name, email, password, roles } = req.body;
+    const { first_name, last_name, email, password, roles, googleToken } = req.body;
 
     // 1. Verificar si ya existe en la tabla de usuarios definitivos
     const userCheck = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
@@ -20,7 +20,15 @@ async function createPendingUser(req, res, next) {
       return res.status(400).json({ message: 'Ya existe una solicitud pendiente para este correo. Por favor, espera la aprobación del administrador.' });
     }
 
-    const hashed = await bcrypt.hash(password, 10);
+    let hashed;
+    // Si viene googleToken, permitimos que no haya password (generamos uno aleatorio seguro)
+    if (googleToken && !password) {
+      const randomPass = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
+      hashed = await bcrypt.hash(randomPass, 10);
+    } else {
+      if (!password) return res.status(400).json({ message: 'La contraseña es requerida' });
+      hashed = await bcrypt.hash(password, 10);
+    }
     const id = uuidv4();
 
     await pool.query(
@@ -82,10 +90,10 @@ async function approvePendingUser(req, res, next) {
 
     // Obtener todos los roles solicitados
     const allRoles = pendingUser.roles || [];
-    
+
     if (rolesDecisions && Object.keys(rolesDecisions).length > 0) {
       console.log("Usando decisions del frontend:", rolesDecisions);
-      
+
       // Usar las decisiones del frontend
       allRoles.forEach(role => {
         const decision = rolesDecisions[role];
@@ -108,7 +116,7 @@ async function approvePendingUser(req, res, next) {
     } else {
       // Fallback: usar roles_decisiones de la BD
       console.log("Usando decisions de la BD:", pendingUser.roles_decisiones);
-      
+
       if (pendingUser.roles_decisiones && pendingUser.roles_decisiones.length > 0) {
         pendingUser.roles_decisiones.forEach(decision => {
           if (decision.decision === 'aprobado') {
@@ -122,7 +130,7 @@ async function approvePendingUser(req, res, next) {
         approvedRoles = allRoles;
       }
     }
-    
+
     // Si no hay roles aprobados, rechazar automáticamente
     if (approvedRoles.length === 0) {
       return rejectPendingUser(req, res, next);
@@ -212,30 +220,30 @@ async function getOnePendingUser(req, res, next) {
 async function rejectPendingUser(req, res, next) {
   try {
     const { pendingUserId } = req.body;
-    
+
     // Obtener información del usuario antes de eliminar
     const userQuery = await pool.query(
-      'SELECT * FROM pending_users WHERE id = $1', 
+      'SELECT * FROM pending_users WHERE id = $1',
       [pendingUserId]
     );
-    
+
     if (userQuery.rowCount === 0) {
       return res.status(404).json({ message: 'Solicitud no encontrada' });
     }
-    
+
     const pendingUser = userQuery.rows[0];
-    
+
     // Eliminar solicitud
     await pool.query('DELETE FROM pending_users WHERE id = $1', [pendingUserId]);
-    
+
     // Enviar correo de solicitud rechazada
     await sendUserRejectionEmail(pendingUser.email, pendingUser.first_name);
-    
-    res.json({ 
+
+    res.json({
       message: 'Solicitud rechazada y eliminada.',
       userEmail: pendingUser.email
     });
-    
+
   } catch (err) {
     next(err);
   }
@@ -414,8 +422,8 @@ async function getTutoriasPorEstudiante(req, res, next) {
   try {
     // Validar que al menos haya un criterio de búsqueda
     if (!codigo && !nombre && !apellido) {
-      return res.status(400).json({ 
-        message: 'Debe proporcionar al menos un criterio de búsqueda (código, nombre o apellido)' 
+      return res.status(400).json({
+        message: 'Debe proporcionar al menos un criterio de búsqueda (código, nombre o apellido)'
       });
     }
 
@@ -438,7 +446,7 @@ async function getTutoriasPorEstudiante(req, res, next) {
         // Si hay al menos dos partes, asumimos que la primera es nombre y las demás apellido
         const primerNombre = partes[0];
         const apellidos = partes.slice(1).join(' ');
-        
+
         filtros.push(`(
           (LOWER(e.nombre_estudiante) LIKE LOWER($${idx}) 
            AND LOWER(e.apellido_estudiante) LIKE LOWER($${idx + 1}))
@@ -516,7 +524,7 @@ async function getTutoriasPorEstudiante(req, res, next) {
     const { rows } = await pool.query(query, values);
 
     if (rows.length === 0) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         message: 'No se encontraron tutorías para el estudiante especificado'
       });
     }

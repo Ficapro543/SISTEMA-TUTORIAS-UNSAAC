@@ -1,32 +1,35 @@
 const express = require('express');
 const router = express.Router();
-const { 
-    login, 
+const {
+    login,
     activateAccount,
     refreshToken,
     logout,
-    getProfile 
+    getProfile,
+    googleLogin
 } = require('../controllers/authController');
 const authenticateToken = require('../middleware/authMiddleware');
 const {
     sendResetCode,
     verifyResetCode,
     resendResetCode,
-    resetPassword
+    resetPassword,
+
 } = require('../controllers/passwordController');
 
 
 //Rutas publicas
 router.post('/login', login);
+router.post('/google', googleLogin);
 router.post('/activarCuenta/:token', activateAccount);
 
-router.post('/forgot-password',sendResetCode);
-router.post('/verify-code',verifyResetCode);
-router.post('/resend-code',resendResetCode);
-router.post('/reset-password',resetPassword);
+router.post('/forgot-password', sendResetCode);
+router.post('/verify-code', verifyResetCode);
+router.post('/resend-code', resendResetCode);
+router.post('/reset-password', resetPassword);
 router.post('/refresh', refreshToken);
 router.post('/logout', logout);
 
-router.get('/profile',authenticateToken, getProfile);
+router.get('/profile', authenticateToken, getProfile);
 
 module.exports = router;

@@ -1,9 +1,12 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import styles from "@/styles/pages/general/Registro.module.css"
+import { useGoogleLogin } from '@react-oauth/google';
+import api from "@/utils/api";
 
 function Register() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Estados del formulario
   const [nombres, setNombres] = useState("");
@@ -16,16 +19,33 @@ function Register() {
   const [success, setSuccess] = useState("");
   const [tooltip, setTooltip] = useState({ visible: false, content: "", x: 0, y: 0, align: 'center' });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(false); // New loading state
+  const [googleToken, setGoogleToken] = useState(null);
 
   // Estados para mostrar contraseña
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Pre-fill con datos de Google si existen
+  useEffect(() => {
+    if (location.state && location.state.googleData) {
+      const { email, first_name, last_name } = location.state.googleData;
+      if (email) setCorreo(email);
+      // Google a veces manda nombre y apellido, a veces no.
+      if (first_name) setNombres(first_name);
+      if (last_name) setApellidos(last_name);
+      if (location.state.googleToken) setGoogleToken(location.state.googleToken);
+    }
+  }, [location.state]);
+
+  const isGoogleRegister = !!googleToken;
 
   // Regex correo institucional
   const emailRegex = /^[a-zA-Z0-9._%+-]+@unsaac\.edu\.pe$/;
 
   // Validacion contraseña
   const validarPassword = (pass) => {
+    if (isGoogleRegister) return null; // No validar si es google
     if (pass.length < 8 || pass.length > 64) {
       return "La contraseña debe tener entre 8 y 64 caracteres.";
     }
@@ -70,15 +90,55 @@ function Register() {
     setTooltip({ visible: false, content: "", x: 0, y: 0, align: 'center' });
   }
 
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      setLoading(true); // Start loading
+      // Si el usuario hace click en Google aqui, intentamos loguear/verificar
+      // Igual que en login. Si ya existe -> login. Si no, pre-fill form aqui mismo.
+      try {
+        const response = await api.post('/auth/google', {
+          token: tokenResponse.access_token,
+          isAccessToken: true
+        });
+        const data = response.data;
+        if (data.needs_registration) {
+          // Rellenamos el form con los datos recibidos
+          setCorreo(data.userData.email);
+          setNombres(data.userData.first_name);
+          setApellidos(data.userData.last_name);
+          setGoogleToken(data.tempGoogleToken || tokenResponse.access_token);
+          setError(""); // Limpiar errores previos
+        } else {
+          // Si resulta que YA existia, lo logueamos directamente
+          localStorage.setItem('accessToken', data.accessToken);
+          localStorage.setItem('refreshToken', data.refreshToken);
+          localStorage.setItem('user', JSON.stringify(data.user));
+
+          if (data.user && data.user.roles) {
+            localStorage.setItem('userRoles', JSON.stringify(data.user.roles));
+            api.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
+            navigate("/dashboard");
+          }
+        }
+      } catch (err) {
+        console.error("Google Auth Error:", err);
+        setError(err.response?.data?.message || "Error al autenticar con Google");
+      } finally {
+        setLoading(false); // Stop loading
+      }
+    },
+    onError: () => setLoading(false)
+  });
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
 
-    if(isSubmitting) return;
+    if (isSubmitting) return;
 
     // Validaciones
-    if (!nombres || !apellidos || !correo || !password || !confirmar) {
+    if (!nombres || !apellidos || !correo || ((!password || !confirmar) && !isGoogleRegister)) {
       setError("Por favor, completa todos los campos.");
       return;
     }
@@ -88,16 +148,18 @@ function Register() {
       return;
     }
 
-    // Validar contraseña con la función
-    const errorPassword = validarPassword(password);
-    if (errorPassword) {
-      setError(errorPassword);
-      return;
-    }
+    // Validar contraseña con la función si NO es google
+    if (!isGoogleRegister) {
+      const errorPassword = validarPassword(password);
+      if (errorPassword) {
+        setError(errorPassword);
+        return;
+      }
 
-    if (password !== confirmar) {
-      setError("Las contraseñas no coinciden.");
-      return;
+      if (password !== confirmar) {
+        setError("Las contraseñas no coinciden.");
+        return;
+      }
     }
 
     if (rol.length === 0) {
@@ -120,34 +182,32 @@ function Register() {
 
     //Envio al backend (COMENTADO TEMPORALMENTE)
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/solicitud`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          first_name: nombres,
-          last_name: apellidos,
+      // Usamos api.post en vez de fetch directo si es posible, para mantener consistencia.
+      // Pero el original usaba fetch. Lo cambiare a api (que importa axios) para consistencia si es facil.
+      // El user tiene 'api' importado en Login, voy a usarlo aqui tambien.
+
+      const payload = {
+        first_name: nombres,
+        last_name: apellidos,
+        email: correo,
+        roles: rol,
+        // Si es google, mandamos token y quizas password vacio o no lo mandamos
+        googleToken: isGoogleRegister ? googleToken : undefined,
+        password: isGoogleRegister ? undefined : password
+      };
+
+      const response = await api.post('/admin/solicitud', payload); // Axios lanza excepcion si status no es 2xx
+
+      navigate("/confirmacion", {
+        state: {
           email: correo,
-          password: password,
-          roles: rol
-        }),
+          nombres: nombres
+        }
       });
 
-
-      const data = await response.json();
-      if (response.ok) {
-        navigate("/confirmacion", {
-          state: {
-            email: correo,
-            nombres: nombres
-          }
-        });
-      }
-      else {
-        setError(data.message || "Error en el registro. Inténtalo de nuevo.");
-      }
     } catch (err) {
-      setError("No se pudo conectar con el servidor.");
-    
+      setError(err.response?.data?.message || "Error en el registro. Inténtalo de nuevo.");
+
     } finally {
       setIsSubmitting(false);
     }
@@ -221,38 +281,44 @@ function Register() {
               value={correo}
               onChange={(e) => setCorreo(e.target.value)}
               className={error && (!correo || !emailRegex.test(correo)) ? styles.inputError : ""}
+              disabled={isGoogleRegister} // Disabled if google
             />
           </div>
 
           <div className={styles.formGroup}>
             <div className={styles.passwordLabelContainer}>
               <label>Contraseña</label>
-              <div
-                className={styles.infoIcon}
-                onMouseEnter={(e) => handleTooltipShow(passwordRequisitos, e, 'password')}
-                onMouseLeave={handleTooltipHide}
-              >
-                <img src="/info-icon.svg" alt="Información" />
-              </div>
+              {!isGoogleRegister && (
+                <div
+                  className={styles.infoIcon}
+                  onMouseEnter={(e) => handleTooltipShow(passwordRequisitos, e, 'password')}
+                  onMouseLeave={handleTooltipHide}
+                >
+                  <img src="/info-icon.svg" alt="Información" />
+                </div>
+              )}
             </div>
             <div className={styles.passwordInputWrapper}>
               <input
-                type={showPassword ? "text" : "password"}
+                type={(showPassword && !isGoogleRegister) ? "text" : "password"} // Always password type if google
                 placeholder="Ingrese su contraseña"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className={`${error && validarPassword(password) ? styles.inputError : ""} ${styles.passwordInput}`}
+                value={isGoogleRegister ? "••••••••" : password} // Dummy validation if google
+                onChange={(e) => !isGoogleRegister && setPassword(e.target.value)}
+                className={`${error && !isGoogleRegister && validarPassword(password) ? styles.inputError : ""} ${styles.passwordInput}`}
+                disabled={isGoogleRegister}
               />
-              <button
-                type="button"
-                className={styles.togglePasswordBtn}
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                <img
-                  src={showPassword ? "/hidden.svg" : "/view.svg"}
-                  alt={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-                />
-              </button>
+              {!isGoogleRegister && (
+                <button
+                  type="button"
+                  className={styles.togglePasswordBtn}
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  <img
+                    src={showPassword ? "/hidden.svg" : "/view.svg"}
+                    alt={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  />
+                </button>
+              )}
             </div>
           </div>
 
@@ -260,22 +326,25 @@ function Register() {
             <label>Confirmar contraseña</label>
             <div className={styles.passwordInputWrapper}>
               <input
-                type={showConfirmPassword ? "text" : "password"}
+                type={(showConfirmPassword && !isGoogleRegister) ? "text" : "password"}
                 placeholder="Confirme su contraseña"
-                value={confirmar}
-                onChange={(e) => setConfirmar(e.target.value)}
-                className={`${error && (!confirmar || confirmar !== password) ? styles.inputError : ""} ${styles.passwordInput}`}
+                value={isGoogleRegister ? "••••••••" : confirmar}
+                onChange={(e) => !isGoogleRegister && setConfirmar(e.target.value)}
+                className={`${error && !isGoogleRegister && (!confirmar || confirmar !== password) ? styles.inputError : ""} ${styles.passwordInput}`}
+                disabled={isGoogleRegister}
               />
-              <button
-                type="button"
-                className={styles.togglePasswordBtn}
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              >
-                <img
-                  src={showConfirmPassword ? "/hidden.svg" : "/view.svg"}
-                  alt={showConfirmPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-                />
-              </button>
+              {!isGoogleRegister && (
+                <button
+                  type="button"
+                  className={styles.togglePasswordBtn}
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  <img
+                    src={showConfirmPassword ? "/hidden.svg" : "/view.svg"}
+                    alt={showConfirmPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  />
+                </button>
+              )}
             </div>
           </div>
 
@@ -333,9 +402,7 @@ function Register() {
           <button
             type="button"
             className={styles.googleBtn}
-            onClick={() =>
-              alert("🔐 Conexión con Google pendiente de backend.")
-            }
+            onClick={() => googleLogin()}
           >
             <img src="/google.svg" alt="Google" />
             Continuar con Google
@@ -352,6 +419,12 @@ function Register() {
             </button>
           </div>
         </form>
+        {loading && (
+          <div className={styles.loadingOverlay}>
+            <div className={styles.spinner}></div>
+            <p className={styles.loadingText}>Procesando...</p>
+          </div>
+        )}
       </div>
     </div>
   );

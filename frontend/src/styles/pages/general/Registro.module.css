@@ -1,5 +1,5 @@
 /* Fondo General */
-.registerPage{
+.registerPage {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -11,7 +11,7 @@
 }
 
 /* Contenedor del registro */
-.registerContainer{
+.registerContainer {
     background-color: var(--color-text-light);
     color: var(--color-secondary);
     padding: 45px 70px;
@@ -24,7 +24,7 @@
     position: relative;
 }
 
-.registerContainer h2{
+.registerContainer h2 {
     margin-bottom: 5px;
     color: var(--color-text-dark);
     font-size: 2rem;
@@ -32,38 +32,38 @@
 }
 
 /*Subtitulo*/
-.subtitle{
+.subtitle {
     font-size: 1rem;
     color: var(--color-gray);
     margin-bottom: 30px;
 }
 
 /* Formularios */
-.formGroup{
+.formGroup {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     margin-bottom: 20px;
 }
 
-.formGroup label{
+.formGroup label {
     margin-bottom: 4px;
     font-weight: bold;
     font-size: 0.95rem;
 }
 
-.passwordLabelContainer{
+.passwordLabelContainer {
     display: flex;
     align-items: center;
     gap: 4px;
     margin-bottom: 4px;
 }
 
-.passwordLabelContainer label{
+.passwordLabelContainer label {
     margin-bottom: 0;
 }
 
-.passwordLabelContainer .infoIcon{
+.passwordLabelContainer .infoIcon {
     position: static;
     width: 18px;
     height: 18px;
@@ -77,27 +77,27 @@
     padding: 1px;
 }
 
-.passwordLabelContainer .infoIcon:hover{
+.passwordLabelContainer .infoIcon:hover {
     background: var(--color-secondary);
 }
 
-.passwordLabelContainer .infoIcon img{
+.passwordLabelContainer .infoIcon img {
     width: 12px;
     height: 12px;
     filter: brightness(0) saturate(100%) invert(40%) sepia(10%) saturate(500%) hue-rotate(180deg) brightness(90%) contrast(90%);
 }
 
-.passwordLabelContainer .infoIcon:hover img{
+.passwordLabelContainer .infoIcon:hover img {
     filter: brightness(0) invert(1);
 }
 
 /* Contenedor Contraseña*/
-.passwordInputWrapper{
+.passwordInputWrapper {
     position: relative;
     width: 100%;
 }
 
-.passwordInput{
+.passwordInput {
     width: 100%;
     padding: 12px;
     border-radius: var(--radius);
@@ -108,14 +108,14 @@
     transition: var(--transition);
 }
 
-.passwordInput:focus{
+.passwordInput:focus {
     border-color: var(--color-secondary);
     outline: none;
     background-color: white;
 }
 
 /*Boton*/
-.togglePasswordBtn{
+.togglePasswordBtn {
     position: absolute;
     right: 12px;
     top: 50%;
@@ -131,21 +131,21 @@
     justify-content: center;
 }
 
-.togglePasswordBtn:hover{
+.togglePasswordBtn:hover {
     background-color: var(--color-gray-light);
 }
 
-.togglePasswordBtn img{
+.togglePasswordBtn img {
     width: 20px;
     height: 20px;
     filter: brightness(0) saturate(100%) invert(23%) sepia(98%) saturate(1385%) hue-rotate(195deg) brightness(93%) contrast(101%);
 }
 
-.togglePasswordBtn:hover img{
+.togglePasswordBtn:hover img {
     filter: brightness(0) saturate(100%) invert(23%) sepia(98%) saturate(1385%) hue-rotate(195deg) brightness(73%) contrast(101%);
 }
 
-.formGroup input{
+.formGroup input {
     width: 100%;
     padding: 12px;
     border-radius: var(--radius);
@@ -161,37 +161,48 @@
     background-color: white;
 }
 
-.inputError{
-    border-color: #e74c3c !important; 
+/* Estilos para inputs bloqueados (Google Register) */
+.registerForm input:disabled {
+    background-color: #e9ecef;
+    /* Light gray for visual feedback */
+    color: #6c757d;
+    /* Muted text color */
+    cursor: not-allowed;
+    border-color: #ced4da;
+    font-weight: 500;
+}
+
+.inputError {
+    border-color: #e74c3c !important;
     background-color: #ffe6e6 !important;
 }
 
 /*Campos en fila*/
-.row{
+.row {
     display: flex;
     justify-content: space-between;
     gap: 15px;
 }
 
-.half{
+.half {
     flex: 1;
 }
 
-.rolesLabel{
+.rolesLabel {
     text-align: left;
     font-weight: bold;
     margin-bottom: 8px;
     color: var(--color-secondary);
 }
 
-.rolesContainer{
-    display:flex;
+.rolesContainer {
+    display: flex;
     justify-content: space-between;
     gap: 15px;
     margin-bottom: 25px;
 }
 
-.rolCard{
+.rolCard {
     flex: 1;
     background: white;
     border: 2px solid var(--color-gray-light);
@@ -207,19 +218,19 @@
     min-height: 140px;
 }
 
-.rolCard:hover{
+.rolCard:hover {
     border-color: var(--color-primary);
-    box-shadow: 0 5px 15px rgba(0 , 0 , 0 , 0.1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
-.rolCard.activo{
+.rolCard.activo {
     border-color: var(--color-primary);
     background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
     color: var(--color-text-light);
-    box-shadow: 0 8px 25px rgba(0 , 78 , 146 , 0.3);
+    box-shadow: 0 8px 25px rgba(0, 78, 146, 0.3);
 }
 
-.rolIcon{
+.rolIcon {
     width: 60px;
     height: 60px;
     display: flex;
@@ -228,25 +239,25 @@
     margin-bottom: 5px;
 }
 
-.rolIcon img{
+.rolIcon img {
     width: 100%;
     height: 100%;
     object-fit: contain;
     filter: brightness(0) saturate(100%) invert(23%) sepia(98%) saturate(1385%) hue-rotate(195deg) brightness(93%) contrast(101%);
 }
 
-.rolCard.activo .rolIcon img{
+.rolCard.activo .rolIcon img {
     filter: brightness(0) invert(1);
 }
 
-.rolName{
+.rolName {
     font-weight: 200;
     font-size: 0.9rem;
     text-align: center;
     margin-top: auto;
 }
 
-.infoIcon{
+.infoIcon {
     position: absolute;
     top: 8px;
     right: 8px;
@@ -265,38 +276,42 @@
     padding: 2px;
 }
 
-.infoIcon:hover{
+.infoIcon:hover {
     background: var(--color-secondary);
 }
 
-.infoIcon img{
-    width: 12px; /* Tamaño adecuado para el icono */
+.infoIcon img {
+    width: 12px;
+    /* Tamaño adecuado para el icono */
     height: 12px;
     filter: brightness(0) saturate(100%) invert(40%) sepia(10%) saturate(500%) hue-rotate(180deg) brightness(90%) contrast(90%);
     transition: var(--transition);
 }
-.infoIcon:hover img{
-    filter: brightness(0) invert(1); /* Blanco al hacer hover */
+
+.infoIcon:hover img {
+    filter: brightness(0) invert(1);
+    /* Blanco al hacer hover */
 }
 
-.rolCard.activo .infoIcon{
+.rolCard.activo .infoIcon {
     background: var(--color-primary);
 }
 
-.rolCard.activo .infoIcon img{
-    filter: brightness(0) invert(1); /* Blanco cuando está activo */
+.rolCard.activo .infoIcon img {
+    filter: brightness(0) invert(1);
+    /* Blanco cuando está activo */
 }
 
-.rolCard.activo .infoIcon:hover{
+.rolCard.activo .infoIcon:hover {
     background: var(--color-text-light);
 }
 
-.rolCard.activo .infoIcon:hover img{
+.rolCard.activo .infoIcon:hover img {
     filter: brightness(0) saturate(100%) invert(23%) sepia(98%) saturate(1385%) hue-rotate(195deg) brightness(93%) contrast(101%);
 }
 
 /* Tooltip */
-.tooltip{
+.tooltip {
     position: fixed;
     background: var(--color-secondary);
     color: var(--color-text-light);
@@ -305,19 +320,19 @@
     font-size: 0.8rem;
     max-width: 250px;
     z-index: 1000;
-    box-shadow: 0 4px 15px rgba(0 , 0 , 0 , 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     pointer-events: none;
     white-space: pre-line;
     line-height: 1.4;
     text-align: center;
 }
 
-.tooltipLeft{
+.tooltipLeft {
     text-align: left;
     padding-left: 20px;
 }
 
-.tooltipArrow{
+.tooltipArrow {
     position: absolute;
     bottom: -6px;
     left: 50%;
@@ -330,14 +345,14 @@
 }
 
 /* Mensajes */
-.errorMessage{
+.errorMessage {
     color: crimson;
     font-size: 0.9rem;
     text-align: center;
     margin-bottom: 10px;
 }
 
-.succesMessage{
+.succesMessage {
     color: seagreen;
     font-size: 0.95rem;
     margin-bottom: 10px;
@@ -345,7 +360,7 @@
 }
 
 /*Boton Principal*/
-.registerBtn{
+.registerBtn {
     width: 100%;
     background: var(--color-primary);
     color: var(--color-text-light);
@@ -359,12 +374,12 @@
     transition: var(--transition);
 }
 
-.registerBtn:hover{
+.registerBtn:hover {
     background: var(--color-secondary);
 }
 
 /* Separador */
-.divider{
+.divider {
     margin: 30px 0 25px;
     position: relative;
     color: #777;
@@ -372,7 +387,7 @@
 }
 
 .divider::before,
-.divider::after{
+.divider::after {
     content: "";
     position: absolute;
     top: 50%;
@@ -381,21 +396,21 @@
     background-color: var(--color-border);
 }
 
-.divider::before{
+.divider::before {
     left: 0;
 }
 
-.divider::after{
+.divider::after {
     right: 0;
 }
 
 /* Google button */
-.googleBtn{
+.googleBtn {
     composes: google-btn from global;
 }
 
 /* Seccion de Login */
-.loginSection{
+.loginSection {
     margin-top: 20px;
     display: flex;
     justify-content: center;
@@ -403,12 +418,12 @@
     gap: 8px;
 }
 
-.loginSection p{
+.loginSection p {
     color: var(--color-gray);
     font-size: 0.95rem;
 }
 
-.loginBtn{
+.loginBtn {
     background: none;
     border: none;
     color: var(--color-primary);
@@ -419,14 +434,56 @@
     border-radius: var(--radius);
 }
 
-.loginBtn:hover{
+.loginBtn:hover {
     text-decoration: underline;
 }
 
 /* Pie de pagina */
-.footer{
+.footer {
     margin-top: 40px;
     font-size: 0.85rem;
     color: var(--color-gray);
     text-align: center;
+}
+
+/* Loading Overlay */
+.loadingOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(2px);
+}
+
+.spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--color-secondary);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 10px;
+}
+
+.loadingText {
+    color: var(--color-secondary);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }

@@ -105,6 +105,121 @@ async function login(req, res, next) {
   }
 }
 
+const { OAuth2Client } = require('google-auth-library');
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+async function googleLogin(req, res, next) {
+  try {
+    const { token, isAccessToken } = req.body;
+    if (!token) return res.status(400).json({ message: 'Token de Google requerido' });
+
+    let email, given_name, family_name, picture;
+
+    if (isAccessToken) {
+      // Validar usando access_token llamando a Google userinfo
+      const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (!userInfoResponse.ok) {
+        throw new Error('Failed to fetch user info from Google');
+      }
+
+      const userInfo = await userInfoResponse.json();
+      email = userInfo.email;
+      given_name = userInfo.given_name;
+      family_name = userInfo.family_name;
+      picture = userInfo.picture;
+
+    } else {
+      // 1. Verificar id_token con Google (Legacy/Default button)
+      const ticket = await googleClient.verifyIdToken({
+        idToken: token,
+        audience: process.env.GOOGLE_CLIENT_ID
+      });
+      const payload = ticket.getPayload();
+      email = payload.email;
+      given_name = payload.given_name;
+      family_name = payload.family_name;
+      picture = payload.picture;
+    }
+
+    // 2. Validar dominio
+    if (!email.endsWith('@unsaac.edu.pe')) {
+      return res.status(403).json({ message: 'Solo se permiten correos institucionales (@unsaac.edu.pe)' });
+    }
+
+    // 3. Buscar usuario en usuarios activos
+    const userQuery = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+
+    if (userQuery.rowCount > 0) {
+      const user = userQuery.rows[0];
+      if (!user.is_active) {
+        return res.status(403).json({ message: 'Tu cuenta existe pero no está activa.' });
+      }
+
+      // Generar tokens para usuario existente
+      const jwtPayload = {
+        id: user.id,
+        email: user.email,
+        roles: user.roles,
+        first_name: user.first_name,
+        last_name: user.last_name
+      };
+
+      const accessToken = signAccessToken(jwtPayload);
+      const refreshToken = signRefreshToken(jwtPayload);
+
+      // Guardar refresh token
+      await pool.query(
+        'INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)',
+        [user.id, refreshToken, new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)]
+      );
+
+      const rolesLower = user.roles.map(r => r.toLowerCase());
+      return res.json({
+        message: 'Login exitoso',
+        accessToken,
+        refreshToken,
+        user: {
+          id: user.id,
+          email: user.email,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          roles: {
+            administrador: rolesLower.includes('administrador'),
+            tutor: rolesLower.includes('tutor'),
+            verificador: rolesLower.includes('verificador')
+          }
+        }
+      });
+    }
+
+    // 4. Buscar en usuarios pendientes
+    const pendingQuery = await pool.query('SELECT * FROM pending_users WHERE email = $1', [email]);
+    if (pendingQuery.rowCount > 0) {
+      return res.status(400).json({ message: 'Ya existe una solicitud pendiente para este correo. Espera la aprobación del administrador.' });
+    }
+
+    // 5. Usuario nuevo -> Redirigir a registro con datos pre-rellenados
+    return res.json({
+      needs_registration: true,
+      message: 'Usuario nuevo, redirigiendo a registro',
+      userData: {
+        email,
+        first_name: given_name,
+        last_name: family_name,
+        picture
+      },
+      tempGoogleToken: token // Devolvemos el token para que el registro lo pueda re-verificar
+    });
+
+  } catch (err) {
+    console.error('Google Login Error:', err);
+    res.status(401).json({ message: 'Token de Google inválido' });
+  }
+}
+
 async function activateAccount(req, res, next) {
   const client = await pool.connect();
 
@@ -154,7 +269,7 @@ async function activateAccount(req, res, next) {
         }
       });
     }
-  
+
     // 3. Verificar expiracion
     if (tokenData.expires_at < new Date()) {
       console.log("⚠️ Token expirado");
@@ -175,7 +290,7 @@ async function activateAccount(req, res, next) {
          WHERE token = $1`,
         [token]
       );
-      
+
       await client.query('COMMIT');
 
       return res.status(200).json({
@@ -370,6 +485,7 @@ async function getProfile(req, res, next) {
 
 module.exports = {
   login,
+  googleLogin,
   activateAccount,
   refreshToken,
   logout,
