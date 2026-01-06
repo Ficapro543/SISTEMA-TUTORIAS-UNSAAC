@@ -72,12 +72,6 @@ export default function CrearCronogramaModal({ isOpen, onClose, onSubmit, initia
         }
     }
 
-    import api from '@/utils/api'; // Add import at the top (Wait, I need to check if I can add import with replace_file_content properly if I am targeting a function mid-file. I should probably separate the import addition or use multi_replace if I can't guarantee header.)
-    // Actually, let's verify imports first. The file starts with imports.
-    // I can add the import in a separate step or just assume I'm editing the whole block if I use multi_replace.
-    // But replace_file_content is for contiguous blocks.
-    // I'll use multi_replace_file_content to add the import AND fix the function.
-
     async function loadEstudiantes() {
         try {
             const response = await api.get(
