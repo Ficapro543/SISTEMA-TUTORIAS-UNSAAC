@@ -21,6 +21,8 @@ import { RadioGroup, RadioGroupItem } from '@/componentes/ui/RadioGroup';
 import { Plus, Pencil, Printer, Check, CornerDownLeft, Loader2 } from '@/componentes/ui/icons';
 import styles from '@/styles/pages/tutor/NuevoTutorPanel.module.css';
 import { getTutorias, registrarTutoria, actualizarTutoria } from '@/services/tutorService';
+import { pdf } from '@react-pdf/renderer';
+import { ConstanciaTutoriaPDF, ListaEstudiantesTutoriaPDF } from '@/componentes/pdf-documents';
 
 const NuevoTutorPanel = () => {
     const [cronogramas, setCronogramas] = useState([]);
@@ -30,6 +32,7 @@ const NuevoTutorPanel = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [downloadingId, setDownloadingId] = useState(null);
     const [submitting, setSubmitting] = useState(false);
+    const [isPrintingLista, setIsPrintingLista] = useState(false);
 
     // Form state
     const [obsAcademico, setObsAcademico] = useState('');
@@ -148,13 +151,56 @@ const NuevoTutorPanel = () => {
     };
 
     const handleDownload = async (cronograma) => {
-        // En un futuro, esto llamaría a un endpoint de generación de PDF real
-        setDownloadingId(cronograma.id);
-        console.log("Generando constancia para:", cronograma.id);
+        if (!cronograma.tutoria) {
+            alert('Esta tutoría aún no ha sido registrada.');
+            return;
+        }
 
-        await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulación de espera de red
-        alert(`Constancia generada para ${cronograma.estudiante.nombre}`);
-        setDownloadingId(null);
+        try {
+            setDownloadingId(cronograma.id);
+            const blob = await pdf(<ConstanciaTutoriaPDF cronograma={cronograma} />).toBlob();
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `constancia-tutoria-${cronograma.estudiante.codigo}-${new Date().getTime()}.pdf`;
+            link.click();
+            URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Error al generar PDF:', error);
+            alert('Error al generar la constancia PDF');
+        } finally {
+            setDownloadingId(null);
+        }
+    };
+
+    const handlePrintLista = async () => {
+        const cronogramasConTutoria = cronogramas.filter(c => c.tutoria !== null);
+
+        if (cronogramasConTutoria.length === 0) {
+            alert('No hay estudiantes atendidos para imprimir.');
+            return;
+        }
+
+        try {
+            setIsPrintingLista(true);
+            const blob = await pdf(
+                <ListaEstudiantesTutoriaPDF
+                    cronogramas={cronogramasConTutoria}
+                    tutorNombre={userName}
+                />
+            ).toBlob();
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `lista-estudiantes-tutorias-${new Date().getTime()}.pdf`;
+            link.click();
+            URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Error al generar PDF:', error);
+            alert('Error al generar la lista PDF');
+        } finally {
+            setIsPrintingLista(false);
+        }
     };
 
     const formatHora = (hora) => {
@@ -261,6 +307,20 @@ const NuevoTutorPanel = () => {
                         )}
                     </TableBody>
                 </Table>
+
+                {/* Botón Imprimir Lista de Estudiantes */}
+                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', paddingBottom: '20px' }}>
+                    <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={handlePrintLista}
+                        disabled={isPrintingLista || cronogramas.filter(c => c.tutoria).length === 0}
+                        style={{ minWidth: '280px' }}
+                    >
+                        <Printer className={styles.icon} />
+                        {isPrintingLista ? 'Generando PDF...' : 'Imprimir Lista de Estudiantes'}
+                    </Button>
+                </div>
             </div>
 
             {/* Modal de Registro/Edición */}
