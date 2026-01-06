@@ -24,11 +24,13 @@ const getTutoriasByTutor = async (req, res) => {
                 t.obs_profesional, 
                 t.requiere_derivacion,
                 d.especialidad as derivacion_especialidad,
-                d.motivo as derivacion_motivo
+                d.motivo as derivacion_motivo,
+                at.original_name as archivo_nombre
             FROM cronogramas c
             JOIN estudiante e ON c.codigo_estudiante = e.codigo_estudiante
             LEFT JOIN tutorias t ON c.id = t.cronograma_id
             LEFT JOIN derivaciones d ON t.id = d.tutoria_id
+            LEFT JOIN archivos_tutoria at ON t.id = at.tutoria_id
             WHERE c.tutor_user_id = $1
             ORDER BY c.fecha DESC, c.hora DESC
         `;
@@ -80,10 +82,26 @@ const registrarTutoria = async (req, res) => {
         ]);
         const newTutoriaId = tutoriaResult.rows[0].id;
 
-        // 2. Actualizar Cronograma
+        // 2. Insertar Archivo (si existe)
+        if (req.file) {
+            const insertArchivoQuery = `
+                INSERT INTO archivos_tutoria (tutoria_id, filename, original_name, path, mimetype, size)
+                VALUES ($1, $2, $3, $4, $5, $6)
+            `;
+            await client.query(insertArchivoQuery, [
+                newTutoriaId,
+                req.file.filename,
+                req.file.originalname,
+                req.file.path,
+                req.file.mimetype,
+                req.file.size
+            ]);
+        }
+
+        // 3. Actualizar Cronograma
         await client.query(`UPDATE cronogramas SET estado = 'realizada' WHERE id = $1`, [cronograma_id]);
 
-        // 3. Insertar Derivación (si aplica)
+        // 4. Insertar Derivación (si aplica)
         if (requiere_derivacion && derivacion && derivacion.especialidad) {
             const insertDerivacion = `
                 INSERT INTO derivaciones (tutoria_id, especialidad, motivo)
@@ -147,6 +165,22 @@ const actualizarTutoria = async (req, res) => {
             await client.query(`DELETE FROM derivaciones WHERE tutoria_id = $1`, [id]);
         }
 
+        // Manejo de archivo (si se sube uno nuevo)
+        if (req.file) {
+            const insertArchivoQuery = `
+                INSERT INTO archivos_tutoria (tutoria_id, filename, original_name, path, mimetype, size)
+                VALUES ($1, $2, $3, $4, $5, $6)
+            `;
+            await client.query(insertArchivoQuery, [
+                id,
+                req.file.filename,
+                req.file.originalname,
+                req.file.path,
+                req.file.mimetype,
+                req.file.size
+            ]);
+        }
+
         await client.query('COMMIT');
         res.json({ message: 'Tutoría actualizada correctamente' });
 
@@ -188,9 +222,44 @@ const getHistorialEstudiante = async (req, res) => {
     }
 };
 
+/**
+ * Descargar/Ver el archivo adjunto de una tutoría.
+ */
+const descargarArchivo = async (req, res) => {
+    const { tutoriaId } = req.params;
+
+    try {
+        const query = `SELECT path, mimetype, original_name FROM archivos_tutoria WHERE tutoria_id = $1`;
+        const result = await pool.query(query, [tutoriaId]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Archivo no encontrado.' });
+        }
+
+        const archivo = result.rows[0];
+
+        // Verificar si el archivo existe en disco
+        const fs = require('fs');
+        if (!fs.existsSync(archivo.path)) {
+            return res.status(404).json({ message: 'El archivo físico no se encuentra en el servidor.' });
+        }
+
+        res.setHeader('Content-Type', archivo.mimetype);
+        res.setHeader('Content-Disposition', `inline; filename="${archivo.original_name}"`);
+        // O usar res.download si se prefiere forzar descarga:
+        // res.download(archivo.path, archivo.original_name);
+        res.sendFile(require('path').resolve(archivo.path));
+
+    } catch (error) {
+        console.error('Error en descargarArchivo:', error);
+        res.status(500).json({ message: 'Error al descargar el archivo.' });
+    }
+};
+
 module.exports = {
     getTutoriasByTutor,
     registrarTutoria,
     actualizarTutoria,
-    getHistorialEstudiante
+    getHistorialEstudiante,
+    descargarArchivo
 };

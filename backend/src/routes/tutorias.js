@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const tutoriasController = require('../controllers/tutoriasController');
 const authenticateToken = require('../middleware/authMiddleware');
+const upload = require('../utils/multerConfig');
 
 // Todas las rutas requieren autenticación
 router.use(authenticateToken);
@@ -10,12 +11,15 @@ router.use(authenticateToken);
 router.get('/tutor/:tutorId', tutoriasController.getTutoriasByTutor);
 
 // Registrar una nueva tutoría (acción del botón "+ Registrar")
-router.post('/registrar', tutoriasController.registrarTutoria);
+router.post('/registrar', upload.single('archivo'), tutoriasController.registrarTutoria);
 
 // Actualizar una tutoría existente (acción del botón "Editar")
-router.put('/actualizar/:id', tutoriasController.actualizarTutoria);
+router.put('/actualizar/:id', upload.single('archivo'), tutoriasController.actualizarTutoria);
 
 // Historial del estudiante (casos especiales)
 router.get('/historial/:codigoEstudiante', tutoriasController.getHistorialEstudiante);
+
+// Ruta para descargar/ver archivo adjunto
+router.get('/archivo/:tutoriaId', tutoriasController.descargarArchivo);
 
 module.exports = router;

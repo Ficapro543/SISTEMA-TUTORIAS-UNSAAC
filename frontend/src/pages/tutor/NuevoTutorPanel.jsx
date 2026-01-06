@@ -18,9 +18,9 @@ import Input from '@/componentes/ui/Input';
 import Textarea from '@/componentes/ui/Textarea';
 import Label from '@/componentes/ui/Label';
 import { RadioGroup, RadioGroupItem } from '@/componentes/ui/RadioGroup';
-import { Plus, Pencil, Printer, Check, CornerDownLeft, Loader2 } from '@/componentes/ui/icons';
+import { Plus, Pencil, Printer, Check, CornerDownLeft, Loader2, Upload, Eye } from '@/componentes/ui/icons';
 import styles from '@/styles/pages/tutor/NuevoTutorPanel.module.css';
-import { getTutorias, registrarTutoria, actualizarTutoria } from '@/services/tutorService';
+import { getTutorias, registrarTutoria, actualizarTutoria, verArchivo } from '@/services/tutorService';
 import { pdf } from '@react-pdf/renderer';
 import { ConstanciaTutoriaPDF, ListaEstudiantesTutoriaPDF } from '@/componentes/pdf-documents';
 
@@ -41,6 +41,8 @@ const NuevoTutorPanel = () => {
     const [requiereDerivacion, setRequiereDerivacion] = useState(false);
     const [especialidad, setEspecialidad] = useState('Departamento de Psicología');
     const [motivo, setMotivo] = useState('');
+    const [archivo, setArchivo] = useState(null);
+    const [existingFile, setExistingFile] = useState(null);
 
     // Get user from localStorage
     const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -72,7 +74,10 @@ const NuevoTutorPanel = () => {
                     requiereDerivacion: item.requiere_derivacion,
                     especialidad: item.derivacion_especialidad,
                     motivo: item.derivacion_motivo,
-                    fechaRegistro: 'Registrado' // Fecha real podría venir del backend
+                    especialidad: item.derivacion_especialidad,
+                    motivo: item.derivacion_motivo,
+                    fechaRegistro: 'Registrado', // Fecha real podría venir del backend
+                    archivoNombre: item.archivo_nombre
                 } : null
             }));
             setCronogramas(formattedData);
@@ -97,6 +102,8 @@ const NuevoTutorPanel = () => {
         setRequiereDerivacion(false);
         setEspecialidad('Departamento de Psicología');
         setMotivo('');
+        setArchivo(null);
+        setExistingFile(null);
         setIsDialogOpen(true);
     };
 
@@ -110,34 +117,61 @@ const NuevoTutorPanel = () => {
             setRequiereDerivacion(cronograma.tutoria.requiereDerivacion || false);
             setEspecialidad(cronograma.tutoria.especialidad || 'Departamento de Psicología');
             setMotivo(cronograma.tutoria.motivo || '');
+            setExistingFile(cronograma.tutoria.archivoNombre || null);
         }
+        setArchivo(null);
         setIsDialogOpen(true);
+    };
+
+    const handleFileChange = (e) => {
+        if (e.target.files && e.target.files[0]) {
+            setArchivo(e.target.files[0]);
+        }
+    };
+
+    const handleViewFile = async () => {
+        if (!selectedCronograma?.tutoria?.id) return;
+
+        try {
+            const blob = await verArchivo(selectedCronograma.tutoria.id);
+            const url = URL.createObjectURL(blob);
+            window.open(url, '_blank');
+            // Nota: Podríamos hacer URL.revokeObjectURL(url) después de un tiempo, 
+            // pero al abrir en nueva pestaña es mejor dejar que el navegador lo maneje o hacerlo al desmontar.
+        } catch (error) {
+            console.error("Error visualizando archivo:", error);
+            alert("Error al abrir el archivo. Puede que no exista en el servidor.");
+        }
     };
 
     const handleSubmit = async () => {
         if (!selectedCronograma) return;
         setSubmitting(true);
 
-        const payload = {
-            cronograma_id: selectedCronograma.id,
-            obs_academico: obsAcademico,
-            obs_personal: obsPersonal,
-            obs_profesional: obsProfesional,
-            requiere_derivacion: requiereDerivacion,
-            derivacion: requiereDerivacion ? {
-                especialidad,
-                motivo
-            } : null
-        };
+        const formData = new FormData();
+        formData.append('cronograma_id', selectedCronograma.id);
+        formData.append('obs_academico', obsAcademico);
+        formData.append('obs_personal', obsPersonal);
+        formData.append('obs_profesional', obsProfesional);
+        formData.append('requiere_derivacion', requiereDerivacion);
+
+        if (requiereDerivacion) {
+            formData.append('derivacion[especialidad]', especialidad);
+            formData.append('derivacion[motivo]', motivo);
+        }
+
+        if (archivo) {
+            formData.append('archivo', archivo);
+        }
 
         try {
             if (isEditing && selectedCronograma.tutoria) {
                 // Actualizar
-                await actualizarTutoria(selectedCronograma.tutoria.id, payload);
+                await actualizarTutoria(selectedCronograma.tutoria.id, formData);
                 alert('Tutoría actualizada correctamente');
             } else {
                 // Registrar nueva
-                await registrarTutoria(payload);
+                await registrarTutoria(formData);
                 alert('Tutoría registrada correctamente');
             }
             setIsDialogOpen(false);
@@ -464,6 +498,50 @@ const NuevoTutorPanel = () => {
                                     </div>
                                 )}
                             </div>
+
+                            {/* Archivo Adjunto */}
+                            <div className={styles.archivoSection} style={{ marginTop: '20px' }}>
+                                <Label className={styles.labelMuted}>Ficha de Seguimiento / Constancia de Notas (PDF):</Label>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '5px' }}>
+                                    <input
+                                        type="file"
+                                        accept="application/pdf"
+                                        id="file-upload"
+                                        style={{ display: 'none' }}
+                                        onChange={handleFileChange}
+                                    />
+                                    <label htmlFor="file-upload">
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => document.getElementById('file-upload').click()}
+                                        >
+                                            <Upload className={styles.icon} />
+                                            {archivo || existingFile ? 'Cambiar Archivo' : 'Subir Archivo'}
+                                        </Button>
+                                    </label>
+                                    {archivo ? (
+                                        <span style={{ fontSize: '0.875rem' }}>{archivo.name}</span>
+                                    ) : existingFile ? (
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <span style={{ fontSize: '0.875rem' }}>Archivo actual: {existingFile}</span>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={handleViewFile}
+                                                title="Ver Archivo"
+                                                style={{ padding: '0 5px', height: 'auto' }}
+                                            >
+                                                <Eye className={styles.icon} />
+                                            </Button>
+                                        </div>
+                                    ) : null}
+                                </div>
+                            </div>
+
+                            {/* Botones de acción logicamente debajo */}
 
                             {/* Botones de acción */}
                             <div className={styles.actionButtons}>

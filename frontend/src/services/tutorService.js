@@ -28,17 +28,25 @@ export const getTutorias = async (tutorId) => {
 
 /**
  * Registrar una nueva tutoría (Completa cronograma + inserta tutoría)
+ * Soporta envío de archivos mediante FormData
  */
 export const registrarTutoria = async (data) => {
-    const response = await api.post(`/tutorias/registrar`, data);
+    const isFormData = data instanceof FormData;
+    const config = isFormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : {};
+
+    const response = await api.post(`/tutorias/registrar`, data, config);
     return response.data;
 };
 
 /**
  * Actualizar una tutoría existente
+ * Soporta envío de archivos mediante FormData
  */
 export const actualizarTutoria = async (id, data) => {
-    const response = await api.put(`/tutorias/actualizar/${id}`, data);
+    const isFormData = data instanceof FormData;
+    const config = isFormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : {};
+
+    const response = await api.put(`/tutorias/actualizar/${id}`, data, config);
     return response.data;
 };
 
@@ -47,5 +55,12 @@ export const actualizarTutoria = async (id, data) => {
  */
 export const getHistorialEstudiante = async (codigoEstudiante) => {
     const response = await api.get(`/tutorias/historial/${codigoEstudiante}`);
+    return response.data;
+};
+
+export const verArchivo = async (tutoriaId) => {
+    const response = await api.get(`/tutorias/archivo/${tutoriaId}`, {
+        responseType: 'blob'
+    });
     return response.data;
 };
