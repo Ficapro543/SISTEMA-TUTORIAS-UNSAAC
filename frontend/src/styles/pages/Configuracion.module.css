@@ -1,0 +1,369 @@
+/* Layout Base */
+.container {
+    min-height: 100vh;
+    background-color: #f8fafc;
+    /* bg-background equiv */
+    font-family: var(--font-main, sans-serif);
+}
+
+.headerContainer {
+    background-color: white;
+    /* bg-card */
+    border-bottom: 1px solid #e2e8f0;
+    /* border-border */
+}
+
+.headerContent {
+    max-width: 1200px;
+    /* container mx-auto */
+    margin: 0 auto;
+    padding: 1rem 1.5rem;
+    /* px-6 py-4 */
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.backButton {
+    background: transparent;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    color: #64748b;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.backButton:hover {
+    background-color: #f1f5f9;
+    /* hover:bg-muted */
+    color: #0f172a;
+}
+
+.titleSection h1 {
+    font-size: 1.25rem;
+    /* text-xl */
+    font-weight: 700;
+    color: #0f172a;
+    /* text-foreground */
+    margin: 0;
+}
+
+.titleSection p {
+    font-size: 0.875rem;
+    /* text-sm */
+    color: #64748b;
+    /* text-muted-foreground */
+    margin: 0;
+}
+
+.mainContent {
+    max-width: 48rem;
+    /* max-w-3xl for better spacing */
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    /* py-8 px-6 */
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    /* space-y-6 */
+}
+
+/* Page Header inside Main Content */
+.pageHeader {
+    margin-bottom: 2rem;
+}
+
+.pageHeader h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1e293b;
+    /* Ensure dark text */
+    margin: 0 0 0.5rem 0;
+}
+
+.pageHeader p {
+    font-size: 1rem;
+    color: #64748b;
+    margin: 0;
+}
+
+/* Cards */
+.card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.cardHeader {
+    padding: 1.5rem 1.5rem 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.iconWrapper {
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    background-color: rgba(59, 130, 246, 0.1);
+    /* bg-primary/10 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.primaryIcon {
+    color: #3b82f6;
+}
+
+.accentIconWrapper {
+    background-color: rgba(245, 158, 11, 0.1);
+}
+
+.accentIcon {
+    color: #d97706;
+}
+
+.destructiveIconWrapper {
+    background-color: rgba(239, 68, 68, 0.1);
+}
+
+.destructiveIcon {
+    color: #ef4444;
+}
+
+.headerTitle h2 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1e293b;
+    /* Ensure dark text */
+    margin: 0 0 0.25rem 0;
+}
+
+.headerTitle p {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin: 0;
+}
+
+.cardContent {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+/* Forms */
+.gridCols2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+}
+
+@media (min-width: 768px) {
+    .gridCols2 {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.formGroup label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #334155;
+    /* Dark gray for labels */
+}
+
+.input {
+    width: 100%;
+    padding: 0.625rem 0.875rem;
+    border-radius: 0.375rem;
+    border: 1px solid #e2e8f0;
+    font-size: 0.9rem;
+    color: #1e293b;
+    /* Dark text for input */
+    transition: all 0.2s;
+    background-color: #fff;
+}
+
+.input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 1px #3b82f6;
+}
+
+.inputGroup {
+    position: relative;
+}
+
+.inputGroup input {
+    padding-right: 2.5rem;
+}
+
+.togglePassword {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #64748b;
+    display: flex;
+}
+
+.togglePassword:hover {
+    color: #0f172a;
+}
+
+.separator {
+    height: 1px;
+    background-color: #e2e8f0;
+    margin: 0.5rem 0;
+}
+
+/* Buttons */
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+
+.buttonPrimary {
+    background-color: #0f172a;
+    color: white;
+}
+
+.buttonPrimary:hover {
+    background-color: #1e293b;
+}
+
+.buttonSecondary {
+    background-color: #f1f5f9;
+    color: #0f172a;
+}
+
+.buttonSecondary:hover {
+    background-color: #e2e8f0;
+}
+
+.buttonDestructive {
+    background-color: #ef4444;
+    color: white;
+}
+
+.buttonDestructive:hover {
+    background-color: #dc2626;
+}
+
+.footerRight {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 0.5rem;
+}
+
+/* Danger Zone */
+.dangerCard {
+    border-color: rgba(239, 68, 68, 0.5);
+    background-color: rgba(239, 68, 68, 0.05);
+}
+
+.dangerTitle {
+    color: #ef4444;
+}
+
+.warningBox {
+    background-color: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: start;
+}
+
+.warningText p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #7f1d1d;
+}
+
+/* Alert Dialog Overlay */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(2px);
+}
+
+.dialogContent {
+    background: white;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    max-width: 32rem;
+    width: 90%;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.dialogHeader {
+    margin-bottom: 1rem;
+}
+
+.dialogTitle {
+    font-size: 1.125rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #1e293b;
+}
+
+.dialogDesc {
+    color: #64748b;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    margin-top: 0.5rem;
+}
+
+.dialogFooter {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}

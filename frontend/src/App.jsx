@@ -14,6 +14,7 @@ import Cronogramas from "./pages/admin/Cronogramas.jsx";
 
 import BackendStatus from "./pages/general/BackendStatus.jsx";
 import Dashboard from "./pages/Dashboard.jsx"
+import Configuracion from './pages/Configuracion';
 
 function App() {
   return (
@@ -30,10 +31,11 @@ function App() {
       <Route path="/recuperar/verificar" element={<Layout><VerificarCodigo /></Layout>} />
       <Route path="/recuperar/nueva" element={<Layout><NuevaContrasena /></Layout>} />
       <Route path="/ping" element={<Layout><BackendStatus /></Layout>} />
-      <Route path="/admin/cronogramas" element={<Cronogramas />} />
 
-      {/* MainPage */}
+      {/* Rutas protegidas */}
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/configuracion" element={<Configuracion />} />
+
       {/* Catch-all */}
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes >

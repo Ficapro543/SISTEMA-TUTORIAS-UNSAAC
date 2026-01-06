@@ -24,6 +24,8 @@ import VerifConsultaTutorias from "./verificador/VerifConsultaTutorias";
 import VerifSeguimientoEstudiante from "./verificador/VerifSeguimientoEstudiante";
 import VerifSeguimientoTutor from "./verificador/VerifSeguimientoTutor";
 
+import api from "@/utils/api"; // Fixed API import path
+
 export default function Dashboard() {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
@@ -42,7 +44,7 @@ export default function Dashboard() {
     // In production, these should come strictly from localStorage
 
     useEffect(() => {
-        // Load user data
+        // Load user data initially from localStorage
         const storedUser = localStorage.getItem("user");
         const storedRoles = localStorage.getItem("userRoles");
 
@@ -53,10 +55,40 @@ export default function Dashboard() {
         if (storedRoles) {
             const parsedRoles = JSON.parse(storedRoles);
             setRoles(Object.keys(parsedRoles).filter(key => parsedRoles[key]));
-        } else {
-            // Fallback for visual testing if no roles set (remove in production)
-            // setRoles(['administrador', 'tutor']);
         }
+
+        // Fetch fresh user data from backend to ensure we have the latest fields (like 'code')
+        const fetchProfile = async () => {
+            try {
+                const response = await api.get('/auth/profile');
+                const userData = response.data.user;
+
+                // Update state
+                setUser(userData);
+
+                // Update localStorage
+                localStorage.setItem("user", JSON.stringify(userData));
+
+                // Update roles based on fresh data (optional but good practice)
+                if (userData.roles) {
+                    // Convert boolean roles object to array of active keys for local logic
+                    const activeRoles = Object.keys(userData.roles).filter(key => userData.roles[key]);
+                    setRoles(activeRoles);
+                    localStorage.setItem("userRoles", JSON.stringify(userData.roles));
+                }
+
+            } catch (error) {
+                console.error("Error fetching profile:", error);
+                // If 401, maybe token expired? ensure logout or handle silently
+                if (error.response?.status === 401) {
+                    // optionally handle logout or just let the user stay with stale data 
+                    // until they try to do something that requires auth
+                }
+            }
+        };
+
+        fetchProfile();
+
 
         // Clock timer
         const timer = setInterval(() => {
@@ -134,21 +166,21 @@ export default function Dashboard() {
             <header className={styles.mainHeader}>
                 <div className={styles.headerContainer}>
                     <div className={styles.headerContent}>
-                        <img 
-                            src="/logo_izquierdo.png" 
-                            alt="Logo UNSAAC" 
-                            className={styles.logoLeft} 
+                        <img
+                            src="/logo_izquierdo.png"
+                            alt="Logo UNSAAC"
+                            className={styles.logoLeft}
                         />
-                        
+
                         <div className={styles.titleContainer}>
                             <h1 className={styles.mainTitle}>SISTEMA DE TUTORÍAS</h1>
                             <p className={styles.subtitleHeader}>UNSAAC</p>
                         </div>
-                        
-                        <img 
-                            src="/logo_derecho.png" 
-                            alt="Logo Derecho" 
-                            className={styles.logoRight} 
+
+                        <img
+                            src="/logo_derecho.png"
+                            alt="Logo Derecho"
+                            className={styles.logoRight}
                         />
                     </div>
                 </div>
@@ -170,6 +202,8 @@ export default function Dashboard() {
                 <div
                     className={styles.userInfo}
                     onClick={() => setShowUserMenu(prev => !prev)}
+                    role="button"
+                    tabIndex={0}
                 >
                     <div className={styles.avatarCircle}>
                         {user.first_name?.charAt(0)}{user.last_name?.charAt(0)}
@@ -182,7 +216,10 @@ export default function Dashboard() {
                             Cód. {user.code || "---"}
                         </span>
                     </div>
-                    {showUserMenu ? <FaCaretUp color="#64748b" /> : <FaCaretDown color="#64748b" />}
+                    {/* Chevron inside the click area */}
+                    <div style={{ marginLeft: '8px', display: 'flex', alignItems: 'center' }}>
+                        {showUserMenu ? <FaCaretUp color="#64748b" /> : <FaCaretDown color="#64748b" />}
+                    </div>
 
                     {/* DROPDOWN MENU */}
                     {showUserMenu && (
@@ -198,7 +235,7 @@ export default function Dashboard() {
                                 </div>
                             </div>
                             <div className={styles.dropdownMenu}>
-                                <div className={styles.dropdownItem}>
+                                <div className={styles.dropdownItem} onClick={() => navigate('/configuracion')}>
                                     <FaCog color="#64748b" />
                                     <span>Configurar Información Personal</span>
                                 </div>
@@ -218,7 +255,7 @@ export default function Dashboard() {
                     className={`${styles.tab} ${activeTab === 'inicio' ? styles.tabActive : ''}`}
                     onClick={() => handleTabClick('inicio')}
                 >
-                    <Home/>
+                    <Home />
                     <span>INICIO</span>
                 </div>
                 {roles.includes('administrador') && (
@@ -226,7 +263,7 @@ export default function Dashboard() {
                         className={`${styles.tab} ${activeTab === 'admin' ? styles.tabActive : ''}`}
                         onClick={() => handleTabClick('admin')}
                     >
-                        <Shield/>
+                        <Shield />
                         <span>ADMINISTRADOR</span>
                     </div>
                 )}
@@ -235,7 +272,7 @@ export default function Dashboard() {
                         className={`${styles.tab} ${activeTab === 'tutor' ? styles.tabActive : ''}`}
                         onClick={() => handleTabClick('tutor')}
                     >
-                        <BookOpen/>
+                        <BookOpen />
                         <span>TUTOR</span>
                     </div>
                 )}
@@ -244,7 +281,7 @@ export default function Dashboard() {
                         className={`${styles.tab} ${activeTab === 'verificador' ? styles.tabActive : ''}`}
                         onClick={() => handleTabClick('verificador')}
                     >
-                        <ClipboardCheck/>
+                        <ClipboardCheck />
                         <span>VERIFICADOR</span>
                     </div>
                 )}
@@ -453,7 +490,7 @@ export default function Dashboard() {
                         )}
 
                         {activeAdminTab === 'cronogramas' && (
-                            <Cronogramas embedded = {true}/>
+                            <Cronogramas embedded={true} />
                         )}
 
                         {activeAdminTab === 'reportes' && (
