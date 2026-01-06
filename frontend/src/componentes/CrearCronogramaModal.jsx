@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import api from '@/utils/api';
 import { X } from 'lucide-react';
 import { getTutors, getSemesters } from '@/services/assignmentService';
 import styles from '@/styles/components/CrearCronogramaModal.module.css';
@@ -71,24 +72,20 @@ export default function CrearCronogramaModal({ isOpen, onClose, onSubmit, initia
         }
     }
 
+    import api from '@/utils/api'; // Add import at the top (Wait, I need to check if I can add import with replace_file_content properly if I am targeting a function mid-file. I should probably separate the import addition or use multi_replace if I can't guarantee header.)
+    // Actually, let's verify imports first. The file starts with imports.
+    // I can add the import in a separate step or just assume I'm editing the whole block if I use multi_replace.
+    // But replace_file_content is for contiguous blocks.
+    // I'll use multi_replace_file_content to add the import AND fix the function.
+
     async function loadEstudiantes() {
         try {
-            const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
-            const token = localStorage.getItem('accessToken');
-
-            const response = await fetch(
-                `${API_URL}/api/assignments/tutor/${formData.tutor_user_id}/students?semesterId=${formData.semestre}`,
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                }
+            const response = await api.get(
+                `/assignments/tutor/${formData.tutor_user_id}/students?semesterId=${formData.semestre}`
             );
 
-            if (!response.ok) throw new Error('Error al cargar estudiantes');
-
-            const data = await response.json();
-            setEstudiantes(data);
+            // Access response.data directly
+            setEstudiantes(response.data);
         } catch (err) {
             console.error('Error al cargar estudiantes:', err);
             setError(`Error al cargar estudiantes: ${err.message || 'Error de conexión'}`);
