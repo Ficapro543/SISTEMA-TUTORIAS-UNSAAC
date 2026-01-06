@@ -5,6 +5,7 @@ Sistema web integral para la gestión, seguimiento y control de tutorías acadé
 Desarrollado por el Grupo 1 del Curso de Metodologías de Desarrollo de Software - 2025-II.
 
 Docente: Mg. Carlos Ramon Quispe Onofre
+
 Integrantes:
 - Cabeza Huillca, Flavio Antony (211265).
 - Castro Pari, Rayneld Fidel (231865).
