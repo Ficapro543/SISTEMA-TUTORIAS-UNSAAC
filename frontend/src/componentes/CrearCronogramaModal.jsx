@@ -73,7 +73,7 @@ export default function CrearCronogramaModal({ isOpen, onClose, onSubmit, initia
 
     async function loadEstudiantes() {
         try {
-            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+            const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
             const token = localStorage.getItem('accessToken');
 
             const response = await fetch(
