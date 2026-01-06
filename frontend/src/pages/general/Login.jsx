@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "@/utils/api"; // Importar el api configurado
 import styles from "@/styles/pages/general/Login.module.css";
+import { useGoogleLogin } from '@react-oauth/google';
 
 function Login() {
   const navigate = useNavigate();
@@ -106,7 +107,47 @@ function Login() {
   const handleForgotPassword = () => navigate("/recuperar");
   const handleRegister = () => navigate("/registro");
 
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        setLoading(true);
+        // Enviamos el access_token al backend
+        const response = await api.post('/auth/google', {
+          token: tokenResponse.access_token, // Enviamos access_token
+          isAccessToken: true // Flag para diferenciar
+        });
 
+        const data = response.data;
+
+        if (data.needs_registration) {
+          navigate("/registro", {
+            state: {
+              googleData: data.userData,
+              googleToken: data.tempGoogleToken // Token temporal o el mismo access_token para validar en registro
+            }
+          });
+        } else {
+          // Login normal
+          localStorage.setItem('accessToken', data.accessToken);
+          localStorage.setItem('refreshToken', data.refreshToken);
+          localStorage.setItem('user', JSON.stringify(data.user));
+
+          if (data.user && data.user.roles) {
+            localStorage.setItem('userRoles', JSON.stringify(data.user.roles));
+            api.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
+            navigate("/dashboard");
+          }
+        }
+
+      } catch (err) {
+        console.error("Google Auth Error:", err);
+        setError(err.response?.data?.message || "Error al autenticar con Google");
+      } finally {
+        setLoading(false);
+      }
+    },
+    onError: errorResponse => console.log(errorResponse),
+  });
 
   return (
     <div className={styles.loginPage}>
@@ -166,7 +207,14 @@ function Login() {
           </p>
         </form>
 
+        <div className={styles.divider}>
+          <span>O continúa con</span>
+        </div>
 
+        <button className={styles.googleBtn} onClick={() => googleLogin()}>
+          <img src="/google.svg" alt="Google" />
+          Continuar con Google
+        </button>
 
         <div className={styles.registerSection}>
           <p>¿No tienes cuenta?</p>
@@ -178,6 +226,13 @@ function Login() {
             Registrarse aquí
           </button>
         </div>
+
+        {loading && (
+          <div className={styles.loadingOverlay}>
+            <div className={styles.spinner}></div>
+            <p className={styles.loadingText}>Procesando...</p>
+          </div>
+        )}
       </div>
     </div>
   );
