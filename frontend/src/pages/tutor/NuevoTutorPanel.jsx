@@ -74,8 +74,7 @@ const NuevoTutorPanel = () => {
                     requiereDerivacion: item.requiere_derivacion,
                     especialidad: item.derivacion_especialidad,
                     motivo: item.derivacion_motivo,
-                    especialidad: item.derivacion_especialidad,
-                    motivo: item.derivacion_motivo,
+
                     fechaRegistro: 'Registrado', // Fecha real podría venir del backend
                     archivoNombre: item.archivo_nombre
                 } : null
